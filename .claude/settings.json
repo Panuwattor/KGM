@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(composer require *)",
+      "PowerShell(cd \"c:\\\\xampp\\\\htdocs\\\\KGM\"; $phpPath = \"C:\\\\xampp\\\\php\\\\php.exe\"; & $phpPath \"C:\\\\ProgramData\\\\ComposerSetup\\\\bin\\\\composer.phar\" require spatie/laravel-permission barryvdh/laravel-dompdf intervention/image 2>&1 | Select-Object -Last 25)",
+      "Read(//c/xampp/**)",
+      "Read(//c//**)",
+      "PowerShell(& \"C:\\\\Users\\\\PC\\\\.config\\\\herd\\\\bin\\\\php.bat\" --version 2>&1)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" \"http://127.0.0.1:8000/\")",
+      "PowerShell($pages = @\\(\"/shop\", \"/about\", \"/services\", \"/contact\", \"/login\", \"/register\", \"/quote\", \"/careers\", \"/showrooms\"\\); foreach \\($p in $pages\\) { try { $r = Invoke-WebRequest -Uri \"http://127.0.0.1:8000$p\" -TimeoutSec 5 -UseBasicParsing; \"$p -> $\\($r.StatusCode\\)\" } catch { \"$p -> ERROR: $\\($_.Exception.Message.Substring\\(0, [Math]::Min\\(50, $_.Exception.Message.Length\\)\\)\\)\" } })",
+      "PowerShell($adminPages = @\\(\"/admin\"\\); foreach \\($p in $adminPages\\) { try { $r = Invoke-WebRequest -Uri \"http://127.0.0.1:8000$p\" -TimeoutSec 5 -UseBasicParsing -MaximumRedirection 5; \"$p -> $\\($r.StatusCode\\) \\(after redirect\\)\" } catch { \"$p -> $\\($_.Exception.Message.Substring\\(0, 60\\)\\)\" } })",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://127.0.0.1:8000/\" -TimeoutSec 5 -UseBasicParsing; \"Status: $\\($r.StatusCode\\)\" } catch { \"Need to restart server. Error: $\\($_.Exception.Message.Substring\\(0,50\\)\\)\" })",
+      "PowerShell($r = Invoke-WebRequest -Uri \"http://127.0.0.1:8000/\" -TimeoutSec 8 -UseBasicParsing; $body = $r.Content; @\\(\"viewport\",\"hamburger\",\"mobile-drawer\",\"hero-slide\",\"features-grid\",\"footer-grid\"\\) | ForEach-Object { $found = $body.Contains\\($_\\); \"$_ : $\\(if\\($found\\){'OK'}else{'MISSING'}\\)\" })",
+      "PowerShell($r = Invoke-WebRequest -Uri \"http://127.0.0.1:8000/shop\" -TimeoutSec 8 -UseBasicParsing; \"Shop status: $\\($r.StatusCode\\), size: $\\([math]::Round\\($r.Content.Length/1024,1\\)\\)KB\")",
+      "PowerShell(cd \"c:\\\\xampp\\\\htdocs\\\\KGM\"; & \"C:\\\\Users\\\\PC\\\\.config\\\\herd\\\\bin\\\\php.bat\" artisan view:clear 2>&1 | tail -1; try { $r = Invoke-WebRequest -Uri \"http://127.0.0.1:8000/\" -TimeoutSec 5 -UseBasicParsing; \"Home: $\\($r.StatusCode\\)\"; $r2 = Invoke-WebRequest -Uri \"http://127.0.0.1:8000/login\" -TimeoutSec 5 -UseBasicParsing; \"Login: $\\($r2.StatusCode\\)\" } catch { $_.Exception.Message })",
+      "PowerShell($r = Invoke-WebRequest -Uri \"http://127.0.0.1:8000/\" -TimeoutSec 8 -UseBasicParsing; $b = $r.Content; @\\(\"navbar-top\",\"user-dropdown\",\"user-icon-wrap\",\"bi-person-circle\"\\) | ForEach-Object { \"$_ : $\\(if\\($b.Contains\\($_\\)\\){'OK'}else{'gone'}\\)\" })",
+      "PowerShell(cd \"c:\\\\xampp\\\\htdocs\\\\KGM\"; & \"C:\\\\Users\\\\PC\\\\.config\\\\herd\\\\bin\\\\php.bat\" artisan tinker --execute=\"App\\\\Models\\\\Banner::all\\(['id','title','image_path','is_active']\\)->each\\(fn\\(\\\\$b\\)=>print_r\\(\\\\$b->toArray\\(\\)\\)\\);\" 2>&1)",
+      "Bash(php artisan *)",
+      "PowerShell(cd c:\\\\xampp\\\\htdocs\\\\KGM; php artisan tinker --execute=\"use App\\\\Models\\\\User; \\\\$u = User::create\\(['name'=>'ลูกค้าทดสอบ','email'=>'customer@test.com','password'=>bcrypt\\('password123'\\),'role'=>'customer']\\); echo \\\\$u->id . ' ' . \\\\$u->email;\")",
+      "Bash(xargs grep -l \"user_id\")",
+      "Bash(Select-String -Path \"c:\\\\xampp\\\\htdocs\\\\KGM\\\\.env\" -Pattern \"SESSION|APP_URL|COOKIE\")",
+      "Bash(Select-Object -ExpandProperty Line)",
+      "Bash(dir \"c:\\\\xampp\\\\htdocs\\\\KGM\\\\public\\\\css\")",
+      "WebFetch(domain:www.kgm.co.th)"
+    ]
+  }
+}

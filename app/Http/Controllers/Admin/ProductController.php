@@ -1,0 +1,157 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\AdminLog;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\ProductImage;
+use App\Models\ProductVariant;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
+class ProductController extends Controller
+{
+    public function index(Request $request)
+    {
+        $query = Product::with('category')->withTrashed();
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+        if ($request->filled('category_id')) {
+            $query->where('category_id', $request->category_id);
+        }
+        if ($request->filled('status')) {
+            match($request->status) {
+                'active'    => $query->where('is_active', true)->whereNull('deleted_at'),
+                'inactive'  => $query->where('is_active', false)->whereNull('deleted_at'),
+                'deleted'   => $query->onlyTrashed(),
+                'low_stock' => $query->whereColumn('stock_quantity', '<=', 'low_stock_threshold'),
+            };
+        }
+        $products = $query->orderBy('sort_order')->latest()->paginate(20)->withQueryString();
+        $categories = Category::active()->get();
+        return view('admin.products.index', compact('products', 'categories'));
+    }
+
+    public function create()
+    {
+        $categories = Category::active()->get();
+        return view('admin.products.form', compact('categories'));
+    }
+
+    public function store(Request $request)
+    {
+        $data = $this->validateProduct($request);
+        $data['slug'] = Str::slug($request->name) . '-' . Str::random(5);
+
+        $product = Product::create($data);
+
+        $this->saveVariants($product, $request);
+        AdminLog::record('created', "สร้างสินค้า: {$product->name}", $product);
+
+        return redirect()->route('admin.products.edit', $product)->with('success', 'สร้างสินค้าเรียบร้อยแล้ว');
+    }
+
+    public function show(Product $product)
+    {
+        return redirect()->route('admin.products.edit', $product);
+    }
+
+    public function edit(Product $product)
+    {
+        $product->load('images', 'variants');
+        $categories = Category::active()->get();
+        return view('admin.products.form', compact('product', 'categories'));
+    }
+
+    public function update(Request $request, Product $product)
+    {
+        $data = $this->validateProduct($request, $product->id);
+        $old = $product->toArray();
+        $product->update($data);
+        $this->saveVariants($product, $request);
+        AdminLog::record('updated', "อัปเดตสินค้า: {$product->name}", $product, $old, $data);
+        return redirect()->route('admin.products.edit', $product)->with('success', 'อัปเดตสินค้าเรียบร้อยแล้ว');
+    }
+
+    public function destroy(Product $product)
+    {
+        AdminLog::record('deleted', "ลบสินค้า: {$product->name}", $product);
+        $product->delete();
+        return redirect()->route('admin.products.index')->with('success', 'ลบสินค้าแล้ว');
+    }
+
+    public function uploadImages(Request $request, Product $product)
+    {
+        $request->validate(['images.*' => 'required|image|max:5120']);
+        $isPrimary = $product->images()->count() === 0;
+
+        foreach ($request->file('images') as $file) {
+            $path = $file->store('products', 'public');
+            ProductImage::create([
+                'product_id' => $product->id,
+                'image_path' => $path,
+                'sort_order' => $product->images()->max('sort_order') + 1,
+                'is_primary' => $isPrimary,
+            ]);
+            $isPrimary = false;
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    public function deleteImage(Product $product, ProductImage $image)
+    {
+        if ($image->product_id !== $product->id) abort(403);
+        \Storage::disk('public')->delete($image->image_path);
+        $image->delete();
+        if ($image->is_primary) {
+            $product->images()->first()?->update(['is_primary' => true]);
+        }
+        return response()->json(['success' => true]);
+    }
+
+    private function validateProduct(Request $request, ?int $ignoreId = null): array
+    {
+        return $request->validate([
+            'name'               => 'required|string|max:255',
+            'category_id'        => 'nullable|exists:categories,id',
+            'short_description'  => 'nullable|string|max:500',
+            'description'        => 'nullable|string',
+            'price'              => 'required|numeric|min:0',
+            'sale_price'         => 'nullable|numeric|min:0',
+            'wholesale_price'    => 'nullable|numeric|min:0',
+            'sku'                => 'nullable|string|max:100|unique:products,sku,' . $ignoreId,
+            'stock_quantity'     => 'required|integer|min:0',
+            'low_stock_threshold'=> 'integer|min:0',
+            'manage_stock'       => 'boolean',
+            'is_active'          => 'boolean',
+            'is_featured'        => 'boolean',
+            'is_new'             => 'boolean',
+            'is_bestseller'      => 'boolean',
+            'sort_order'         => 'integer',
+            'meta_title'         => 'nullable|string|max:255',
+            'meta_description'   => 'nullable|string|max:500',
+        ]);
+    }
+
+    private function saveVariants(Product $product, Request $request): void
+    {
+        if (!$request->filled('variants')) return;
+
+        $product->variants()->delete();
+        foreach ($request->variants as $variant) {
+            if (empty($variant['size']) && empty($variant['color'])) continue;
+            ProductVariant::create([
+                'product_id'       => $product->id,
+                'size'             => $variant['size'] ?? null,
+                'color'            => $variant['color'] ?? null,
+                'sku'              => $variant['sku'] ?? null,
+                'price_adjustment' => $variant['price_adjustment'] ?? 0,
+                'stock_quantity'   => $variant['stock_quantity'] ?? 0,
+            ]);
+        }
+    }
+}
