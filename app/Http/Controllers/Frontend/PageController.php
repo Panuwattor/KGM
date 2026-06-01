@@ -22,6 +22,8 @@ class PageController extends Controller
 
     public function embroideryScreen() { return view('frontend.embroidery-screen'); }
 
+    public function schoolUniforms() { return view('frontend.school-uniforms'); }
+
     public function showrooms()
     {
         $showrooms = Showroom::active()->get();

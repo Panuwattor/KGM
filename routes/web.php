@@ -39,6 +39,7 @@ Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/services', [PageController::class, 'services'])->name('services');
 Route::get('/order', [PageController::class, 'order'])->name('order');
 Route::get('/embroidery-screen', [PageController::class, 'embroideryScreen'])->name('embroidery-screen');
+Route::get('/school-uniforms', [PageController::class, 'schoolUniforms'])->name('school-uniforms');
 Route::get('/showrooms', [PageController::class, 'showrooms'])->name('showrooms');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::post('/contact', [PageController::class, 'contactSubmit'])->name('contact.submit');

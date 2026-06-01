@@ -79,7 +79,7 @@
                 @foreach([
                     ['bi-palette-fill',      'Design & Production Services', 'บริการออกแบบและสั่งผลิต',      'order'],
                     ['bi-layers-fill',        'Embroidery and Screen Printing','บริการงานปักและสกรีน',         'embroidery-screen'],
-                    ['bi-mortarboard-fill',   'School & Corporate Uniforms',  'เครื่องแบบนักเรียนและองค์กร',  'shop'],
+                    ['bi-mortarboard-fill',   'School & Corporate Uniforms',  'เครื่องแบบนักเรียนและองค์กร',  'school-uniforms'],
                 ] as [$icon, $title, $sub, $r])
                 <a href="{{ route($r) }}" class="card" style="display:flex;align-items:center;gap:16px;padding:18px 22px;text-decoration:none;transition:box-shadow 0.2s,transform 0.2s;"
                    onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.11)'"
