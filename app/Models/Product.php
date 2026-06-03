@@ -12,7 +12,7 @@ class Product extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'category_id', 'name', 'slug', 'short_description', 'description',
+        'category_id', 'brand_id', 'name', 'slug', 'short_description', 'description',
         'price', 'sale_price', 'wholesale_price', 'sku', 'stock_quantity',
         'low_stock_threshold', 'manage_stock', 'is_active', 'is_featured',
         'is_new', 'is_bestseller', 'sort_order',
@@ -33,6 +33,11 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function brand(): BelongsTo
+    {
+        return $this->belongsTo(Brand::class);
     }
 
     public function images(): HasMany

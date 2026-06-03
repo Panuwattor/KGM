@@ -56,51 +56,29 @@
     </div>
 </div>
 
-{{-- ══ ABOUT + SERVICE HIGHLIGHTS ══ --}}
-<section style="background:#E1CD94;padding:44px 0;">
+{{-- ══ CATEGORIES ══ --}}
+@if($categories->isNotEmpty())
+<section class="cat-section">
     <div class="container">
-        <div class="grid grid-2" style="gap:16px;align-items:start;">
-
-            {{-- Company card --}}
-            <div class="card" style="padding:28px 32px;height:100%;box-sizing:border-box;">
-                <img src="/images/logo.png" alt="KGM" style="height:50px;object-fit:contain;object-position:left;margin-bottom:18px;display:block;">
-                <h2 style="font-size:15px;font-weight:800;color:var(--kgm-green-900);margin:0 0 12px;">บริษัท กิจเจริญการ์เมนท์ (1993) จำกัด</h2>
-                <p style="font-size:14px;color:#555;line-height:1.95;margin:0;text-indent:2em;">
-                    เราคือผู้ผลิตและจำหน่ายเครื่องแบบนักเรียนมากกว่า 40 ปี เรามุ่งมั่นสร้างสรรค์ชุดเครื่องแบบเพื่อคนไทยและเด็กนักเรียนทั่วประเทศ
-                    โดยคำนึงถึงคุณภาพและความคุ้มค่ามาเป็นที่หนึ่ง ใส่ใจในทุกรายละเอียด และพิถีพิถันทุกขั้นตอนการผลิตอย่างที่สุด
-                </p>
-                <a href="{{ route('about') }}" style="display:inline-flex;align-items:center;gap:6px;margin-top:20px;font-size:13px;font-weight:700;color:var(--kgm-green-600);text-decoration:none;">
-                    อ่านเพิ่มเติมเกี่ยวกับเรา <i class="bi bi-arrow-right"></i>
-                </a>
-            </div>
-
-            {{-- Service highlight cards --}}
-            <div style="display:flex;flex-direction:column;gap:12px;">
-                @foreach([
-                    ['bi-palette-fill',      'Design & Production Services', 'บริการออกแบบและสั่งผลิต',      'order'],
-                    ['bi-layers-fill',        'Embroidery and Screen Printing','บริการงานปักและสกรีน',         'embroidery-screen'],
-                    ['bi-mortarboard-fill',   'School & Corporate Uniforms',  'เครื่องแบบนักเรียนและองค์กร',  'school-uniforms'],
-                ] as [$icon, $title, $sub, $r])
-                <a href="{{ route($r) }}" class="card" style="display:flex;align-items:center;gap:16px;padding:18px 22px;text-decoration:none;transition:box-shadow 0.2s,transform 0.2s;"
-                   onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.11)'"
-                   onmouseout="this.style.transform='';this.style.boxShadow=''">
-                    <div style="width:52px;height:52px;background:var(--kgm-green-100);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--kgm-green-600);flex-shrink:0;">
-                        <i class="bi {{ $icon }}"></i>
-                    </div>
-                    <div style="flex:1;">
-                        <div style="font-size:15px;font-weight:800;color:var(--kgm-green-900);line-height:1.4;">{{ $title }}</div>
-                        <div style="font-size:13px;color:#888;margin-top:3px;">{{ $sub }}</div>
-                    </div>
-                    <div style="width:32px;height:32px;background:#fdf4e0;border-radius:999px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i class="bi bi-chevron-right" style="color:#b8860b;font-size:13px;"></i>
-                    </div>
-                </a>
-                @endforeach
-            </div>
-
+        <div style="text-align:center;margin-bottom:24px;">
+            <div class="section-subtitle" style="text-align:center;">เลือกตามหมวดหมู่</div>
+            <div class="section-title">หมวดหมู่สินค้า</div>
+            <div class="section-divider" style="margin:10px auto 0;"></div>
+        </div>
+        <div class="cat-grid">
+            @foreach($categories as $cat)
+            <a href="{{ route('shop.category', $cat->slug) }}" class="cat-card">
+                <div class="cat-img-wrap">
+                    <img src="{{ asset('storage/'.$cat->image) }}" alt="{{ $cat->name }}" loading="lazy">
+                    <div class="cat-overlay"><i class="bi bi-heart"></i></div>
+                </div>
+                <div class="cat-name">{{ $cat->name }}</div>
+            </a>
+            @endforeach
         </div>
     </div>
 </section>
+@endif
 
 {{-- ══ PRODUCTS ══ --}}
 @if($featuredProducts->isNotEmpty() || $bestsellerProducts->isNotEmpty() || $newProducts->isNotEmpty())
@@ -124,9 +102,9 @@
             @endif
         </div>
 
-        <div id="tab-featured"><div class="grid grid-4" style="gap:14px;">@foreach($featuredProducts as $product)@include('components.product-card')@endforeach</div></div>
-        <div id="tab-bestseller" style="display:none;"><div class="grid grid-4" style="gap:14px;">@foreach($bestsellerProducts as $product)@include('components.product-card')@endforeach</div></div>
-        <div id="tab-new"        style="display:none;"><div class="grid grid-4" style="gap:14px;">@foreach($newProducts as $product)@include('components.product-card')@endforeach</div></div>
+        <div id="tab-featured"><div class="grid grid-5" style="gap:14px;">@foreach($featuredProducts as $product)@include('components.product-card')@endforeach</div></div>
+        <div id="tab-bestseller" style="display:none;"><div class="grid grid-5" style="gap:14px;">@foreach($bestsellerProducts as $product)@include('components.product-card')@endforeach</div></div>
+        <div id="tab-new"        style="display:none;"><div class="grid grid-5" style="gap:14px;">@foreach($newProducts as $product)@include('components.product-card')@endforeach</div></div>
 
         <div style="text-align:center;margin-top:24px;">
             <a href="{{ route('shop') }}" class="btn btn-outline"><i class="bi bi-grid-3x3-gap"></i> ดูสินค้าทั้งหมด</a>
@@ -134,6 +112,58 @@
     </div>
 </section>
 @endif
+
+{{-- ══ ABOUT + SERVICE HIGHLIGHTS ══ --}}
+<img src="/images/cartoon.jpg" alt="KGM" class="">
+<section style="background:#E1CD94;" class="pt-0 pb-5">
+    <div class="container">
+        <div class="grid" style="gap:24px;align-items:stretch;">
+            <div class="row justify-content-center g-0">
+                <div class="col-md-10">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3 mt-0" style="padding:32px 36px;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box;">
+                                <h2 style="font-size:15px;font-weight:800;color:var(--kgm-green-900);margin:0 0 12px;">บริษัท กิจเจริญการ์เมนท์ (1993) จำกัด</h2>
+                                <p style="font-size:14px;color:#555;line-height:1.95;margin:0;text-indent:2em;">
+                                    เราคือผู้ผลิตและจำหน่ายเครื่องแบบนักเรียนมากกว่า 40 ปี เรามุ่งมั่นสร้างสรรค์ชุดเครื่องแบบเพื่อคนไทยและเด็กนักเรียนทั่วประเทศ
+                                    โดยคำนึงถึงคุณภาพและความคุ้มค่ามาเป็นที่หนึ่ง ใส่ใจในทุกรายละเอียด และพิถีพิถันทุกขั้นตอนการผลิตอย่างที่สุด
+                                </p>
+                                <a href="{{ route('about') }}" class="btn btn-outline" style="display:inline-flex;align-items:center;gap:6px;margin-top:20px;font-size:13px;font-weight:700;text-decoration:none;">
+                                    อ่านเพิ่มเติมเกี่ยวกับเรา <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+
+                        </div>
+                        <div class="col-md-6">
+                            {{-- Service highlight cards --}}
+                            <div style="display:flex;flex-direction:column;gap:12px;justify-content:space-between;">
+                                @foreach([
+                                    ['bi-palette-fill',      'Design & Production Services', 'บริการออกแบบและสั่งผลิต',      'order'],
+                                    ['bi-layers-fill',        'Embroidery and Screen Printing','บริการงานปักและสกรีน',         'embroidery-screen'],
+                                    ['bi-mortarboard-fill',   'School & Corporate Uniforms',  'เครื่องแบบนักเรียนและองค์กร',  'school-uniforms'],
+                                ] as [$icon, $title, $sub, $r])
+                                <a href="{{ route($r) }}" class="card" style="display:flex;flex-direction:row;align-items:stretch;padding:0;overflow:hidden;text-decoration:none;transition:box-shadow 0.2s,transform 0.2s;"
+                                onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.13)'"
+                                onmouseout="this.style.transform='';this.style.boxShadow=''">
+                                    {{-- col-4: icon --}}
+                                    <div style="flex:0 0 33.33%;background:var(--kgm-green-100);display:flex;align-items:center;justify-content:center;">
+                                        <i class="bi {{ $icon }}" style="font-size:40px;color:var(--kgm-green-600);"></i>
+                                    </div>
+                                    {{-- col-8: text --}}
+                                    <div style="flex:0 0 66.66%;padding:18px 20px;display:flex;flex-direction:column;justify-content:center;gap:4px;">
+                                        <div style="font-size:15px;font-weight:800;color:var(--kgm-green-900);line-height:1.3;">{{ $title }}</div>
+                                        <div style="font-size:12px;color:#999;">{{ $sub }}</div>
+                                    </div>
+                                </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 {{-- ══ PROMO BANNERS ══ --}}
 <section style="padding:28px 0;">

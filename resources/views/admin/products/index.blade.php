@@ -97,6 +97,6 @@
         @endforelse
         </tbody>
     </table>
-    <div style="padding:16px 20px;">{{ $products->links() }}</div>
+    <div style="padding:16px 20px;display:flex;justify-content:center;">{{ $products->links() }}</div>
 </div>
 @endsection

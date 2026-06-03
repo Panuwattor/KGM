@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="icon" type="image/png" href="/images/logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
@@ -404,5 +405,53 @@ function addToCart(productId, variantId, qty = 1) {
 }
 </script>
 @stack('scripts')
+<script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+
+{{-- ── Floating Contact ── --}}
+<style>
+.fc-wrap { position: fixed; bottom: 28px; right: 24px; z-index: 1050; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.fc-item { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; transition: transform .2s; }
+.fc-item:hover { transform: translateX(-4px); }
+.fc-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,.2); flex-shrink: 0; }
+.fc-label { background: #fff; color: #333; font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.15); white-space: nowrap; }
+.fc-main { width: 58px; height: 58px; border-radius: 50%; background: var(--kgm-green-700); border: none; color: #fff; font-size: 26px; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,.25); cursor: pointer; transition: transform .3s; align-self: flex-end; }
+</style>
+
+<div x-data="{ open: false }" class="fc-wrap">
+    {{-- 3 เมนู --}}
+    <template x-if="open">
+        <div class="d-flex flex-column gap-3 align-items-end mb-1"
+             x-transition:enter="transition" x-transition:enter-start="opacity-0 translate-y-2"
+             x-transition:enter-end="opacity-100 translate-y-0">
+
+            <a href="tel:0851100010" class="fc-item">
+                <span class="fc-label">085-110-0010</span>
+                <div class="fc-icon" style="background:#34a853;">
+                    <i class="bi bi-telephone-fill"></i>
+                </div>
+            </a>
+
+            <a href="https://line.me/ti/p/~@kgmuniform" target="_blank" class="fc-item">
+                <span class="fc-label">LINE : @kgmuniform</span>
+                <div class="fc-icon" style="background:#06c755;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
+                </div>
+            </a>
+
+            <a href="https://m.me/kgmuniform" target="_blank" class="fc-item">
+                <span class="fc-label">Messenger</span>
+                <div class="fc-icon" style="background:linear-gradient(135deg,#0099ff,#a033ff);">
+                    <i class="bi bi-messenger"></i>
+                </div>
+            </a>
+        </div>
+    </template>
+
+    {{-- ปุ่มหลัก --}}
+    <button class="fc-main" @click="open = !open" :style="open ? 'transform:rotate(45deg)' : ''">
+        <i class="bi" :class="open ? 'bi-x-lg' : 'bi-chat-dots-fill'"></i>
+    </button>
+</div>
+
 </body>
 </html>

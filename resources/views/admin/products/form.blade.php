@@ -128,12 +128,26 @@
             <div class="form-card">
                 <h3><i class="bi bi-search"></i> SEO</h3>
                 <div class="form-group">
+                    <label class="form-label">URL Slug <small style="color:#aaa;font-weight:400;">(ปล่อยว่างให้ระบบสร้างอัตโนมัติ)</small></label>
+                    <div style="display:flex;align-items:center;gap:0;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
+                        <span style="background:#f5f7f5;padding:10px 12px;font-size:13px;color:#888;white-space:nowrap;border-right:1px solid #e5e7eb;">/shop/</span>
+                        <input type="text" name="slug" class="form-control" style="border:none;border-radius:0;"
+                            value="{{ old('slug', $product->slug ?? '') }}"
+                            placeholder="auto-generated">
+                    </div>
+                    @if(isset($product))
+                    <div style="font-size:12px;color:#888;margin-top:4px;">
+                        URL ปัจจุบัน: <a href="{{ route('shop.show', $product->slug) }}" target="_blank" style="color:var(--admin-primary);">{{ url('/shop/'.$product->slug) }}</a>
+                    </div>
+                    @endif
+                </div>
+                <div class="form-group">
                     <label class="form-label">Meta Title</label>
-                    <input type="text" name="meta_title" class="form-control" value="{{ old('meta_title', $product->meta_title ?? '') }}">
+                    <input type="text" name="meta_title" class="form-control" value="{{ old('meta_title', $product->meta_title ?? '') }}" placeholder="ปล่อยว่างใช้ชื่อสินค้า">
                 </div>
                 <div class="form-group">
                     <label class="form-label">Meta Description</label>
-                    <textarea name="meta_description" class="form-control" rows="3">{{ old('meta_description', $product->meta_description ?? '') }}</textarea>
+                    <textarea name="meta_description" class="form-control" rows="3" placeholder="ปล่อยว่างใช้คำอธิบายย่อ">{{ old('meta_description', $product->meta_description ?? '') }}</textarea>
                 </div>
             </div>
         </div>

@@ -8,7 +8,9 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
+use App\Helpers\ThaiSlug;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -44,7 +46,9 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $data = $this->validateProduct($request);
-        $data['slug'] = Str::slug($request->name) . '-' . Str::random(5);
+        $data['slug'] = $this->generateSlug(
+            $request->filled('slug') ? $request->slug : $request->name
+        );
 
         $product = Product::create($data);
 
@@ -69,6 +73,12 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $data = $this->validateProduct($request, $product->id);
+
+        // Only update slug if admin explicitly changed it
+        if ($request->filled('slug') && $request->slug !== $product->slug) {
+            $data['slug'] = $this->generateSlug($request->slug, $product->id);
+        }
+
         $old = $product->toArray();
         $product->update($data);
         $this->saveVariants($product, $request);
@@ -105,12 +115,25 @@ class ProductController extends Controller
     public function deleteImage(Product $product, ProductImage $image)
     {
         if ($image->product_id !== $product->id) abort(403);
-        \Storage::disk('public')->delete($image->image_path);
+        Storage::disk('public')->delete($image->image_path);
         $image->delete();
         if ($image->is_primary) {
             $product->images()->first()?->update(['is_primary' => true]);
         }
         return response()->json(['success' => true]);
+    }
+
+    private function generateSlug(string $name, ?int $ignoreId = null): string
+    {
+        $base = ThaiSlug::make($name);
+
+        $slug = $base;
+        $counter = 2;
+        while (Product::where('slug', $slug)->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))->exists()) {
+            $slug = $base . '-' . $counter++;
+        }
+
+        return $slug;
     }
 
     private function validateProduct(Request $request, ?int $ignoreId = null): array

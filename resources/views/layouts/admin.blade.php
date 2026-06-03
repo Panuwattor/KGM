@@ -7,6 +7,7 @@
     <title>@yield('title', 'แอดมิน') | KGM Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
     <style>
@@ -138,6 +139,18 @@
         .filter-bar { background: white; border-radius: 16px; padding: 16px 20px; margin-bottom: 20px; display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .filter-item { flex: 1; min-width: 150px; }
         .filter-item label { display: block; font-size: 12px; font-weight: 600; color: #666; margin-bottom: 5px; }
+
+        /* Pagination */
+        .kgm-pagination { display: flex; align-items: center; gap: 4px; }
+        .pg-btn {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 15px; color: #555; background: #f5f7f5;
+            text-decoration: none; transition: all 0.2s; border: none; cursor: pointer;
+        }
+        .pg-btn:hover { background: var(--g100); color: var(--g700); }
+        .pg-btn.disabled { color: #ccc; pointer-events: none; background: transparent; }
+        .pg-info { font-size: 13px; font-weight: 600; color: #888; padding: 0 8px; min-width: 60px; text-align: center; }
 
         /* Responsive */
         @media(max-width: 1100px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }

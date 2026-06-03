@@ -7,10 +7,19 @@
 </div>
 <div class="table-wrap">
     <table>
-        <thead><tr><th>ชื่อหมวดหมู่</th><th>หมวดหมู่หลัก</th><th>สินค้า</th><th>สถานะ</th><th></th></tr></thead>
+        <thead><tr><th width="60">รูป</th><th>ชื่อหมวดหมู่</th><th>หมวดหมู่หลัก</th><th>สินค้า</th><th>สถานะ</th><th></th></tr></thead>
         <tbody>
         @forelse($categories as $cat)
         <tr>
+            <td>
+                @if($cat->image)
+                    <img src="{{ asset('storage/'.$cat->image) }}" style="width:48px;height:48px;object-fit:cover;border-radius:10px;">
+                @else
+                    <div style="width:48px;height:48px;background:#f0f4f0;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#ccc;">
+                        <i class="bi bi-tag"></i>
+                    </div>
+                @endif
+            </td>
             <td><strong>{{ $cat->parent_id ? '— ' : '' }}{{ $cat->name }}</strong></td>
             <td>{{ $cat->parent?->name ?? '-' }}</td>
             <td>{{ $cat->products_count }}</td>
@@ -22,7 +31,7 @@
             </td>
         </tr>
         @empty
-        <tr><td colspan="5" style="text-align:center;padding:32px;color:#aaa;">ยังไม่มีหมวดหมู่</td></tr>
+        <tr><td colspan="6" style="text-align:center;padding:32px;color:#aaa;">ยังไม่มีหมวดหมู่</td></tr>
         @endforelse
         </tbody>
     </table>
