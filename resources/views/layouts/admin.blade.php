@@ -263,7 +263,7 @@
                 @if(isset($unread) && $unread > 0)<span class="topbar-notif">{{ $unread }}</span>@endif
             </div>
             <div x-data="{ open: false }" style="position:relative;">
-                <div class="admin-avatar" @click="open=!open">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
+                <div class="admin-avatar" @click="open=!open"><i class="bi bi-person-fill"></i></div>
                 <div x-show="open" @click.away="open=false" x-cloak
                     style="position:absolute;right:0;top:48px;background:white;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.12);min-width:180px;overflow:hidden;z-index:999;">
                     <div style="padding:14px 16px;border-bottom:1px solid #f0f2f0;">

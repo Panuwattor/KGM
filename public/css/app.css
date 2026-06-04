@@ -54,6 +54,8 @@ img { max-width: 100%; }
 .nav-actions { display: flex; align-items: center; gap: 4px; justify-content: flex-end; }
 .nav-btn { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: white; border-radius: 999px; transition: all 0.2s; position: relative; background: none; border: none; cursor: pointer; font-size: 19px; }
 .nav-btn:hover { background: rgba(255,255,255,0.1); color: var(--kgm-gold-300); }
+.nav-login-btn { display: flex !important; align-items: center; gap: 6px; padding: 7px 16px !important; color: #fff !important; background: transparent !important; border: 2px solid rgba(255,255,255,0.8) !important; border-radius: 999px !important; font-size: 14px !important; font-weight: 600; transition: all 0.2s; white-space: nowrap; text-decoration: none !important; }
+.nav-login-btn:hover, .nav-login-btn:active, .nav-login-btn:focus { background: var(--kgm-gold-400) !important; color: var(--kgm-green-900) !important; border-color: var(--kgm-gold-400) !important; }
 .cart-badge { position: absolute; top: 2px; right: 2px; background: var(--kgm-gold-400); color: var(--kgm-green-900); border-radius: 999px; padding: 1px 5px; font-size: 10px; font-weight: 700; min-width: 18px; text-align: center; line-height: 1.4; }
 
 /* Hamburger */

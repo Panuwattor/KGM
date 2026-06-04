@@ -17,14 +17,14 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'email'    => 'required|email',
+            'phone'    => 'required|string',
             'password' => 'required',
         ]);
 
         if (Auth::guard('customer')->attempt($credentials, $request->boolean('remember'))) {
             if (!Auth::guard('customer')->user()->isActive()) {
                 Auth::guard('customer')->logout();
-                return back()->withErrors(['email' => 'บัญชีนี้ถูกระงับการใช้งาน'])->onlyInput('email');
+                return back()->withErrors(['phone' => 'บัญชีนี้ถูกระงับการใช้งาน'])->onlyInput('phone');
             }
 
             $request->session()->regenerate();
@@ -32,7 +32,7 @@ class LoginController extends Controller
             return redirect()->intended(route('home'));
         }
 
-        return back()->withErrors(['email' => 'อีเมลหรือรหัสผ่านไม่ถูกต้อง'])->onlyInput('email');
+        return back()->withErrors(['phone' => 'เบอร์โทรหรือรหัสผ่านไม่ถูกต้อง'])->onlyInput('phone');
     }
 
     public function logout(Request $request)

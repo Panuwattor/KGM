@@ -36,9 +36,6 @@
             <a href="{{ route('showrooms') }}" class="nav-link {{ request()->routeIs('showrooms') ? 'active' : '' }}">สาขา</a>
             <a href="{{ route('news') }}"      class="nav-link {{ request()->routeIs('news*')     ? 'active' : '' }}">ข่าวสาร</a>
             <a href="{{ route('contact') }}"   class="nav-link {{ request()->routeIs('contact')   ? 'active' : '' }}">ติดต่อ</a>
-            <a href="{{ route('quote') }}"     class="nav-link nav-link-quote">
-                <i class="bi bi-file-earmark-text"></i> ขอใบเสนอราคา
-            </a>
         </div>
 
         {{-- Action icons --}}
@@ -60,11 +57,11 @@
             @if(auth('customer')->check())
             <div class="user-dropdown" x-data="{ open: false }" @click.outside="open = false">
                 <button class="nav-btn" style="padding:0;" @click="open = !open" title="{{ auth('customer')->user()->name }}">
-                    <div class="user-avatar">{{ strtoupper(substr(auth('customer')->user()->name, 0, 1)) }}</div>
+                    <div class="user-avatar"><i class="bi bi-person-fill"></i></div>
                 </button>
                 <div class="user-dropdown-menu" x-show="open" x-transition x-cloak>
                     <div class="user-dropdown-header">
-                        <div class="user-avatar user-avatar-lg">{{ strtoupper(substr(auth('customer')->user()->name, 0, 1)) }}</div>
+                        <div class="user-avatar user-avatar-lg"><i class="bi bi-person-fill"></i></div>
                         <div>
                             <div style="font-weight:700;font-size:14px;color:#2c3e50;line-height:1.3;">{{ auth('customer')->user()->name }}</div>
                             <div style="font-size:11px;color:#999;">{{ auth('customer')->user()->email }}</div>
@@ -86,7 +83,9 @@
                 </div>
             </div>
             @else
-            <a href="{{ route('login') }}" class="nav-btn" title="เข้าสู่ระบบ"><i class="bi bi-person-circle" style="font-size:20px;"></i></a>
+            <a href="{{ route('login') }}" class="nav-login-btn">
+                <i class="bi bi-person-circle"></i> เข้าสู่ระบบ
+            </a>
             @endif
 
             {{-- Hamburger (mobile) --}}
@@ -157,7 +156,7 @@
             {{-- Brand --}}
             <div>
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-                    <div style="width:46px;height:46px;background:linear-gradient(135deg,var(--kgm-gold-500),var(--kgm-gold-300));border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:var(--kgm-green-900);">K</div>
+                    <img src="{{ asset('images/kgm_logo.png') }}" alt="KGM" style="width:70px;height:70px;object-fit:contain;">
                     <div style="color:white;font-weight:700;font-size:15px;">กิจเจริญการ์เมนท์<span style="display:block;color:rgba(255,255,255,0.45);font-size:11px;font-weight:400;">(1993) จำกัด</span></div>
                 </div>
                 <p style="font-size:13px;line-height:1.8;color:rgba(255,255,255,0.55);margin:0 0 4px;">โรงงานผลิตเครื่องแบบนักเรียนและยูนิฟอร์มคุณภาพสูง ประสบการณ์กว่า 30 ปี</p>
@@ -383,25 +382,34 @@ function updateCartBadge(count) {
     b.style.display = count > 0 ? 'block' : 'none';
 }
 
+document.addEventListener('DOMContentLoaded', function () {
+    fetch('/cart/count', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => r.json())
+        .then(data => updateCartBadge(data.count))
+        .catch(() => {});
+});
+
 function addToCart(productId, variantId, qty = 1) {
     fetch('/cart/add', {
         method: 'POST',
         headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
         },
         body: JSON.stringify({ product_id: productId, variant_id: variantId, quantity: qty })
     })
     .then(r => r.json())
     .then(data => {
-        updateCartBadge(data.count);
+        if (data.count !== undefined) updateCartBadge(data.count);
         const n = document.createElement('div');
         n.className = 'alert alert-success';
         n.style.cssText = 'position:fixed;top:76px;right:16px;z-index:9999;padding:10px 18px;min-width:180px;max-width:90vw;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,0.15);';
         n.innerHTML = '<i class="bi bi-cart-check-fill"></i> ' + (data.message || 'เพิ่มลงตะกร้าแล้ว');
         document.body.appendChild(n);
         setTimeout(() => n.remove(), 2500);
-    });
+    })
+    .catch(() => {});
 }
 </script>
 @stack('scripts')
