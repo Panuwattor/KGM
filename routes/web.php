@@ -14,6 +14,7 @@ use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BannerController;
@@ -131,6 +132,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
 
     Route::resource('categories', CategoryController::class);
+    Route::resource('product-types', ProductTypeController::class);
     Route::resource('products', ProductController::class);
     Route::post('products/{product}/images', [ProductController::class, 'uploadImages'])->name('products.images.upload');
     Route::delete('products/{product}/images/{image}', [ProductController::class, 'deleteImage'])->name('products.images.delete');

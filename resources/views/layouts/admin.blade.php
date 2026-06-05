@@ -188,6 +188,9 @@
             <a href="{{ route('admin.categories.index') }}" class="nav-item {{ request()->routeIs('admin.categories*') ? 'active' : '' }}">
                 <i class="bi bi-tags"></i> หมวดหมู่
             </a>
+            <a href="{{ route('admin.product-types.index') }}" class="nav-item {{ request()->routeIs('admin.product-types*') ? 'active' : '' }}">
+                <i class="bi bi-grid-3x3-gap"></i> ประเภทสินค้า
+            </a>
         </div>
         <div class="nav-section">
             <div class="nav-section-title">ออเดอร์</div>

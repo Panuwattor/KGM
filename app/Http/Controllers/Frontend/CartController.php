@@ -46,8 +46,12 @@ class CartController extends Controller
         $this->cart->updateQuantity($id, $request->quantity);
 
         if ($request->expectsJson()) {
-            $subtotal = $this->cart->getSubtotal();
-            return response()->json(['subtotal' => $subtotal, 'count' => $this->cart->getCount()]);
+            $data = $this->cartSummaryJson();
+            $item = $this->cart->getCartItems()->firstWhere('id', $id);
+            $data['item_quantity'] = $item?->quantity ?? 0;
+            $data['item_subtotal'] = $item?->subtotal ?? 0;
+            $data['item_removed']  = !$item;
+            return response()->json($data);
         }
         return back();
     }
@@ -56,9 +60,31 @@ class CartController extends Controller
     {
         $this->cart->removeItem($id);
         if (request()->expectsJson()) {
-            return response()->json(['count' => $this->cart->getCount()]);
+            return response()->json($this->cartSummaryJson());
         }
         return back()->with('success', 'ลบสินค้าออกจากตะกร้าแล้ว');
+    }
+
+    private function cartSummaryJson(): array
+    {
+        $cartItems           = $this->cart->getCartItems();
+        $subtotal            = $this->cart->getSubtotal();
+        $couponCode          = session('coupon_code');
+        $coupon              = $couponCode ? Coupon::where('code', $couponCode)->first() : null;
+        $discountAmount      = $coupon ? $coupon->calculateDiscount($subtotal) : 0;
+        $shippingFee         = $this->cart->getShippingFee($subtotal, $couponCode);
+        $freeShippingThreshold = (float) env('FREE_SHIPPING_AMOUNT', 1000);
+
+        return [
+            'count'                    => $this->cart->getCount(),
+            'subtotal'                 => $subtotal,
+            'discount_amount'          => $discountAmount,
+            'shipping_fee'             => $shippingFee,
+            'total'                    => $subtotal - $discountAmount + $shippingFee,
+            'free_shipping_threshold'  => $freeShippingThreshold,
+            'amount_for_free_shipping' => max(0, $freeShippingThreshold - $subtotal),
+            'is_empty'                 => $cartItems->isEmpty(),
+        ];
     }
 
     public function applyCoupon(Request $request)

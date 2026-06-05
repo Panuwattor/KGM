@@ -68,8 +68,9 @@
         {{-- Cart Items --}}
         <div>
             {{-- Free Shipping Bar --}}
-            @if($amountForFreeShipping > 0)
-            <div style="background:linear-gradient(135deg,var(--kgm-gold-100),white);border:2px solid var(--kgm-gold-300);border-radius:16px;padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;gap:10px;">
+            <div id="shipping-bar-wrap" data-threshold="{{ $freeShippingThreshold }}"
+                style="{{ $amountForFreeShipping > 0 ? 'background:linear-gradient(135deg,var(--kgm-gold-100),white);border:2px solid var(--kgm-gold-300);border-radius:16px;padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;gap:10px;' : 'background:var(--kgm-green-100);border-radius:16px;padding:12px 20px;margin-bottom:16px;display:flex;align-items:center;gap:8px;color:var(--kgm-green-700);font-weight:700;font-size:14px;' }}">
+                @if($amountForFreeShipping > 0)
                 <i class="bi bi-truck" style="color:var(--kgm-gold-600);font-size:20px;flex-shrink:0;"></i>
                 <div style="flex:1;min-width:0;">
                     <span style="font-weight:700;color:var(--kgm-green-800);font-size:14px;">ซื้อเพิ่มอีก ฿{{ number_format($amountForFreeShipping, 0) }} จะได้ส่งฟรี!</span>
@@ -77,12 +78,10 @@
                         <div style="background:linear-gradient(to right,var(--kgm-gold-500),var(--kgm-gold-300));height:100%;border-radius:999px;width:{{ min(100, ($subtotal/$freeShippingThreshold)*100) }}%;transition:width 0.5s;"></div>
                     </div>
                 </div>
-            </div>
-            @else
-            <div style="background:var(--kgm-green-100);border-radius:16px;padding:12px 20px;margin-bottom:16px;display:flex;align-items:center;gap:8px;color:var(--kgm-green-700);font-weight:700;font-size:14px;">
+                @else
                 <i class="bi bi-truck-flatbed"></i> คุณได้รับการจัดส่งฟรี!
+                @endif
             </div>
-            @endif
 
             <div style="background:white;border-radius:20px;box-shadow:0 2px 10px rgba(0,0,0,0.06);overflow:hidden;">
                 @foreach($cartItems as $item)
@@ -101,26 +100,16 @@
                         </div>
                     </div>
                     <div class="cart-item-actions">
-                        <form method="POST" action="{{ route('cart.remove', $item->id) }}">
-                            @csrf @method('DELETE')
-                            <button type="submit" style="background:none;border:none;cursor:pointer;color:#bbb;font-size:17px;padding:0;" title="ลบ">
-                                <i class="bi bi-trash3"></i>
-                            </button>
-                        </form>
+                        <button type="button" onclick="cartRemove({{ $item->id }}, this)"
+                            style="background:none;border:none;cursor:pointer;color:#bbb;font-size:17px;padding:0;" title="ลบ">
+                            <i class="bi bi-trash3"></i>
+                        </button>
                         <div class="qty-control">
-                            <form method="POST" action="{{ route('cart.update', $item->id) }}" style="display:inline;">
-                                @csrf
-                                <input type="hidden" name="quantity" value="{{ max(0, $item->quantity-1) }}">
-                                <button type="submit" class="qty-btn">-</button>
-                            </form>
-                            <span style="width:36px;text-align:center;font-weight:700;font-size:14px;">{{ $item->quantity }}</span>
-                            <form method="POST" action="{{ route('cart.update', $item->id) }}" style="display:inline;">
-                                @csrf
-                                <input type="hidden" name="quantity" value="{{ $item->quantity+1 }}">
-                                <button type="submit" class="qty-btn">+</button>
-                            </form>
+                            <button type="button" class="qty-btn" onclick="cartQty({{ $item->id }}, -1)">-</button>
+                            <span id="qty-{{ $item->id }}" style="width:36px;text-align:center;font-weight:700;font-size:14px;">{{ $item->quantity }}</span>
+                            <button type="button" class="qty-btn" onclick="cartQty({{ $item->id }}, 1)">+</button>
                         </div>
-                        <div style="font-weight:800;font-size:14px;color:var(--kgm-green-800);white-space:nowrap;">฿{{ number_format($item->subtotal, 0) }}</div>
+                        <div id="item-subtotal-{{ $item->id }}" style="font-weight:800;font-size:14px;color:var(--kgm-green-800);white-space:nowrap;">฿{{ number_format($item->subtotal, 0) }}</div>
                     </div>
                 </div>
                 @endforeach
@@ -156,13 +145,11 @@
 
             {{-- Totals --}}
             <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
-                <div style="display:flex;justify-content:space-between;font-size:14px;"><span>ยอดสินค้า</span><span>฿{{ number_format($subtotal, 2) }}</span></div>
-                @if($discountAmount > 0)
-                <div style="display:flex;justify-content:space-between;font-size:14px;color:#e74c3c;"><span>ส่วนลด</span><span>-฿{{ number_format($discountAmount, 2) }}</span></div>
-                @endif
-                <div style="display:flex;justify-content:space-between;font-size:14px;"><span>ค่าจัดส่ง</span><span>{{ $shippingFee > 0 ? '฿'.number_format($shippingFee,2) : 'ฟรี' }}</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:14px;"><span>ยอดสินค้า</span><span id="summary-subtotal">฿{{ number_format($subtotal, 2) }}</span></div>
+                <div id="summary-discount-row" style="display:{{ $discountAmount > 0 ? 'flex' : 'none' }};justify-content:space-between;font-size:14px;color:#e74c3c;"><span>ส่วนลด</span><span id="summary-discount">-฿{{ number_format($discountAmount, 2) }}</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:14px;"><span>ค่าจัดส่ง</span><span id="summary-shipping">{{ $shippingFee > 0 ? '฿'.number_format($shippingFee,2) : 'ฟรี' }}</span></div>
                 <div style="border-top:2px solid #e8ecef;padding-top:10px;display:flex;justify-content:space-between;font-size:18px;font-weight:800;color:var(--kgm-green-700);">
-                    <span>ยอดรวม</span><span>฿{{ number_format($total, 2) }}</span>
+                    <span>ยอดรวม</span><span id="summary-total">฿{{ number_format($total, 2) }}</span>
                 </div>
             </div>
 
@@ -181,3 +168,94 @@
     @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+const CSRF = document.querySelector('meta[name=csrf-token]').content;
+
+function fmtDec(n) {
+    return '฿' + parseFloat(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function fmtWhole(n) {
+    return '฿' + Math.round(n).toLocaleString('en-US');
+}
+
+function updateSummary(data) {
+    updateCartBadge(data.count);
+    document.getElementById('summary-subtotal').textContent = fmtDec(data.subtotal);
+
+    const discRow = document.getElementById('summary-discount-row');
+    if (data.discount_amount > 0) {
+        discRow.style.display = 'flex';
+        document.getElementById('summary-discount').textContent = '-' + fmtDec(data.discount_amount);
+    } else {
+        discRow.style.display = 'none';
+    }
+
+    document.getElementById('summary-shipping').textContent = data.shipping_fee > 0 ? fmtDec(data.shipping_fee) : 'ฟรี';
+    document.getElementById('summary-total').textContent = fmtDec(data.total);
+    updateShippingBar(data);
+}
+
+function updateShippingBar(data) {
+    const el = document.getElementById('shipping-bar-wrap');
+    if (!el) return;
+    const threshold = parseFloat(el.dataset.threshold);
+    if (data.amount_for_free_shipping > 0) {
+        const pct = Math.min(100, (threshold - data.amount_for_free_shipping) / threshold * 100);
+        el.style.cssText = 'background:linear-gradient(135deg,var(--kgm-gold-100),white);border:2px solid var(--kgm-gold-300);border-radius:16px;padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;gap:10px;';
+        el.innerHTML = `<i class="bi bi-truck" style="color:var(--kgm-gold-600);font-size:20px;flex-shrink:0;"></i>
+            <div style="flex:1;min-width:0;">
+                <span style="font-weight:700;color:var(--kgm-green-800);font-size:14px;">ซื้อเพิ่มอีก ฿${Math.round(data.amount_for_free_shipping).toLocaleString('en-US')} จะได้ส่งฟรี!</span>
+                <div style="background:#e8ecef;border-radius:999px;height:6px;margin-top:6px;overflow:hidden;">
+                    <div style="background:linear-gradient(to right,var(--kgm-gold-500),var(--kgm-gold-300));height:100%;border-radius:999px;width:${pct}%;transition:width 0.5s;"></div>
+                </div>
+            </div>`;
+    } else {
+        el.style.cssText = 'background:var(--kgm-green-100);border-radius:16px;padding:12px 20px;margin-bottom:16px;display:flex;align-items:center;gap:8px;color:var(--kgm-green-700);font-weight:700;font-size:14px;';
+        el.innerHTML = '<i class="bi bi-truck-flatbed"></i> คุณได้รับการจัดส่งฟรี!';
+    }
+}
+
+function cartQty(id, delta) {
+    const qtyEl = document.getElementById('qty-' + id);
+    const newQty = Math.max(0, parseInt(qtyEl.textContent) + delta);
+    cartUpdate(id, newQty);
+}
+
+function cartUpdate(id, qty) {
+    fetch(`/cart/update/${id}`, {
+        method: 'POST',
+        headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quantity: qty })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.is_empty) { location.reload(); return; }
+        if (data.item_removed) {
+            document.getElementById('cart-item-' + id)?.remove();
+        } else {
+            document.getElementById('qty-' + id).textContent = data.item_quantity;
+            document.getElementById('item-subtotal-' + id).textContent = fmtWhole(data.item_subtotal);
+        }
+        updateSummary(data);
+    })
+    .catch(() => {});
+}
+
+function cartRemove(id, btn) {
+    btn.disabled = true;
+    fetch(`/cart/remove/${id}`, {
+        method: 'DELETE',
+        headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.is_empty) { location.reload(); return; }
+        document.getElementById('cart-item-' + id)?.remove();
+        updateSummary(data);
+    })
+    .catch(() => { btn.disabled = false; });
+}
+</script>
+@endpush

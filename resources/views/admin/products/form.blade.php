@@ -23,7 +23,7 @@
                     <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $product->name ?? '') }}" required>
                     @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
-                <div class="form-grid">
+                <div class="form-grid cols-3">
                     <div class="form-group">
                         <label class="form-label">หมวดหมู่</label>
                         <select name="category_id" class="form-control">
@@ -31,6 +31,17 @@
                             @foreach($categories as $cat)
                             <option value="{{ $cat->id }}" {{ old('category_id', $product->category_id ?? '') == $cat->id ? 'selected' : '' }}>
                                 {{ $cat->parent ? '— ' : '' }}{{ $cat->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ประเภทสินค้า</label>
+                        <select name="product_type_id" class="form-control">
+                            <option value="">-- เลือกประเภท --</option>
+                            @foreach($productTypes as $pt)
+                            <option value="{{ $pt->id }}" {{ old('product_type_id', $product->product_type_id ?? '') == $pt->id ? 'selected' : '' }}>
+                                {{ $pt->name }}
                             </option>
                             @endforeach
                         </select>

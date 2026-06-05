@@ -33,7 +33,6 @@
     @endif
 </div>
 @endif
-
 {{-- ══ FEATURES BAR ══ --}}
 <div class="features-bar">
     <div class="container">
@@ -56,12 +55,34 @@
     </div>
 </div>
 
+{{-- ══ PRODUCT TYPES ══ --}}
+@if($productTypes->isNotEmpty())
+<section class="type-section">
+    <div class="container">
+        <div class="type-grid">
+            @foreach($productTypes as $pt)
+            <a href="{{ route('shop') }}?type={{ $pt->slug }}" class="type-card">
+                <div class="type-img-wrap">
+                    @if($pt->image)
+                        <img src="{{ asset('storage/'.$pt->image) }}" alt="{{ $pt->name }}" loading="lazy">
+                    @else
+                        <div class="type-img-placeholder"><i class="bi bi-grid-3x3-gap"></i></div>
+                    @endif
+                </div>
+                <div class="type-name">{{ $pt->name }}</div>
+            </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+
 {{-- ══ CATEGORIES ══ --}}
 @if($categories->isNotEmpty())
 <section class="cat-section">
     <div class="container">
         <div style="text-align:center;margin-bottom:24px;">
-            <div class="section-subtitle" style="text-align:center;">เลือกตามหมวดหมู่</div>
             <div class="section-title">หมวดหมู่สินค้า</div>
             <div class="section-divider" style="margin:10px auto 0;"></div>
         </div>
@@ -82,10 +103,9 @@
 
 {{-- ══ PRODUCTS ══ --}}
 @if($featuredProducts->isNotEmpty() || $bestsellerProducts->isNotEmpty() || $newProducts->isNotEmpty())
-<section class="section" style="background:white;">
+<section class="pt-5 pb-0" style="background:white;">
     <div class="container">
         <div style="text-align:center;margin-bottom:28px;">
-            <div class="section-subtitle" style="text-align:center;">สินค้าของเรา</div>
             <div class="section-title">สินค้าแนะนำและยอดนิยม</div>
             <div class="section-divider" style="margin:10px auto 0;"></div>
         </div>
@@ -121,9 +141,9 @@
             <div class="row justify-content-center g-0">
                 <div class="col-md-10">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="card mb-3 mt-0" style="padding:32px 36px;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box;">
-                                <h2 style="font-size:15px;font-weight:800;color:var(--kgm-green-900);margin:0 0 12px;">บริษัท กิจเจริญการ์เมนท์ (1993) จำกัด</h2>
+                        <div class="col-md-6  mb-3">
+                            <div class="card" style="height:100%;padding:32px 36px;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box;">
+                                <h2 style="font-size:19px;color:#236237;font-weight:800;color:var(--kgm-green-900);margin:0 0 12px;">บริษัท กิจเจริญการ์เมนท์ (1993) จำกัด</h2>
                                 <p style="font-size:14px;color:#555;line-height:1.95;margin:0;text-indent:2em;">
                                     เราคือผู้ผลิตและจำหน่ายเครื่องแบบนักเรียนมากกว่า 40 ปี เรามุ่งมั่นสร้างสรรค์ชุดเครื่องแบบเพื่อคนไทยและเด็กนักเรียนทั่วประเทศ
                                     โดยคำนึงถึงคุณภาพและความคุ้มค่ามาเป็นที่หนึ่ง ใส่ใจในทุกรายละเอียด และพิถีพิถันทุกขั้นตอนการผลิตอย่างที่สุด
@@ -132,10 +152,8 @@
                                     อ่านเพิ่มเติมเกี่ยวกับเรา <i class="bi bi-arrow-right"></i>
                                 </a>
                             </div>
-
                         </div>
                         <div class="col-md-6">
-                            {{-- Service highlight cards --}}
                             <div style="display:flex;flex-direction:column;gap:12px;justify-content:space-between;">
                                 @foreach([
                                     ['bi-palette-fill',      'Design & Production Services', 'บริการออกแบบและสั่งผลิต',      'order'],

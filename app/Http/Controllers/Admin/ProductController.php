@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AdminLog;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductType;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Helpers\ThaiSlug;
@@ -17,12 +18,15 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::with('category')->withTrashed();
+        $query = Product::with('category', 'productType')->withTrashed();
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
         if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
+        }
+        if ($request->filled('product_type_id')) {
+            $query->where('product_type_id', $request->product_type_id);
         }
         if ($request->filled('status')) {
             match($request->status) {
@@ -30,17 +34,20 @@ class ProductController extends Controller
                 'inactive'  => $query->where('is_active', false)->whereNull('deleted_at'),
                 'deleted'   => $query->onlyTrashed(),
                 'low_stock' => $query->whereColumn('stock_quantity', '<=', 'low_stock_threshold'),
+                default     => null,
             };
         }
-        $products = $query->orderBy('sort_order')->latest()->paginate(20)->withQueryString();
-        $categories = Category::active()->get();
-        return view('admin.products.index', compact('products', 'categories'));
+        $products     = $query->orderBy('sort_order')->latest()->paginate(20)->withQueryString();
+        $categories   = Category::active()->get();
+        $productTypes = ProductType::active()->orderBy('sort_order')->get();
+        return view('admin.products.index', compact('products', 'categories', 'productTypes'));
     }
 
     public function create()
     {
         $categories = Category::active()->get();
-        return view('admin.products.form', compact('categories'));
+        $productTypes = ProductType::active()->orderBy('sort_order')->get();
+        return view('admin.products.form', compact('categories', 'productTypes'));
     }
 
     public function store(Request $request)
@@ -67,7 +74,8 @@ class ProductController extends Controller
     {
         $product->load('images', 'variants');
         $categories = Category::active()->get();
-        return view('admin.products.form', compact('product', 'categories'));
+        $productTypes = ProductType::active()->orderBy('sort_order')->get();
+        return view('admin.products.form', compact('product', 'categories', 'productTypes'));
     }
 
     public function update(Request $request, Product $product)
@@ -141,6 +149,7 @@ class ProductController extends Controller
         return $request->validate([
             'name'               => 'required|string|max:255',
             'category_id'        => 'nullable|exists:categories,id',
+            'product_type_id'    => 'nullable|exists:product_types,id',
             'short_description'  => 'nullable|string|max:500',
             'description'        => 'nullable|string',
             'price'              => 'required|numeric|min:0',

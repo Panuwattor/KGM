@@ -6,13 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\ProductType;
 
 class Product extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
-        'category_id', 'brand_id', 'name', 'slug', 'short_description', 'description',
+        'category_id', 'product_type_id', 'brand_id', 'name', 'slug', 'short_description', 'description',
         'price', 'sale_price', 'wholesale_price', 'sku', 'stock_quantity',
         'low_stock_threshold', 'manage_stock', 'is_active', 'is_featured',
         'is_new', 'is_bestseller', 'sort_order',
@@ -33,6 +34,11 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function productType(): BelongsTo
+    {
+        return $this->belongsTo(ProductType::class);
     }
 
     public function brand(): BelongsTo

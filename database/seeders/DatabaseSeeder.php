@@ -60,6 +60,7 @@ class DatabaseSeeder extends Seeder
         // ── Brands & Categories & Products ────────────────────────────────────
         $this->call([
             BrandCategorySeeder::class,
+            ProductTypeSeeder::class,
             ProductSeeder::class,
         ]);
 

@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', ($selectedCategory ? $selectedCategory->name.' - ' : '').'ร้านค้า')
+@section('title', ($selectedCategory ? $selectedCategory->name.' - ' : ($selectedType ? $selectedType->name.' - ' : '')).'ร้านค้า')
 
 @push('styles')
 <style>
@@ -22,6 +22,19 @@
 .price-range { display: flex; gap: 6px; align-items: center; }
 .price-range input { width: 88px; }
 .filter-actions { display: flex; gap: 8px; margin-left: auto; align-items: flex-end; }
+
+/* Type pill filter */
+.type-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.type-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
+    text-decoration: none; transition: all 0.2s;
+    background: var(--kgm-green-50, #f0faf4);
+    color: var(--kgm-green-700, #2d6a4f);
+    border: 2px solid var(--kgm-green-100, #d8f3dc);
+}
+.type-pill:hover { background: var(--kgm-green-100, #d8f3dc); border-color: var(--kgm-green-300, #74c69d); }
+.type-pill.active { background: var(--kgm-green-600, #2d6a4f); color: white; border-color: var(--kgm-green-600, #2d6a4f); }
 
 /* Mobile category toggle button */
 .cat-toggle-btn { display: none; width: 100%; background: white; border: 2px solid var(--kgm-green-200); border-radius: 14px; padding: 12px 16px; font-size: 14px; font-weight: 700; color: var(--kgm-green-800); cursor: pointer; text-align: left; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 10px; }
@@ -65,12 +78,15 @@
         <span class="breadcrumb-sep">/</span>
         <a href="{{ route('shop') }}">ร้านค้า</a>
         @if($selectedCategory)
-        @if($selectedCategory->parent)
-        <span class="breadcrumb-sep">/</span>
-        <a href="{{ route('shop.category', $selectedCategory->parent->slug) }}">{{ $selectedCategory->parent->name }}</a>
-        @endif
-        <span class="breadcrumb-sep">/</span>
-        <span>{{ $selectedCategory->name }}</span>
+            @if($selectedCategory->parent)
+            <span class="breadcrumb-sep">/</span>
+            <a href="{{ route('shop.category', $selectedCategory->parent->slug) }}">{{ $selectedCategory->parent->name }}</a>
+            @endif
+            <span class="breadcrumb-sep">/</span>
+            <span>{{ $selectedCategory->name }}</span>
+        @elseif($selectedType)
+            <span class="breadcrumb-sep">/</span>
+            <span>{{ $selectedType->name }}</span>
         @endif
     </div>
 
@@ -88,8 +104,22 @@
             {{-- Category list: always visible on desktop, collapsible on mobile --}}
             <div x-show="open" x-transition:enter="transition-all duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-all duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="block-on-desktop">
                 <div class="filter-card">
+                    <h4><i class="bi bi-grid-3x3-gap"></i> ประเภทสินค้า</h4>
+                    <div class="type-pills">
+                        <a href="{{ route('shop') }}" class="type-pill {{ !$selectedType && !$selectedCategory ? 'active' : '' }}">
+                            <i class="bi bi-grid"></i> ทั้งหมด
+                        </a>
+                        @foreach($productTypes as $pt)
+                        <a href="{{ route('shop') }}?type={{ $pt->slug }}" class="type-pill {{ $selectedType?->id === $pt->id ? 'active' : '' }}">
+                            {{ $pt->name }}
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="filter-card">
                     <h4><i class="bi bi-tags"></i> หมวดหมู่</h4>
-                    <a href="{{ route('shop') }}" class="cat-link {{ !$selectedCategory ? 'active' : '' }}"><i class="bi bi-grid"></i> สินค้าทั้งหมด</a>
+                    <a href="{{ route('shop') }}" class="cat-link {{ !$selectedCategory && !$selectedType ? 'active' : '' }}"><i class="bi bi-grid"></i> สินค้าทั้งหมด</a>
                     @foreach($categories as $cat)
                     <a href="{{ route('shop.category', $cat->slug) }}" class="cat-link {{ $selectedCategory?->id === $cat->id ? 'active' : '' }}">
                         <i class="bi bi-chevron-right" style="font-size:11px;"></i> {{ $cat->name }}
@@ -148,9 +178,20 @@
             {{-- Page Header --}}
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
                 <div>
-                    <h1 style="font-size:22px;font-weight:800;color:var(--kgm-green-800);">{{ $selectedCategory ? $selectedCategory->name : 'สินค้าทั้งหมด' }}</h1>
+                    <h1 style="font-size:22px;font-weight:800;color:var(--kgm-green-800);">
+                        @if($selectedCategory)
+                            {{ $selectedCategory->name }}
+                        @elseif($selectedType)
+                            <i class="bi bi-grid-3x3-gap" style="font-size:18px;margin-right:6px;"></i>{{ $selectedType->name }}
+                        @else
+                            สินค้าทั้งหมด
+                        @endif
+                    </h1>
                     <p style="font-size:13px;color:#888;">พบ {{ $products->total() }} รายการ</p>
                 </div>
+                @if($selectedType)
+                <a href="{{ route('shop') }}" class="btn btn-light" style="font-size:13px;"><i class="bi bi-x"></i> ล้างประเภท</a>
+                @endif
             </div>
 
             {{-- Products --}}

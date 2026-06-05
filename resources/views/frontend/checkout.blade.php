@@ -10,16 +10,24 @@
 .step-label { font-size: 14px; font-weight: 600; color: #aaa; }
 .step.active .step-label, .step.done .step-label { color: var(--kgm-green-700); }
 .step-line { flex: 1; height: 2px; background: #e8ecef; max-width: 60px; margin: 0 8px; }
+
+.checkout-layout { display: grid; grid-template-columns: 3fr 2fr; gap: 28px; align-items: start; }
+.checkout-summary { position: sticky; top: 90px; }
+
+@media (max-width: 767px) {
+    .checkout-layout { grid-template-columns: 1fr; gap: 16px; }
+    .checkout-summary { position: static; }
+}
 </style>
 @endpush
 
 @section('content')
 <div class="container" style="padding-top:32px;padding-bottom:64px;max-width:1100px;">
-    <h1 style="font-size:28px;font-weight:800;color:var(--kgm-green-800);margin-bottom:24px;"><i class="bi bi-bag-check"></i> ชำระเงิน</h1>
+    <h1 style="font-size:clamp(20px,5vw,28px);font-weight:800;color:var(--kgm-green-800);margin-bottom:24px;"><i class="bi bi-bag-check"></i> ชำระเงิน</h1>
 
     <form method="POST" action="{{ route('checkout.store') }}" x-data="checkoutForm()">
         @csrf
-        <div style="display:grid;grid-template-columns:3fr 2fr;gap:28px;align-items:start;">
+        <div class="checkout-layout">
             <div>
                 {{-- Address --}}
                 <div style="background:white;border-radius:20px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-bottom:20px;">
@@ -106,7 +114,7 @@
             </div>
 
             {{-- Summary --}}
-            <div style="position:sticky;top:90px;">
+            <div class="checkout-summary">
                 <div style="background:white;border-radius:20px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
                     <h3 style="font-size:17px;font-weight:800;color:var(--kgm-green-800);margin-bottom:16px;"><i class="bi bi-receipt"></i> สรุปออเดอร์</h3>
                     @foreach($cartItems as $item)

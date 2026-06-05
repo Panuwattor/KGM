@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductType;
 use App\Models\Review;
 use Illuminate\Http\Request;
 
@@ -12,21 +13,26 @@ class ShopController extends Controller
 {
     public function index(Request $request)
     {
-        $categories = Category::active()->parents()->with('children')->get();
+        $categories   = Category::active()->parents()->with('children')->get();
+        $productTypes = ProductType::active()->orderBy('sort_order')->get();
         $query = Product::active()->with(['images', 'category']);
 
         $this->applyFilters($query, $request);
 
-        $products = $query->paginate(16)->withQueryString();
+        $products         = $query->paginate(16)->withQueryString();
         $selectedCategory = null;
+        $selectedType     = $request->filled('type')
+            ? ProductType::where('slug', $request->type)->first()
+            : null;
 
-        return view('frontend.shop.index', compact('products', 'categories', 'selectedCategory'));
+        return view('frontend.shop.index', compact('products', 'categories', 'productTypes', 'selectedCategory', 'selectedType'));
     }
 
     public function category(Request $request, string $slug)
     {
         $selectedCategory = Category::where('slug', $slug)->where('is_active', true)->firstOrFail();
-        $categories = Category::active()->parents()->with('children')->get();
+        $categories   = Category::active()->parents()->with('children')->get();
+        $productTypes = ProductType::active()->orderBy('sort_order')->get();
 
         $categoryIds = collect([$selectedCategory->id]);
         if ($selectedCategory->children->isNotEmpty()) {
@@ -36,9 +42,10 @@ class ShopController extends Controller
         $query = Product::active()->whereIn('category_id', $categoryIds)->with(['images', 'category']);
         $this->applyFilters($query, $request);
 
-        $products = $query->paginate(16)->withQueryString();
+        $products     = $query->paginate(16)->withQueryString();
+        $selectedType = null;
 
-        return view('frontend.shop.index', compact('products', 'categories', 'selectedCategory'));
+        return view('frontend.shop.index', compact('products', 'categories', 'productTypes', 'selectedCategory', 'selectedType'));
     }
 
     public function show(string $slug)
@@ -86,6 +93,9 @@ class ShopController extends Controller
 
     private function applyFilters($query, Request $request): void
     {
+        if ($request->filled('type')) {
+            $query->whereHas('productType', fn($q) => $q->where('slug', $request->type));
+        }
         if ($request->filled('min_price')) {
             $query->where('price', '>=', $request->min_price);
         }

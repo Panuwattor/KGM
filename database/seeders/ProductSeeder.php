@@ -6,6 +6,7 @@ use App\Helpers\ThaiSlug;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\ProductType;
 use Illuminate\Database\Seeder;
 use Illuminate\Http\File;
 use Illuminate\Support\Facades\Storage;
@@ -17,6 +18,27 @@ class ProductSeeder extends Seeder
         // ── Brand & Category lookups ───────────────────────────────────────────
         $brand = fn(string $slug) => Brand::where('slug', $slug)->first()?->id;
         $cat   = fn(string $slug) => Category::where('slug', $slug)->firstOrFail()->id;
+
+        // ── ProductType lookup ────────────────────────────────────────────────
+        $types = ProductType::pluck('id', 'slug');
+        $typeOf = function (string $name) use ($types): ?int {
+            if (str_starts_with($name, 'เสื้อกีฬา') || str_starts_with($name, 'กางเกงวอร์ม')) {
+                return $types['sport-shirt'] ?? null;
+            }
+            if (str_starts_with($name, 'เสื้อ')) {
+                return $types['shirt'] ?? null;
+            }
+            if (str_starts_with($name, 'กางเกง')) {
+                return $types['pants'] ?? null;
+            }
+            if (str_starts_with($name, 'กระโปรง')) {
+                return $types['skirt'] ?? null;
+            }
+            if (str_starts_with($name, 'กระเป๋า')) {
+                return $types['bag'] ?? null;
+            }
+            return $types['accessories'] ?? null;
+        };
 
         // ── Unique slug generator ─────────────────────────────────────────────
         $usedSlugs = [];
@@ -61,12 +83,13 @@ class ProductSeeder extends Seeder
         // single no-size variant (accessories / bags)
         $noSize = [['size' => null, 'adj' => 0, 'stock' => rand(10, 30)]];
 
-        $make = function (array $p) use ($img, $makeSlug) {
+        $make = function (array $p) use ($img, $makeSlug, $typeOf) {
             $variants   = $p['variants'] ?? [];
             $totalStock = (int) array_sum(array_column($variants, 'stock'));
 
             $product = Product::create([
                 'category_id'         => $p['cat'],
+                'product_type_id'     => $p['type'] ?? $typeOf($p['name']),
                 'brand_id'            => $p['brand'] ?? null,
                 'name'                => $p['name'],
                 'slug'                => $makeSlug($p['name']),

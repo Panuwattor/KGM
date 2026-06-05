@@ -5,22 +5,23 @@
         @if($product->sale_price)<span class="badge badge-sale">-{{ $product->discount_percent }}%</span>@endif
     </div>
     <div class="card">
-        <a href="{{ route('shop.show', $product->slug) }}" style="display:block;">
-            <div class="product-img-wrap">
+        <div class="product-img-wrap">
+            <a href="{{ route('shop.show', $product->slug) }}" style="display:block;line-height:0;">
                 <img src="{{ $product->main_image ? asset('storage/'.$product->main_image) : asset('images/logo.png') }}"
                     alt="{{ $product->name }}" class="product-img" loading="lazy"
                     onerror="this.onerror=null;this.src='/images/logo.png'">
-                @auth('customer')
-                @php $inWishlist = auth('customer')->user()->wishlists()->where('product_id', $product->id)->exists(); @endphp
-                <form method="POST" action="{{ route('account.wishlist.toggle', $product) }}" style="display:inline;" onclick="event.stopPropagation()">
-                    @csrf
-                    <button type="submit" class="product-wishlist {{ $inWishlist ? 'active' : '' }}" title="รายการโปรด">
-                        <i class="bi bi-heart{{ $inWishlist ? '-fill' : '' }}"></i>
-                    </button>
-                </form>
-                @endauth
-            </div>
-        </a>
+            </a>
+            @auth('customer')
+            @php $inWishlist = auth('customer')->user()->wishlists()->where('product_id', $product->id)->exists(); @endphp
+            <button type="button"
+                class="product-wishlist {{ $inWishlist ? 'active' : '' }}"
+                title="รายการโปรด"
+                data-url="{{ route('account.wishlist.toggle', $product) }}"
+                onclick="toggleWishlist(this)">
+                <i class="bi bi-heart{{ $inWishlist ? '-fill' : '' }}"></i>
+            </button>
+            @endauth
+        </div>
         <div class="product-info">
             @if($product->category?->name)
             <div class="product-category">{{ $product->category->name }}</div>

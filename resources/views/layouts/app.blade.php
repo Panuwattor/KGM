@@ -411,6 +411,37 @@ function addToCart(productId, variantId, qty = 1) {
     })
     .catch(() => {});
 }
+
+function toggleWishlist(btn) {
+    const url = btn.dataset.url;
+    btn.disabled = true;
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+            'Accept': 'application/json',
+        }
+    })
+    .then(r => r.json())
+    .then(data => {
+        const icon = btn.querySelector('i');
+        if (data.in_wishlist) {
+            btn.classList.add('active');
+            icon.className = 'bi bi-heart-fill';
+        } else {
+            btn.classList.remove('active');
+            icon.className = 'bi bi-heart';
+        }
+        const n = document.createElement('div');
+        n.className = 'alert alert-success';
+        n.style.cssText = 'position:fixed;top:76px;right:16px;z-index:9999;padding:10px 18px;min-width:180px;max-width:90vw;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,0.15);';
+        n.innerHTML = '<i class="bi bi-heart-fill"></i> ' + (data.message || 'อัปเดตรายการโปรดแล้ว');
+        document.body.appendChild(n);
+        setTimeout(() => n.remove(), 2000);
+    })
+    .catch(() => {})
+    .finally(() => { btn.disabled = false; });
+}
 </script>
 @stack('scripts')
 <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>

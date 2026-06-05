@@ -25,6 +25,15 @@
         </select>
     </div>
     <div class="filter-item">
+        <label>ประเภทสินค้า</label>
+        <select name="product_type_id" class="form-control">
+            <option value="">ทั้งหมด</option>
+            @foreach($productTypes as $pt)
+            <option value="{{ $pt->id }}" {{ request('product_type_id') == $pt->id ? 'selected' : '' }}>{{ $pt->name }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="filter-item">
         <label>สถานะ</label>
         <select name="status" class="form-control">
             <option value="">ทั้งหมด</option>
@@ -40,7 +49,7 @@
 <div class="table-wrap">
     <table>
         <thead><tr>
-            <th width="60">รูป</th><th>ชื่อสินค้า</th><th>หมวดหมู่</th><th>ราคา</th>
+            <th width="60">รูป</th><th>ชื่อสินค้า</th><th>หมวดหมู่</th><th>ประเภท</th><th>ราคา</th>
             <th>สต๊อก</th><th>สถานะ</th><th width="130">จัดการ</th>
         </tr></thead>
         <tbody>
@@ -63,6 +72,13 @@
                 </div>
             </td>
             <td style="font-size:13px;">{{ $product->category?->name ?? '-' }}</td>
+            <td>
+                @if($product->productType)
+                    <span class="status-badge status-blue" style="font-size:11px;">{{ $product->productType->name }}</span>
+                @else
+                    <span style="color:#ccc;font-size:13px;">-</span>
+                @endif
+            </td>
             <td>
                 <div style="font-weight:700;color:var(--g600);">฿{{ number_format($product->current_price, 0) }}</div>
                 @if($product->sale_price)
@@ -93,7 +109,7 @@
             </td>
         </tr>
         @empty
-        <tr><td colspan="7" style="text-align:center;padding:40px;color:#aaa;"><i class="bi bi-box-seam" style="font-size:32px;display:block;margin-bottom:8px;"></i>ไม่พบสินค้า</td></tr>
+        <tr><td colspan="8" style="text-align:center;padding:40px;color:#aaa;"><i class="bi bi-box-seam" style="font-size:32px;display:block;margin-bottom:8px;"></i>ไม่พบสินค้า</td></tr>
         @endforelse
         </tbody>
     </table>
