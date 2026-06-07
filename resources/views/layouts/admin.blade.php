@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'แอดมิน') | KGM Admin</title>
+    <link rel="icon" type="image/png" href="/images/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
@@ -21,7 +22,7 @@
         body { font-family: 'Sarabun', sans-serif; background: #f0f4f0; color: #2c3e50; display: flex; min-height: 100vh; }
 
         /* Sidebar */
-        .sidebar { width: var(--sidebar-w); background: linear-gradient(180deg, var(--g900) 0%, var(--g800) 100%); min-height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; overflow-y: auto; transition: transform 0.3s; }
+        .sidebar { width: var(--sidebar-w); background: linear-gradient(180deg, var(--g900) 0%, var(--g800) 100%); height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; overflow-y: auto; transition: transform 0.3s; }
         .sidebar-logo { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
         .sidebar-logo-inner { display: flex; align-items: center; gap: 10px; }
         .logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, var(--gold), var(--gold-l)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 20px; color: var(--g900); }
@@ -166,7 +167,7 @@
 <aside class="sidebar">
     <div class="sidebar-logo">
         <div class="sidebar-logo-inner">
-            <div class="logo-icon">K</div>
+                <img src="{{ asset('images/logo.png') }}" style="width: 40px; height: 40px;" alt="Logo">
             <div class="logo-text">KGM Admin<span>ระบบจัดการหลังบ้าน</span></div>
         </div>
     </div>
@@ -217,11 +218,17 @@
             <a href="{{ route('admin.posts.index') }}" class="nav-item {{ request()->routeIs('admin.posts*') ? 'active' : '' }}">
                 <i class="bi bi-newspaper"></i> บทความ/ข่าวสาร
             </a>
+            <a href="{{ route('admin.videos.index') }}" class="nav-item {{ request()->routeIs('admin.videos*') ? 'active' : '' }}">
+                <i class="bi bi-play-circle"></i> เรื่องราวที่น่าสนใจ
+            </a>
         </div>
         <div class="nav-section">
             <div class="nav-section-title">ผู้ใช้งาน</div>
+            <a href="{{ route('admin.customers.index') }}" class="nav-item {{ request()->routeIs('admin.customers*') ? 'active' : '' }}">
+                <i class="bi bi-people"></i> ลูกค้า
+            </a>
             <a href="{{ route('admin.users.index') }}" class="nav-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
-                <i class="bi bi-people"></i> สมาชิก
+                <i class="bi bi-person-badge"></i> ผู้ใช้งานระบบ
             </a>
             <a href="{{ route('admin.contacts.index') }}" class="nav-item {{ request()->routeIs('admin.contacts*') ? 'active' : '' }}">
                 <i class="bi bi-chat-left-text"></i> ข้อความติดต่อ
@@ -304,5 +311,13 @@
 </div>
 
 @stack('scripts')
+<script>
+    const sidebar = document.querySelector('.sidebar');
+    const active = sidebar?.querySelector('.nav-item.active');
+    if (sidebar && active) {
+        const offset = active.offsetTop - sidebar.clientHeight / 2 + active.clientHeight / 2;
+        sidebar.scrollTop = Math.max(0, offset);
+    }
+</script>
 </body>
 </html>

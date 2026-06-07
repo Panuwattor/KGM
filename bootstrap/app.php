@@ -20,6 +20,12 @@ return Application::configure(basePath: dirname(__DIR__))
             }
             return route('login');
         });
+        $middleware->redirectUsersTo(function (\Illuminate\Http\Request $request) {
+            if ($request->is('admin') || $request->is('admin/*')) {
+                return route('admin.dashboard');
+            }
+            return route('home');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

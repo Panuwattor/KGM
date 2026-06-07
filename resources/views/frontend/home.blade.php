@@ -33,28 +33,57 @@
     @endif
 </div>
 @endif
-{{-- ══ FEATURES BAR ══ --}}
-<div class="features-bar">
+
+{{-- ══ COUPON CAROUSEL ══ --}}
+@if($homeCoupons->isNotEmpty())
+<section class="cq-sec">
     <div class="container">
-        <div class="features-grid">
-            @foreach([
-                ['bi-award',     'คุณภาพมาตรฐาน',   'ISO Certified ผ่าน QC ทุกชิ้น'],
-                ['bi-truck',     'จัดส่งทั่วไทย',    'ส่งฟรีเมื่อซื้อครบ ฿1,000'],
-                ['bi-palette',   'ออกแบบเอง',        'Custom Design ตามต้องการ'],
-                ['bi-headset',   'บริการหลังการขาย', 'ทีมงานพร้อมช่วยเหลือ'],
-            ] as [$icon,$title,$sub])
-            <div class="feature-item">
-                <div class="feature-icon"><i class="bi {{ $icon }}"></i></div>
-                <div class="feature-text">
-                    <strong>{{ $title }}</strong>
-                    <span>{{ $sub }}</span>
+        <div class="cq-wrap">
+            <button class="cq-arrow cq-prev" onclick="cqSlide(-1)" aria-label="ก่อนหน้า"><i class="bi bi-chevron-left"></i></button>
+            <button class="cq-arrow cq-next" onclick="cqSlide(1)"  aria-label="ถัดไป"><i class="bi bi-chevron-right"></i></button>
+
+            <div class="cq-viewport">
+                <div class="cq-track" id="cq-track">
+                    @foreach($homeCoupons as $i => $coupon)
+                    <div class="cq-ticket">
+                        {{-- LEFT: image bg or gradient --}}
+                        <div class="cq-left"
+                             @if($coupon->image) style="background-image:url('{{ asset('storage/'.$coupon->image) }}');" @endif>
+                            @if(!$coupon->image)
+                            <div class="cq-left-inner">
+                                @if($coupon->type === 'free_shipping')
+                                    <i class="bi bi-truck" style="font-size:20px;"></i>
+                                    <span class="cq-lbl">ส่งฟรี</span>
+                                @elseif($coupon->type === 'percent')
+                                    <span class="cq-num">{{ (int)$coupon->value }}%</span>
+                                    <span class="cq-lbl">ส่วนลด</span>
+                                @else
+                                    <span class="cq-num" style="font-size:17px;">฿{{ number_format((float)$coupon->value,0) }}</span>
+                                    <span class="cq-lbl">ส่วนลด</span>
+                                @endif
+                            </div>
+                            @endif
+                        </div>
+                        {{-- notch circles --}}
+                        <span class="cq-notch cq-nt"></span>
+                        <span class="cq-notch cq-nb"></span>
+                        {{-- RIGHT --}}
+                        <div class="cq-right">
+                            <div class="cq-name">{{ $coupon->name }}</div>
+                            @if($coupon->minimum_order > 0)
+                            <div class="cq-cond">ซื้อขั้นต่ำ ฿{{ number_format($coupon->minimum_order,0) }}</div>
+                            @endif
+                            <a href="{{ route('coupons.index') }}" class="cq-btn">เก็บคูปอง</a>
+                        </div>
+                    </div>
+                    @endforeach
                 </div>
             </div>
-            @endforeach
+
         </div>
     </div>
-</div>
-
+</section>
+@endif
 {{-- ══ PRODUCT TYPES ══ --}}
 @if($productTypes->isNotEmpty())
 <section class="type-section">
@@ -78,6 +107,7 @@
 @endif
 
 
+
 {{-- ══ CATEGORIES ══ --}}
 @if($categories->isNotEmpty())
 <section class="cat-section">
@@ -91,7 +121,6 @@
             <a href="{{ route('shop.category', $cat->slug) }}" class="cat-card">
                 <div class="cat-img-wrap">
                     <img src="{{ asset('storage/'.$cat->image) }}" alt="{{ $cat->name }}" loading="lazy">
-                    <div class="cat-overlay"><i class="bi bi-heart"></i></div>
                 </div>
                 <div class="cat-name">{{ $cat->name }}</div>
             </a>
@@ -263,6 +292,78 @@
 </section>
 @endif
 
+{{-- ══ VIDEOS ══ --}}
+@if(isset($featuredVideos) && $featuredVideos->isNotEmpty())
+<section class="section" style="background:#f8faf8;">
+    <div class="container">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px;gap:10px;flex-wrap:wrap;">
+            <div>
+                <div class="section-subtitle">YouTube</div>
+                <div class="section-title">เรื่องราวที่น่าสนใจ</div>
+                <div class="section-divider"></div>
+            </div>
+            <a href="{{ route('videos') }}" class="btn btn-outline btn-sm" style="margin-bottom:6px;"><i class="bi bi-play-circle"></i> ดูทั้งหมด</a>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+            @foreach($featuredVideos->take(3) as $video)
+            <div style="background:white;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07);cursor:pointer;transition:transform .2s,box-shadow .2s;"
+                 onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,.13)'"
+                 onmouseleave="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.07)'"
+                 onclick="homeOpenVideo('{{ $video->youtube_id }}')">
+                <div style="position:relative;padding-bottom:56.25%;background:#111;overflow:hidden;">
+                    <img src="{{ $video->thumbnail }}" alt="{{ $video->title }}" loading="lazy"
+                         style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"
+                         onerror="this.src='/images/logo.png'">
+                    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25);">
+                        <div style="width:52px;height:52px;background:rgba(255,255,255,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;padding-left:4px;box-shadow:0 4px 16px rgba(0,0,0,.3);">
+                            <i class="bi bi-play-fill" style="font-size:22px;color:#e30000;"></i>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding:14px;">
+                    <div style="font-size:14px;font-weight:700;color:#1a2e1a;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:6px;line-height:1.4;">{{ $video->title }}</div>
+                    @if($video->description)
+                    <div style="font-size:12px;color:#888;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">{{ $video->description }}</div>
+                    @endif
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+{{-- Home Video Modal --}}
+<div id="home-yt-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);align-items:center;justify-content:center;" onclick="homeCloseVideo(event)">
+    <div style="width:90%;max-width:860px;background:#000;border-radius:12px;overflow:hidden;position:relative;">
+        <button onclick="homeCloseVideo(null,true)" style="position:absolute;top:-40px;right:0;background:none;border:none;color:white;font-size:30px;cursor:pointer;line-height:1;">&times;</button>
+        <div style="position:relative;padding-bottom:56.25%;height:0;">
+            <iframe id="home-yt-iframe" src="" frameborder="0"
+                    style="position:absolute;top:0;left:0;width:100%;height:100%;"
+                    allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"
+                    allowfullscreen></iframe>
+        </div>
+    </div>
+</div>
+@push('scripts')
+<script>
+function homeOpenVideo(id) {
+    document.getElementById('home-yt-iframe').src = 'https://www.youtube.com/embed/' + id + '?autoplay=1&rel=0';
+    const m = document.getElementById('home-yt-modal');
+    m.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+function homeCloseVideo(e, force) {
+    if (force || e.target === document.getElementById('home-yt-modal')) {
+        document.getElementById('home-yt-iframe').src = '';
+        document.getElementById('home-yt-modal').style.display = 'none';
+        document.body.style.overflow = '';
+    }
+}
+document.addEventListener('keydown', function(e) { if(e.key==='Escape') homeCloseVideo(null,true); });
+</script>
+@endpush
+@endif
+
 {{-- ══ LATEST NEWS ══ --}}
 @if($latestPosts->isNotEmpty())
 <section class="section">
@@ -334,6 +435,86 @@
 
 @push('scripts')
 <script>
+// ── Coupon carousel (infinite clone) ──
+(function(){
+    const track = document.getElementById('cq-track');
+    if (!track) return;
+    const origCards = Array.from(track.querySelectorAll('.cq-ticket'));
+    const total = origCards.length;
+    if (total === 0) return;
+
+    // Append clones so the list appears to continue forever
+    const clones = origCards.map(c => { const cl = c.cloneNode(true); track.appendChild(cl); return cl; });
+
+    const GAP = 14, CARD = 272, STEP = CARD + GAP;
+    let cur = 0, tmr = null;
+
+    function vis() {
+        const w = track.parentElement.offsetWidth;
+        return w < 360 ? 1 : w < 640 ? 2 : Math.min(total, Math.floor((w + GAP) / STEP));
+    }
+    function maxI() { return Math.max(0, total - vis()); }
+
+    // Show/hide clones depending on whether scrolling is needed
+    function updateClones() {
+        const show = maxI() > 0;
+        clones.forEach(c => { c.style.display = show ? '' : 'none'; });
+    }
+
+    // Silent jump — remove transition, move, restore transition
+    function snapTo(i) {
+        track.style.transition = 'none';
+        cur = i;
+        track.style.transform = `translateX(-${cur * STEP}px)`;
+        requestAnimationFrame(() => { track.style.transition = ''; });
+    }
+
+    function goTo(i) {
+        updateClones();
+        const vw = track.parentElement.offsetWidth;
+        const tw = total * CARD + Math.max(0, total - 1) * GAP;
+        track.style.marginLeft = tw < vw ? `${(vw - tw) / 2}px` : '0';
+        if (maxI() === 0) { snapTo(0); return; }
+        cur = i;
+        track.style.transform = `translateX(-${cur * STEP}px)`;
+    }
+
+    // After the CSS transition (~450ms), silently jump from clone back to original
+    function afterSlide() {
+        if (cur >= total) snapTo(cur - total);
+        else if (cur < 0) snapTo(cur + total);
+    }
+
+    function slide(d) {
+        reset();
+        goTo(cur + d);
+        setTimeout(afterSlide, 460);
+    }
+
+    function reset() {
+        clearInterval(tmr);
+        tmr = setInterval(() => { goTo(cur + 1); setTimeout(afterSlide, 460); }, 4500);
+    }
+
+    window.cqSlide = d => slide(d);
+    window.cqGo    = i => { reset(); goTo(i); };
+    goTo(0);
+    reset();
+    let resizeTmr;
+    window.addEventListener('resize', () => { clearTimeout(resizeTmr); resizeTmr = setTimeout(() => { afterSlide(); goTo(cur); }, 150); });
+
+    // drag / swipe
+    let startX = 0, startY = 0, horizLock = false;
+    const vp = track.parentElement;
+    vp.addEventListener('mousedown',  e => { startX = e.clientX; vp.style.cursor = 'grabbing'; });
+    vp.addEventListener('mousemove',  e => { if (e.buttons !== 1) return; e.preventDefault(); });
+    vp.addEventListener('mouseup',    e => { vp.style.cursor = ''; const dx = startX - e.clientX; if (Math.abs(dx) > 30) slide(dx > 0 ? 1 : -1); });
+    vp.addEventListener('mouseleave', () => { vp.style.cursor = ''; });
+    vp.addEventListener('touchstart', e => { startX = e.touches[0].clientX; startY = e.touches[0].clientY; horizLock = false; }, { passive: true });
+    vp.addEventListener('touchmove',  e => { const dx = Math.abs(startX - e.touches[0].clientX), dy = Math.abs(startY - e.touches[0].clientY); if (!horizLock && dx > dy) horizLock = true; if (horizLock) e.preventDefault(); }, { passive: false });
+    vp.addEventListener('touchend',   e => { const dx = startX - e.changedTouches[0].clientX; if (Math.abs(dx) > 30) slide(dx > 0 ? 1 : -1); });
+})();
+
 // ── Hero slider ──
 let heroIdx = 0;
 const heroSlides = document.querySelectorAll('.hero-slide');

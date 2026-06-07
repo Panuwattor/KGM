@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Coupon;
+use App\Models\CustomerCoupon;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\CartService;
@@ -23,18 +24,20 @@ class CheckoutController extends Controller
         $cartItems = $this->cart->getCartItems();
         if ($cartItems->isEmpty()) return redirect()->route('cart')->with('error', 'ตะกร้าของคุณว่างเปล่า');
 
-        $subtotal = $this->cart->getSubtotal();
-        $couponCode = session('coupon_code');
-        $coupon = $couponCode ? Coupon::where('code', $couponCode)->first() : null;
-        $discountAmount = $coupon ? $coupon->calculateDiscount($subtotal) : 0;
-        $shippingFee = $this->cart->getShippingFee($subtotal, $couponCode);
+        $subtotal       = $this->cart->getSubtotal();
+        $couponCode     = session('coupon_code');
+        $coupon         = $couponCode
+            ? Coupon::where('code', $couponCode)->with(['products', 'categories'])->first()
+            : null;
+        $discountAmount        = $coupon ? $coupon->calculateDiscount($subtotal, $cartItems) : 0;
+        $shippingFee           = $this->cart->getShippingFee($subtotal, $couponCode);
         $subtotalAfterDiscount = $subtotal - $discountAmount;
-        $vatAmount = round($subtotalAfterDiscount * 0.07, 2);
-        $total = $subtotalAfterDiscount + $shippingFee;
+        $vatAmount             = round($subtotalAfterDiscount * 0.07, 2);
+        $total                 = $subtotalAfterDiscount + $shippingFee;
 
         /** @var \App\Models\Customer $customer */
-        $customer = auth('customer')->user();
-        $addresses = $customer->addresses()->get();
+        $customer       = auth('customer')->user();
+        $addresses      = $customer->addresses()->get();
         $defaultAddress = $addresses->where('is_default', true)->first();
 
         return view('frontend.checkout', compact(
@@ -58,14 +61,16 @@ class CheckoutController extends Controller
         $cartItems = $this->cart->getCartItems();
         if ($cartItems->isEmpty()) return redirect()->route('cart');
 
-        $subtotal = $this->cart->getSubtotal();
-        $couponCode = session('coupon_code');
-        $coupon = $couponCode ? Coupon::where('code', $couponCode)->first() : null;
-        $discountAmount = $coupon ? $coupon->calculateDiscount($subtotal) : 0;
-        $shippingFee = $this->cart->getShippingFee($subtotal, $couponCode);
+        $subtotal       = $this->cart->getSubtotal();
+        $couponCode     = session('coupon_code');
+        $coupon         = $couponCode
+            ? Coupon::where('code', $couponCode)->with(['products', 'categories'])->first()
+            : null;
+        $discountAmount        = $coupon ? $coupon->calculateDiscount($subtotal, $cartItems) : 0;
+        $shippingFee           = $this->cart->getShippingFee($subtotal, $couponCode);
         $subtotalAfterDiscount = $subtotal - $discountAmount;
-        $vatAmount = $request->boolean('needs_tax_invoice') ? round($subtotalAfterDiscount * 0.07, 2) : 0;
-        $total = $subtotalAfterDiscount + $shippingFee;
+        $vatAmount             = $request->boolean('needs_tax_invoice') ? round($subtotalAfterDiscount * 0.07, 2) : 0;
+        $total                 = $subtotalAfterDiscount + $shippingFee;
 
         /** @var \App\Models\Customer $customer */
         $customer = auth('customer')->user();
@@ -118,12 +123,16 @@ class CheckoutController extends Controller
 
             if ($coupon) {
                 $coupon->increment('used_count');
+                CustomerCoupon::where('customer_id', $customer->id)
+                    ->where('coupon_id', $coupon->id)
+                    ->first()?->update(['updated_at' => now()]);
             }
 
             $this->cart->clearCart();
             session()->forget('coupon_code');
         });
 
+        assert($order instanceof Order);
         $this->telegram->notifyNewOrder($order);
 
         return redirect()->route('checkout.success', $order);
@@ -147,8 +156,8 @@ class CheckoutController extends Controller
 
         $path = $request->file('slip')->store('slips', 'public');
         $order->update([
-            'payment_slip' => $path,
-            'status' => 'payment_uploaded',
+            'payment_slip'        => $path,
+            'status'              => 'payment_uploaded',
             'payment_uploaded_at' => now(),
         ]);
 

@@ -70,6 +70,7 @@
             ['account.orders',   'bi-receipt',           'คำสั่งซื้อ'],
             ['account.addresses','bi-geo-alt',           'ที่อยู่'],
             ['account.wishlist', 'bi-heart',             'รายการโปรด'],
+            ['account.coupons',  'bi-ticket-perforated', 'คูปองของฉัน'],
             ['account.quotes',   'bi-file-earmark-text', 'ใบเสนอราคา'],
         ] as [$r, $ic, $lb])
         <a href="{{ route($r) }}" class="acc-mobile-nav-link {{ request()->routeIs($r) ? 'active' : '' }}">
@@ -109,6 +110,7 @@ document.addEventListener('DOMContentLoaded', function () {
             ['account.orders',   'bi-receipt',           'คำสั่งซื้อ'],
             ['account.addresses','bi-geo-alt',           'ที่อยู่จัดส่ง'],
             ['account.wishlist', 'bi-heart',             'รายการโปรด'],
+            ['account.coupons',  'bi-ticket-perforated', 'คูปองของฉัน'],
             ['account.quotes',   'bi-file-earmark-text', 'ใบเสนอราคา'],
         ] as [$r, $ic, $lb])
         <a href="{{ route($r) }}" class="acc-nav-link {{ request()->routeIs($r) ? 'active' : '' }}">

@@ -129,18 +129,48 @@
             {{-- Coupon --}}
             @if($coupon)
             <div style="background:var(--kgm-green-100);border-radius:12px;padding:12px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;">
-                <span style="font-weight:700;color:var(--kgm-green-700);"><i class="bi bi-ticket-perforated"></i> {{ $coupon->code }}</span>
+                <span style="font-weight:700;color:var(--kgm-green-700);">
+                    <i class="bi bi-ticket-perforated"></i> {{ $coupon->code }}
+                    <span style="font-weight:400;font-size:13px;"> — {{ $coupon->getTypeLabel() }}</span>
+                </span>
                 <form method="POST" action="{{ route('cart.coupon.remove') }}">
                     @csrf @method('DELETE')
                     <button type="submit" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:14px;"><i class="bi bi-x-lg"></i></button>
                 </form>
             </div>
             @else
-            <form method="POST" action="{{ route('cart.coupon') }}" style="display:flex;gap:8px;margin-bottom:16px;">
+            <form method="POST" action="{{ route('cart.coupon') }}" style="display:flex;gap:8px;margin-bottom:8px;">
                 @csrf
-                <input type="text" name="coupon_code" class="form-control" placeholder="รหัสคูปอง" style="border-radius:12px;flex:1;min-width:0;">
-                <button type="submit" class="btn btn-sm btn-gold"><i class="bi bi-check-lg"></i></button>
+                <input type="text" name="coupon_code" class="form-control" placeholder="รหัสคูปอง" style="border-radius:12px;flex:1;min-width:0;" value="{{ old('coupon_code') }}">
+                <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-check-lg"></i></button>
             </form>
+            {{-- คูปองที่เก็บไว้ --}}
+            @auth('customer')
+            @if($collectedCoupons->isNotEmpty())
+            <div style="margin-bottom:16px;">
+                <div style="font-size:12px;color:#888;font-weight:600;margin-bottom:8px;"><i class="bi bi-collection"></i> คูปองของฉัน</div>
+                <div style="display:flex;flex-direction:column;gap:6px;">
+                    @foreach($collectedCoupons as $cc)
+                    <form method="POST" action="{{ route('cart.coupon') }}" style="display:flex;align-items:center;gap:8px;background:#f8f9fa;border-radius:12px;padding:8px 12px;">
+                        @csrf
+                        <input type="hidden" name="coupon_code" value="{{ $cc->coupon->code }}">
+                        <div style="flex:1;min-width:0;">
+                            <span style="font-weight:700;font-size:13px;color:var(--kgm-green-800);">{{ $cc->coupon->code }}</span>
+                            <span style="font-size:12px;color:#888;margin-left:6px;">{{ $cc->coupon->getTypeLabel() }}</span>
+                            @if($cc->coupon->expires_at)
+                            <span style="font-size:11px;color:#e74c3c;margin-left:6px;">หมด {{ $cc->coupon->expires_at->format('d/m/y') }}</span>
+                            @endif
+                        </div>
+                        <button type="submit" class="btn btn-sm btn-primary" style="padding:4px 12px;font-size:12px;white-space:nowrap;">ใช้</button>
+                    </form>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+            @endauth
+            @endif
+            @if($errors->has('coupon_code') || session('error'))
+            <div style="color:#e74c3c;font-size:13px;margin-bottom:10px;"><i class="bi bi-exclamation-circle"></i> {{ $errors->first('coupon_code') ?? session('error') }}</div>
             @endif
 
             {{-- Totals --}}

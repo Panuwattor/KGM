@@ -12,7 +12,11 @@
         @forelse($posts as $post)
         <tr>
             <td>
-                <div style="font-weight:700;">{{ Str::limit($post->title, 60) }}</div>
+                <div style="font-weight:700;display:flex;align-items:center;gap:6px;">
+                    @if($post->is_top)<span title="บทความแนะนำ" style="color:#f59e0b;font-size:15px;"><i class="bi bi-pin-angle-fill"></i></span>@endif
+                    {{ Str::limit($post->title, 60) }}
+                </div>
+                @if($post->is_top)<span class="status-badge status-yellow" style="font-size:10px;">Top</span>@endif
                 @if($post->trashed())<span class="status-badge status-red" style="font-size:10px;">ถูกลบ</span>@endif
             </td>
             <td style="font-size:13px;">{{ $post->postCategory?->name ?? '-' }}</td>

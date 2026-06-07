@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Coupon;
+use App\Models\CustomerCoupon;
 use App\Services\CartService;
 use Illuminate\Http\Request;
 
@@ -13,19 +14,24 @@ class CartController extends Controller
 
     public function index()
     {
-        $cartItems = $this->cart->getCartItems();
-        $subtotal = $this->cart->getSubtotal();
-        $couponCode = session('coupon_code');
-        $coupon = $couponCode ? Coupon::where('code', $couponCode)->first() : null;
-        $discountAmount = $coupon ? $coupon->calculateDiscount($subtotal) : 0;
-        $shippingFee = $this->cart->getShippingFee($subtotal, $couponCode);
-        $total = $subtotal - $discountAmount + $shippingFee;
-        $freeShippingThreshold = (float) env('FREE_SHIPPING_AMOUNT', 1000);
-        $amountForFreeShipping = max(0, $freeShippingThreshold - $subtotal);
+        $cartItems   = $this->cart->getCartItems();
+        $subtotal    = $this->cart->getSubtotal();
+        $couponCode  = session('coupon_code');
+        $coupon      = $couponCode
+            ? Coupon::where('code', $couponCode)->with(['products', 'categories'])->first()
+            : null;
+        $discountAmount          = $coupon ? $coupon->calculateDiscount($subtotal, $cartItems) : 0;
+        $shippingFee             = $this->cart->getShippingFee($subtotal, $couponCode);
+        $total                   = $subtotal - $discountAmount + $shippingFee;
+        $freeShippingThreshold   = (float) env('FREE_SHIPPING_AMOUNT', 1000);
+        $amountForFreeShipping   = ($shippingFee == 0) ? 0 : max(0, $freeShippingThreshold - $subtotal);
+
+        $collectedCoupons = $this->getCollectedCoupons($couponCode);
 
         return view('frontend.cart', compact(
             'cartItems', 'subtotal', 'coupon', 'discountAmount',
-            'shippingFee', 'total', 'freeShippingThreshold', 'amountForFreeShipping'
+            'shippingFee', 'total', 'freeShippingThreshold', 'amountForFreeShipping',
+            'collectedCoupons'
         ));
     }
 
@@ -46,8 +52,8 @@ class CartController extends Controller
         $this->cart->updateQuantity($id, $request->quantity);
 
         if ($request->expectsJson()) {
-            $data = $this->cartSummaryJson();
-            $item = $this->cart->getCartItems()->firstWhere('id', $id);
+            $data          = $this->cartSummaryJson();
+            $item          = $this->cart->getCartItems()->firstWhere('id', $id);
             $data['item_quantity'] = $item?->quantity ?? 0;
             $data['item_subtotal'] = $item?->subtotal ?? 0;
             $data['item_removed']  = !$item;
@@ -67,12 +73,14 @@ class CartController extends Controller
 
     private function cartSummaryJson(): array
     {
-        $cartItems           = $this->cart->getCartItems();
-        $subtotal            = $this->cart->getSubtotal();
-        $couponCode          = session('coupon_code');
-        $coupon              = $couponCode ? Coupon::where('code', $couponCode)->first() : null;
-        $discountAmount      = $coupon ? $coupon->calculateDiscount($subtotal) : 0;
-        $shippingFee         = $this->cart->getShippingFee($subtotal, $couponCode);
+        $cartItems             = $this->cart->getCartItems();
+        $subtotal              = $this->cart->getSubtotal();
+        $couponCode            = session('coupon_code');
+        $coupon                = $couponCode
+            ? Coupon::where('code', $couponCode)->with(['products', 'categories'])->first()
+            : null;
+        $discountAmount        = $coupon ? $coupon->calculateDiscount($subtotal, $cartItems) : 0;
+        $shippingFee           = $this->cart->getShippingFee($subtotal, $couponCode);
         $freeShippingThreshold = (float) env('FREE_SHIPPING_AMOUNT', 1000);
 
         return [
@@ -82,7 +90,7 @@ class CartController extends Controller
             'shipping_fee'             => $shippingFee,
             'total'                    => $subtotal - $discountAmount + $shippingFee,
             'free_shipping_threshold'  => $freeShippingThreshold,
-            'amount_for_free_shipping' => max(0, $freeShippingThreshold - $subtotal),
+            'amount_for_free_shipping' => ($shippingFee == 0) ? 0 : max(0, $freeShippingThreshold - $subtotal),
             'is_empty'                 => $cartItems->isEmpty(),
         ];
     }
@@ -90,15 +98,33 @@ class CartController extends Controller
     public function applyCoupon(Request $request)
     {
         $request->validate(['coupon_code' => 'required|string']);
-        $coupon = Coupon::where('code', strtoupper($request->coupon_code))->first();
+        $coupon = Coupon::where('code', strtoupper($request->coupon_code))
+            ->with(['products', 'categories'])
+            ->first();
 
         if (!$coupon || !$coupon->isValid()) {
             return back()->with('error', 'คูปองไม่ถูกต้องหรือหมดอายุแล้ว');
         }
 
-        $subtotal = $this->cart->getSubtotal();
+        $customerId = auth('customer')->id();
+        if ($customerId && !$coupon->isValidForCustomer($customerId)) {
+            return back()->with('error', 'คุณใช้คูปองนี้ครบตามจำนวนที่กำหนดแล้ว');
+        }
+
+        $subtotal  = $this->cart->getSubtotal();
+        $cartItems = $this->cart->getCartItems();
+
         if ($subtotal < $coupon->minimum_order) {
-            return back()->with('error', 'ยอดสั่งซื้อไม่ถึงขั้นต่ำ ฿' . number_format($coupon->minimum_order, 2));
+            return back()->with('error', 'ยอดสั่งซื้อไม่ถึงขั้นต่ำ ฿' . number_format($coupon->minimum_order, 0));
+        }
+
+        if ($coupon->type !== 'free_shipping') {
+            $discount = $coupon->calculateDiscount($subtotal, $cartItems);
+            if ($discount <= 0) {
+                return back()->with('error', $coupon->hasProductScope()
+                    ? 'คูปองนี้ใช้ได้เฉพาะสินค้าที่กำหนด ซึ่งไม่มีในตะกร้าของคุณ'
+                    : 'ไม่สามารถใช้คูปองนี้ได้ในขณะนี้');
+            }
         }
 
         session(['coupon_code' => $coupon->code]);
@@ -114,5 +140,21 @@ class CartController extends Controller
     public function count()
     {
         return response()->json(['count' => $this->cart->getCount()]);
+    }
+
+    private function getCollectedCoupons(?string $activeCouponCode): \Illuminate\Support\Collection
+    {
+        if (!auth('customer')->check()) return collect();
+
+        return CustomerCoupon::where('customer_id', auth('customer')->id())
+            ->with(['coupon.products', 'coupon.categories'])
+            ->get()
+            ->filter(fn($cc) =>
+                $cc->coupon &&
+                $cc->coupon->isValid() &&
+                $cc->coupon->isValidForCustomer(auth('customer')->id()) &&
+                $cc->coupon->code !== $activeCouponCode
+            )
+            ->values();
     }
 }

@@ -5,26 +5,31 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use App\Models\Category;
+use App\Models\Coupon;
 use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\Review;
 use App\Models\Post;
+use App\Models\Video;
+use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        $banners = Banner::active()->get();
-        $categories = Category::active()->whereNull('parent_id')->whereNotNull('image')->orderBy('sort_order')->get();
-        $productTypes = ProductType::active()->where('show_on_home', true)->whereNotNull('image')->orderBy('sort_order')->get();
-        $featuredProducts = Product::active()->featured()->with('images')->latest()->take(10)->get();
-        $bestsellerProducts = Product::active()->bestseller()->with('images')->latest()->take(10)->get();
-        $newProducts = Product::active()->where('is_new', true)->with('images')->latest()->take(10)->get();
-        $testimonials = Review::where('is_approved', true)->with('user', 'product')->latest()->take(6)->get();
-        $latestPosts = Post::published()->with('postCategory')->latest('published_at')->take(3)->get();
+        $banners          = Cache::remember('home.banners',          300, fn() => Banner::active()->get());
+        $categories       = Cache::remember('home.categories',       300, fn() => Category::active()->whereNull('parent_id')->whereNotNull('image')->orderBy('sort_order')->get());
+        $productTypes     = Cache::remember('home.product_types',    300, fn() => ProductType::active()->where('show_on_home', true)->whereNotNull('image')->orderBy('sort_order')->get());
+        $featuredProducts = Cache::remember('home.featured',         300, fn() => Product::active()->featured()->with('images')->latest()->take(10)->get());
+        $bestsellerProducts = Cache::remember('home.bestseller',     300, fn() => Product::active()->bestseller()->with('images')->latest()->take(10)->get());
+        $newProducts      = Cache::remember('home.new_products',     300, fn() => Product::active()->where('is_new', true)->with('images')->latest()->take(10)->get());
+        $testimonials     = Cache::remember('home.testimonials',     600, fn() => Review::where('is_approved', true)->with('user', 'product')->latest()->take(6)->get());
+        $latestPosts      = Cache::remember('home.latest_posts',     300, fn() => Post::published()->with('postCategory')->latest('published_at')->take(3)->get());
+        $homeCoupons      = Cache::remember('home.coupons',          300, fn() => Coupon::publiclyVisible()->latest()->take(5)->get());
+        $featuredVideos   = Cache::remember('home.videos',           300, fn() => Video::active()->featured()->orderBy('sort_order')->latest()->take(6)->get());
 
         return view('frontend.home', compact(
-            'banners', 'categories', 'productTypes', 'featuredProducts', 'bestsellerProducts', 'newProducts', 'testimonials', 'latestPosts'
+            'banners', 'categories', 'productTypes', 'featuredProducts', 'bestsellerProducts', 'newProducts', 'testimonials', 'latestPosts', 'homeCoupons', 'featuredVideos'
         ));
     }
 }

@@ -11,6 +11,7 @@ use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Helpers\ThaiSlug;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -61,6 +62,7 @@ class ProductController extends Controller
 
         $this->saveVariants($product, $request);
         AdminLog::record('created', "สร้างสินค้า: {$product->name}", $product);
+        $this->clearProductCache();
 
         return redirect()->route('admin.products.edit', $product)->with('success', 'สร้างสินค้าเรียบร้อยแล้ว');
     }
@@ -91,6 +93,7 @@ class ProductController extends Controller
         $product->update($data);
         $this->saveVariants($product, $request);
         AdminLog::record('updated', "อัปเดตสินค้า: {$product->name}", $product, $old, $data);
+        $this->clearProductCache();
         return redirect()->route('admin.products.edit', $product)->with('success', 'อัปเดตสินค้าเรียบร้อยแล้ว');
     }
 
@@ -98,6 +101,7 @@ class ProductController extends Controller
     {
         AdminLog::record('deleted', "ลบสินค้า: {$product->name}", $product);
         $product->delete();
+        $this->clearProductCache();
         return redirect()->route('admin.products.index')->with('success', 'ลบสินค้าแล้ว');
     }
 
@@ -167,6 +171,13 @@ class ProductController extends Controller
             'meta_title'         => 'nullable|string|max:255',
             'meta_description'   => 'nullable|string|max:500',
         ]);
+    }
+
+    private function clearProductCache(): void
+    {
+        Cache::forget('home.featured');
+        Cache::forget('home.bestseller');
+        Cache::forget('home.new_products');
     }
 
     private function saveVariants(Product $product, Request $request): void

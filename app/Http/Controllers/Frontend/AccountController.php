@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Address;
+use App\Models\CustomerCoupon;
 use App\Models\Order;
 use App\Models\Product;
 use App\Services\CartService;
@@ -142,6 +143,18 @@ class AccountController extends Controller
             return response()->json(['in_wishlist' => $inWishlist, 'message' => $message]);
         }
         return back()->with('success', $message);
+    }
+
+    public function coupons()
+    {
+        $myCoupons = CustomerCoupon::where('customer_id', auth('customer')->id())
+            ->with(['coupon.products', 'coupon.categories'])
+            ->latest('collected_at')
+            ->get()
+            ->filter(fn($cc) => $cc->coupon && $cc->coupon->isValid())
+            ->values();
+
+        return view('frontend.account.coupons', compact('myCoupons'));
     }
 
     public function quotes()

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -32,6 +33,7 @@ class CategoryController extends Controller
         }
 
         Category::create($data);
+        Cache::forget('home.categories');
         return redirect()->route('admin.categories.index')->with('success', 'สร้างหมวดหมู่แล้ว');
     }
 
@@ -58,6 +60,7 @@ class CategoryController extends Controller
         }
 
         $category->update($data);
+        Cache::forget('home.categories');
         return redirect()->route('admin.categories.index')->with('success', 'อัปเดตหมวดหมู่แล้ว');
     }
 
@@ -67,6 +70,7 @@ class CategoryController extends Controller
             Storage::disk('public')->delete($category->image);
         }
         $category->delete();
+        Cache::forget('home.categories');
         return redirect()->route('admin.categories.index')->with('success', 'ลบหมวดหมู่แล้ว');
     }
 

@@ -30,12 +30,61 @@
         {{-- Desktop links --}}
         <div class="nav-links">
             <a href="{{ route('home') }}"      class="nav-link {{ request()->routeIs('home')      ? 'active' : '' }}">หน้าแรก</a>
-            <a href="{{ route('about') }}"     class="nav-link {{ request()->routeIs('about')     ? 'active' : '' }}">เกี่ยวกับเรา</a>
+            <a href="{{ route('shop') }}" class="nav-link {{ request()->routeIs('shop') ? 'active' : '' }}">สินค้า</a>
+
+            {{-- ประเภทสินค้า dropdown --}}
+            @if($navProductTypes->isNotEmpty())
+            <div class="nav-dropdown" x-data="{ open: false, t: null }" @mouseenter="clearTimeout(t); open=true" @mouseleave="t = setTimeout(() => open=false, 120)">
+                <a href="{{ route('shop') }}" class="nav-link {{ request()->fullUrlWithQuery(['type' => '']) && request()->has('type') ? 'active' : '' }}">
+                    ประเภท <i class="bi bi-chevron-down" style="font-size:10px;margin-left:2px;"></i>
+                </a>
+                <div class="nav-dropdown-panel nav-dropdown-panel-sm" x-show="open"
+                     x-transition:enter="transition ease-out duration-150"
+                     x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-100"
+                     x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-cloak>
+                    <a href="{{ route('shop') }}" class="nav-dropdown-item">
+                        <i class="bi bi-grid-3x3-gap"></i> ทั้งหมด
+                    </a>
+                    @foreach($navProductTypes as $pt)
+                    <a href="{{ route('shop') }}?type={{ $pt->slug }}" class="nav-dropdown-item {{ request()->get('type') === $pt->slug ? 'nav-dropdown-item-active' : '' }}">
+                        <image src="{{ $pt->image }}" alt="{{ $pt->name }}" style="width:16px;height:16px;object-fit:contain;margin-right:6px;">
+                         {{ $pt->name }}
+                    </a>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
+            {{-- หมวดหมู่ dropdown --}}
+            @if($navCategories->isNotEmpty())
+            <div class="nav-dropdown" x-data="{ open: false, t: null }" @mouseenter="clearTimeout(t); open=true" @mouseleave="t = setTimeout(() => open=false, 120)">
+                <a href="{{ route('shop') }}" class="nav-link {{ request()->routeIs('shop.category') ? 'active' : '' }}">
+                    หมวดหมู่ <i class="bi bi-chevron-down" style="font-size:10px;margin-left:2px;"></i>
+                </a>
+                <div class="nav-dropdown-panel nav-dropdown-panel-sm" x-show="open"
+                     x-transition:enter="transition ease-out duration-150"
+                     x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-100"
+                     x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" x-cloak>
+                    @foreach($navCategories as $cat)
+                    <a href="{{ route('shop.category', $cat->slug) }}" class="nav-dropdown-item nav-dropdown-parent {{ request()->route('slug') === $cat->slug ? 'nav-dropdown-item-active' : '' }}">
+                        <i class="bi bi-folder2"></i> {{ $cat->name }}
+                    </a>
+                    @foreach($cat->children as $child)
+                    <a href="{{ route('shop.category', $child->slug) }}" class="nav-dropdown-item nav-dropdown-child {{ request()->route('slug') === $child->slug ? 'nav-dropdown-item-active' : '' }}">
+                        <i class="bi bi-dash"></i> {{ $child->name }}
+                    </a>
+                    @endforeach
+                    @endforeach
+                </div>
+            </div>
+            @endif
+            <a href="{{ route('coupons.index') }}" class="nav-link {{ request()->routeIs('coupons*') ? 'active' : '' }}">คูปอง</a>
             <a href="{{ route('services') }}"  class="nav-link {{ request()->routeIs('services')  ? 'active' : '' }}">บริการ</a>
-            <a href="{{ route('shop') }}"      class="nav-link {{ request()->routeIs('shop*')     ? 'active' : '' }}">สินค้า</a>
-            <a href="{{ route('showrooms') }}" class="nav-link {{ request()->routeIs('showrooms') ? 'active' : '' }}">สาขา</a>
+            <a href="{{ route('about') }}"     class="nav-link {{ request()->routeIs('about')     ? 'active' : '' }}">เกี่ยวกับเรา</a>
             <a href="{{ route('news') }}"      class="nav-link {{ request()->routeIs('news*')     ? 'active' : '' }}">ข่าวสาร</a>
-            <a href="{{ route('contact') }}"   class="nav-link {{ request()->routeIs('contact')   ? 'active' : '' }}">ติดต่อ</a>
+            <a href="{{ route('contact') }}"   class="nav-link {{ request()->routeIs('contact')   ? 'active' : '' }}">ติดต่อเรา</a>
         </div>
 
         {{-- Action icons --}}
@@ -71,6 +120,7 @@
                     <a href="{{ route('account.orders') }}"    class="user-dropdown-item" @click="open=false"><i class="bi bi-receipt"></i> คำสั่งซื้อของฉัน</a>
                     <a href="{{ route('account.quotes') }}"    class="user-dropdown-item" @click="open=false"><i class="bi bi-file-earmark-text"></i> ใบเสนอราคา</a>
                     <a href="{{ route('account.wishlist') }}"  class="user-dropdown-item" @click="open=false"><i class="bi bi-heart"></i> รายการโปรด</a>
+                    <a href="{{ route('account.coupons') }}"   class="user-dropdown-item" @click="open=false"><i class="bi bi-ticket-perforated"></i> คูปองของฉัน</a>
                     <a href="{{ route('account.addresses') }}" class="user-dropdown-item" @click="open=false"><i class="bi bi-geo-alt"></i> ที่อยู่จัดส่ง</a>
                     <a href="{{ route('account.profile') }}"   class="user-dropdown-item" @click="open=false"><i class="bi bi-person-gear"></i> แก้ไขโปรไฟล์</a>
                     <hr class="user-dropdown-sep">
@@ -103,16 +153,58 @@
         <div class="mobile-drawer-header">
             <div style="display:flex;align-items:center;gap:10px;">
                 <img src="{{ asset('images/kgm_logo.png') }}" alt="KGM" style="height:36px;width:auto;object-fit:contain;">
-                <span style="color:white;font-weight:700;font-size:15px;">KGM</span>
+                <span style="color:white;font-weight:700;font-size:15px;"></span>
             </div>
             <button class="mobile-drawer-close" @click="open = false"><i class="bi bi-x-lg"></i></button>
         </div>
 
         <a href="{{ route('home') }}"      class="mobile-nav-link {{ request()->routeIs('home')      ? 'active' : '' }}" @click="open=false"><i class="bi bi-house"></i> หน้าแรก</a>
-        <a href="{{ route('shop') }}"      class="mobile-nav-link {{ request()->routeIs('shop*')     ? 'active' : '' }}" @click="open=false"><i class="bi bi-bag"></i> สินค้า</a>
-        <a href="{{ route('about') }}"     class="mobile-nav-link {{ request()->routeIs('about')     ? 'active' : '' }}" @click="open=false"><i class="bi bi-building"></i> เกี่ยวกับเรา</a>
+        <a href="{{ route('shop') }}" class="mobile-nav-link {{ request()->routeIs('shop') ? 'active' : '' }}" @click="open=false"><i class="bi bi-bag"></i> สินค้า</a>
+
+        {{-- ประเภทสินค้า accordion (mobile) --}}
+        @if($navProductTypes->isNotEmpty())
+        <div x-data="{ typeOpen: false }">
+            <button class="mobile-nav-link w-full {{ request()->has('type') ? 'active' : '' }}" @click="typeOpen = !typeOpen" style="background:none;border:none;cursor:pointer;">
+                <i class="bi bi-tag"></i>
+                <span style="flex:1;text-align:left;">ประเภท</span>
+                <i class="bi" :class="typeOpen ? 'bi-chevron-up' : 'bi-chevron-down'" style="font-size:11px;width:auto;"></i>
+            </button>
+            <div x-show="typeOpen" x-cloak style="padding:0 0 4px 0;">
+                <a href="{{ route('shop') }}" class="mobile-nav-sub" @click="open=false"><i class="bi bi-grid-3x3-gap"></i> ทั้งหมด</a>
+                @foreach($navProductTypes as $pt)
+                <a href="{{ route('shop') }}?type={{ $pt->slug }}" class="mobile-nav-sub" @click="open=false">
+                    <i class="bi bi-tag"></i> {{ $pt->name }}
+                </a>
+                @endforeach
+            </div>
+        </div>
+        @endif
+
+        {{-- หมวดหมู่ accordion (mobile) --}}
+        @if($navCategories->isNotEmpty())
+        <div x-data="{ catOpen: false }">
+            <button class="mobile-nav-link w-full {{ request()->routeIs('shop.category') ? 'active' : '' }}" @click="catOpen = !catOpen" style="background:none;border:none;cursor:pointer;">
+                <i class="bi bi-folder2"></i>
+                <span style="flex:1;text-align:left;">หมวดหมู่</span>
+                <i class="bi" :class="catOpen ? 'bi-chevron-up' : 'bi-chevron-down'" style="font-size:11px;width:auto;"></i>
+            </button>
+            <div x-show="catOpen" x-cloak style="padding:0 0 4px 0;">
+                @foreach($navCategories as $cat)
+                <a href="{{ route('shop.category', $cat->slug) }}" class="mobile-nav-sub mobile-nav-sub-parent" @click="open=false">
+                    <i class="bi bi-folder2"></i> {{ $cat->name }}
+                </a>
+                @foreach($cat->children as $child)
+                <a href="{{ route('shop.category', $child->slug) }}" class="mobile-nav-sub mobile-nav-sub-child" @click="open=false">
+                    <i class="bi bi-dash"></i> {{ $child->name }}
+                </a>
+                @endforeach
+                @endforeach
+            </div>
+        </div>
+        @endif
+        <a href="{{ route('coupons.index') }}" class="mobile-nav-link {{ request()->routeIs('coupons*')  ? 'active' : '' }}" @click="open=false"><i class="bi bi-ticket-perforated"></i> คูปอง</a>
+        <a href="{{ route('about') }}"         class="mobile-nav-link {{ request()->routeIs('about')      ? 'active' : '' }}" @click="open=false"><i class="bi bi-building"></i> เกี่ยวกับเรา</a>
         <a href="{{ route('services') }}"  class="mobile-nav-link {{ request()->routeIs('services')  ? 'active' : '' }}" @click="open=false"><i class="bi bi-tools"></i> บริการ</a>
-        <a href="{{ route('showrooms') }}" class="mobile-nav-link {{ request()->routeIs('showrooms') ? 'active' : '' }}" @click="open=false"><i class="bi bi-shop"></i> สาขา/โชว์รูม</a>
         <a href="{{ route('news') }}"      class="mobile-nav-link {{ request()->routeIs('news*')     ? 'active' : '' }}" @click="open=false"><i class="bi bi-newspaper"></i> ข่าวสาร</a>
         <a href="{{ route('careers') }}"   class="mobile-nav-link {{ request()->routeIs('careers*')  ? 'active' : '' }}" @click="open=false"><i class="bi bi-briefcase"></i> ร่วมงานกับเรา</a>
         <a href="{{ route('contact') }}"   class="mobile-nav-link {{ request()->routeIs('contact')   ? 'active' : '' }}" @click="open=false"><i class="bi bi-chat-left-text"></i> ติดต่อเรา</a>
@@ -214,7 +306,7 @@
 </footer>
 
 {{-- ══ Cookie Consent (PDPA) ══ --}}
-@if(!session('cookie_consent'))
+@if(!session('cookie_consent') && !request()->cookie('cookie_consent'))
 <div x-data="cookieConsent()" x-cloak>
 
     {{-- Banner --}}
@@ -453,7 +545,8 @@ function toggleWishlist(btn) {
 .fc-item:hover { transform: translateX(-4px); }
 .fc-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,.2); flex-shrink: 0; }
 .fc-label { background: #fff; color: #333; font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 20px; box-shadow: 0 2px 8px rgba(0,0,0,.15); white-space: nowrap; }
-.fc-main { width: 58px; height: 58px; border-radius: 50%; background: var(--kgm-green-700); border: none; color: #fff; font-size: 26px; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,.25); cursor: pointer; transition: transform .3s; align-self: flex-end; }
+.fc-main { width: 58px; height: 58px; border-radius: 50%; background: transparent; border: none; padding: 0; overflow: hidden; box-shadow: none; cursor: pointer; transition: transform .2s; align-self: flex-end; }
+.fc-main:hover { transform: scale(1.15) translateY(-3px); }
 </style>
 
 <div x-data="{ open: false }" class="fc-wrap">
@@ -464,21 +557,18 @@ function toggleWishlist(btn) {
              x-transition:enter-end="opacity-100 translate-y-0">
 
             <a href="tel:0851100010" class="fc-item">
-                <span class="fc-label">085-110-0010</span>
                 <div class="fc-icon" style="background:#34a853;">
                     <i class="bi bi-telephone-fill"></i>
                 </div>
             </a>
 
             <a href="https://line.me/ti/p/~@kgmuniform" target="_blank" class="fc-item">
-                <span class="fc-label">LINE : @kgmuniform</span>
                 <div class="fc-icon" style="background:#06c755;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
                 </div>
             </a>
 
             <a href="https://m.me/kgmuniform" target="_blank" class="fc-item">
-                <span class="fc-label">Messenger</span>
                 <div class="fc-icon" style="background:linear-gradient(135deg,#0099ff,#a033ff);">
                     <i class="bi bi-messenger"></i>
                 </div>
@@ -487,8 +577,8 @@ function toggleWishlist(btn) {
     </template>
 
     {{-- ปุ่มหลัก --}}
-    <button class="fc-main" @click="open = !open" :style="open ? 'transform:rotate(45deg)' : ''">
-        <i class="bi" :class="open ? 'bi-x-lg' : 'bi-chat-dots-fill'"></i>
+    <button class="fc-main" @click="open = !open">
+        <img src="{{ asset('images/contact.png') }}" alt="ติดต่อเรา" style="width:100%;height:100%;object-fit:cover;display:block;">
     </button>
 </div>
 

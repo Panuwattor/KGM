@@ -10,6 +10,7 @@ use App\Models\JobApplication;
 use App\Models\Post;
 use App\Models\PostCategory;
 use App\Models\Showroom;
+use App\Models\Video;
 use Illuminate\Http\Request;
 
 class PageController extends Controller
@@ -44,6 +45,12 @@ class PageController extends Controller
 
         ContactMessage::create($request->only('name', 'email', 'phone', 'subject', 'message'));
         return back()->with('success', 'ส่งข้อความเรียบร้อยแล้ว ทีมงานจะติดต่อกลับภายใน 24 ชั่วโมง');
+    }
+
+    public function videos()
+    {
+        $videos = Video::active()->orderBy('sort_order')->latest()->paginate(12);
+        return view('frontend.videos', compact('videos'));
     }
 
     public function news(Request $request)
@@ -123,6 +130,7 @@ class PageController extends Controller
             'necessary_consent'  => true,
         ]);
         session(['cookie_consent' => 'accepted']);
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true])
+            ->cookie('cookie_consent', 'accepted', 60 * 24 * 365);
     }
 }

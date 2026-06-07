@@ -13,9 +13,13 @@ class CartService
     public function getCartItems(): Collection
     {
         if ($this->customer()->check()) {
-            return Cart::where('customer_id', $this->customer()->id())->with(['product.images', 'variant'])->get();
+            return Cart::where('customer_id', $this->customer()->id())
+                ->with(['product.images', 'product.category', 'variant'])
+                ->get();
         }
-        return Cart::where('session_id', session()->getId())->with(['product.images', 'variant'])->get();
+        return Cart::where('session_id', session()->getId())
+            ->with(['product.images', 'product.category', 'variant'])
+            ->get();
     }
 
     public function addItem(int $productId, int $quantity = 1, ?int $variantId = null): Cart
@@ -93,7 +97,7 @@ class CartService
 
         if ($couponCode) {
             $coupon = Coupon::where('code', $couponCode)->first();
-            if ($coupon && $coupon->isValid() && $coupon->type === 'free_shipping') return 0;
+            if ($coupon && $coupon->isValid() && $coupon->type === 'free_shipping' && $subtotal >= $coupon->minimum_order) return 0;
         }
 
         return 50;

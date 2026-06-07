@@ -11,9 +11,9 @@ class Post extends Model
 
     protected $fillable = [
         'post_category_id', 'author_id', 'title', 'slug', 'excerpt', 'body',
-        'featured_image', 'status', 'published_at', 'meta_title', 'meta_description', 'og_image',
+        'featured_image', 'status', 'published_at', 'meta_title', 'meta_description', 'og_image', 'is_top',
     ];
-    protected $casts = ['published_at' => 'datetime'];
+    protected $casts = ['published_at' => 'datetime', 'is_top' => 'boolean'];
 
     public function postCategory() { return $this->belongsTo(PostCategory::class); }
     public function author() { return $this->belongsTo(User::class, 'author_id'); }

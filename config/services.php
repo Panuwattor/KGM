@@ -40,4 +40,11 @@ return [
         'chat_id'   => env('TELEGRAM_CHAT_ID'),
     ],
 
+    'smsmkt' => [
+        'api_key'     => env('SMSMKT_API_KEY'),
+        'secret_key'  => env('SMSMKT_SECRET_KEY'),
+        'project_key' => env('SMSMKT_PROJECT_KEY'),
+        'sender'      => env('SMSMKT_SENDER', 'KGM'),
+    ],
+
 ];

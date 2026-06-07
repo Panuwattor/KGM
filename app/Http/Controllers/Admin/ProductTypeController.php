@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\ProductType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -31,6 +32,7 @@ class ProductTypeController extends Controller
         }
 
         ProductType::create($data);
+        Cache::forget('home.product_types');
         return redirect()->route('admin.product-types.index')->with('success', 'สร้างประเภทสินค้าแล้ว');
     }
 
@@ -56,6 +58,7 @@ class ProductTypeController extends Controller
         }
 
         $productType->update($data);
+        Cache::forget('home.product_types');
         return redirect()->route('admin.product-types.index')->with('success', 'อัปเดตประเภทสินค้าแล้ว');
     }
 
@@ -65,6 +68,7 @@ class ProductTypeController extends Controller
             Storage::disk('public')->delete($productType->image);
         }
         $productType->delete();
+        Cache::forget('home.product_types');
         return redirect()->route('admin.product-types.index')->with('success', 'ลบประเภทสินค้าแล้ว');
     }
 

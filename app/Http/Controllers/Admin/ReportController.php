@@ -31,15 +31,31 @@ class ReportController extends Controller
         ->where('created_at', '>=', $startDate)
         ->groupBy('date')->orderBy('date')->get();
 
-        $topProducts = Product::select('products.*')
-            ->join('order_items', 'products.id', '=', 'order_items.product_id')
+        $topStats = DB::table('order_items')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
             ->whereNotIn('orders.status', ['cancelled', 'refunded'])
             ->where('orders.created_at', '>=', $startDate)
-            ->selectRaw('products.*, SUM(order_items.quantity) as total_qty, SUM(order_items.subtotal) as total_revenue')
-            ->groupBy('products.id')
+            ->select(
+                'order_items.product_id',
+                DB::raw('SUM(order_items.quantity) as total_qty'),
+                DB::raw('SUM(order_items.subtotal) as total_revenue')
+            )
+            ->groupBy('order_items.product_id')
             ->orderByDesc('total_qty')
-            ->take(10)->get();
+            ->take(10)
+            ->get()
+            ->keyBy('product_id');
+
+        $topProducts = Product::whereIn('id', $topStats->keys())
+            ->get()
+            ->map(function ($product) use ($topStats) {
+                $stat = $topStats->get($product->id);
+                $product->total_qty = $stat->total_qty;
+                $product->total_revenue = $stat->total_revenue;
+                return $product;
+            })
+            ->sortByDesc('total_qty')
+            ->values();
 
         return view('admin.reports.index', compact(
             'totalRevenue', 'totalOrders', 'newCustomers', 'avgOrderValue',

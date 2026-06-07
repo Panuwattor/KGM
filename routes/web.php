@@ -4,6 +4,7 @@ use App\Http\Controllers\Frontend\HomeController;
 use App\Http\Controllers\Frontend\ShopController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\CheckoutController;
+use App\Http\Controllers\Frontend\CouponController as FrontendCouponController;
 use App\Http\Controllers\Frontend\AccountController;
 use App\Http\Controllers\Frontend\PageController;
 use App\Http\Controllers\Frontend\QuoteController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductTypeController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\CareerController;
 use App\Http\Controllers\Admin\ContactController;
@@ -25,6 +27,7 @@ use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\MarketingController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ShowroomController;
+use App\Http\Controllers\Admin\VideoController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\SitemapController;
@@ -53,6 +56,9 @@ Route::post('/consent', [PageController::class, 'saveConsent'])->name('consent.s
 Route::get('/news', [PageController::class, 'news'])->name('news');
 Route::get('/news/{slug}', [PageController::class, 'newsShow'])->name('news.show');
 
+// Videos
+Route::get('/videos', [PageController::class, 'videos'])->name('videos');
+
 // Careers
 Route::get('/careers', [PageController::class, 'careers'])->name('careers');
 Route::get('/careers/{career}', [PageController::class, 'careerShow'])->name('careers.show');
@@ -72,6 +78,10 @@ Route::get('/shop', [ShopController::class, 'index'])->name('shop');
 Route::get('/shop/category/{slug}', [ShopController::class, 'category'])->name('shop.category');
 Route::get('/shop/{slug}', [ShopController::class, 'show'])->name('shop.show');
 Route::post('/shop/{product}/review', [ShopController::class, 'submitReview'])->name('shop.review')->middleware('auth');
+
+// Coupons
+Route::get('/coupons', [FrontendCouponController::class, 'index'])->name('coupons.index');
+Route::post('/coupons/{coupon}/collect', [FrontendCouponController::class, 'collect'])->name('coupons.collect')->middleware('auth:customer');
 
 // Cart
 Route::get('/cart', [CartController::class, 'index'])->name('cart');
@@ -105,14 +115,18 @@ Route::middleware('auth:customer')->prefix('account')->name('account.')->group(f
     Route::get('/wishlist', [AccountController::class, 'wishlist'])->name('wishlist');
     Route::post('/wishlist/{product}', [AccountController::class, 'toggleWishlist'])->name('wishlist.toggle');
     Route::get('/quotes', [AccountController::class, 'quotes'])->name('quotes');
+    Route::get('/coupons', [AccountController::class, 'coupons'])->name('coupons');
 });
 
 // Auth (customer)
 Route::middleware('guest:customer')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
+    Route::post('/login/otp', [LoginController::class, 'loginWithOtp'])->name('login.otp');
+    Route::post('/otp/send-login', [LoginController::class, 'sendLoginOtp'])->name('login.otp.send');
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
+    Route::post('/otp/send', [RegisterController::class, 'sendOtp'])->name('otp.send');
 });
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth:customer');
 
@@ -143,7 +157,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('orders/{order}/tracking', [OrderController::class, 'updateTracking'])->name('orders.tracking');
 
     Route::resource('banners', BannerController::class);
-    Route::resource('users', UserController::class)->only(['index', 'show', 'edit', 'update', 'destroy']);
+    Route::resource('users', UserController::class);
+    Route::resource('customers', CustomerController::class)->only(['index', 'show', 'edit', 'update', 'destroy']);
+    Route::post('customers/{customer}/addresses', [CustomerController::class, 'storeAddress'])->name('customers.addresses.store');
+    Route::put('customers/{customer}/addresses/{address}', [CustomerController::class, 'updateAddress'])->name('customers.addresses.update');
+    Route::delete('customers/{customer}/addresses/{address}', [CustomerController::class, 'destroyAddress'])->name('customers.addresses.destroy');
     Route::resource('careers', CareerController::class);
     Route::get('careers/{career}/applications', [CareerController::class, 'applications'])->name('careers.applications');
     Route::patch('career-applications/{application}/status', [CareerController::class, 'updateApplicationStatus'])->name('career-applications.status');
@@ -163,6 +181,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::resource('flash-sales', MarketingController::class)->except(['index'])->names('flash-sales');
 
     Route::resource('posts', PostController::class);
+    Route::resource('videos', VideoController::class);
     Route::resource('showrooms', ShowroomController::class);
 
     Route::get('dealers', [SettingController::class, 'dealers'])->name('dealers.index');
