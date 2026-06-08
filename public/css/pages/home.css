@@ -1,5 +1,5 @@
 /* ══ Hero 60/20/20 slide carousel ══ */
-.hero-section { background: #f0f0f0; padding: 20px 0 14px; }
+.hero-section { background: #f0f0f0; padding: 20px 0 14px; overflow: hidden; }
 .hero-inner { position: relative; }
 .hero-viewport { position: relative; padding-top: 26%; height: 0; cursor: grab; }
 .hero-viewport.dragging { cursor: grabbing; }
