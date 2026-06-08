@@ -9,22 +9,29 @@
 
 {{-- ══ HERO ══ --}}
 @if($banners->isNotEmpty())
-<div class="hero" id="hero-slider">
-    @foreach($banners as $i => $banner)
-    <div class="hero-slide {{ $i === 0 ? 'active' : '' }}">
-        @if($banner->link_url)
-        <a href="{{ $banner->link_url }}">
-            <img src="{{ asset('storage/'.$banner->image_path) }}" alt="Banner {{ $i+1 }}" loading="{{ $i === 0 ? 'eager' : 'lazy' }}" onerror="this.onerror=null;this.src='/images/logo.png'">
-        </a>
-        @else
-        <img src="{{ asset('storage/'.$banner->image_path) }}" alt="Banner {{ $i+1 }}" loading="{{ $i === 0 ? 'eager' : 'lazy' }}" onerror="this.onerror=null;this.src='/images/logo.png'">
+<div class="hero-section" id="hero-slider">
+    <div class="hero-inner">
+        <div class="hero-viewport">
+            <div class="hero-track" id="hero-track">
+                @foreach($banners as $i => $banner)
+                <div class="hero-item">
+                    @if($banner->link_url)
+                    <a href="{{ $banner->link_url }}">
+                        <img src="{{ asset('storage/'.$banner->image_path) }}" alt="Banner {{ $i+1 }}" loading="{{ $i === 0 ? 'eager' : 'lazy' }}" onerror="this.onerror=null;this.src='/images/logo.png'">
+                    </a>
+                    @else
+                    <img src="{{ asset('storage/'.$banner->image_path) }}" alt="Banner {{ $i+1 }}" loading="{{ $i === 0 ? 'eager' : 'lazy' }}" onerror="this.onerror=null;this.src='/images/logo.png'">
+                    @endif
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @if($banners->count() > 1)
+        <button class="hero-nav prev" id="hero-prev" aria-label="ก่อนหน้า"><i class="bi bi-chevron-left"></i></button>
+        <button class="hero-nav next" id="hero-next" aria-label="ถัดไป"><i class="bi bi-chevron-right"></i></button>
         @endif
     </div>
-    @endforeach
-
     @if($banners->count() > 1)
-    <button class="hero-nav prev" onclick="heroSlide(-1)" aria-label="ก่อนหน้า"><i class="bi bi-chevron-left"></i></button>
-    <button class="hero-nav next" onclick="heroSlide(1)"  aria-label="ถัดไป"><i class="bi bi-chevron-right"></i></button>
     <div class="hero-dots" id="hero-dots">
         @foreach($banners as $i => $_)
         <button class="hero-dot {{ $i===0?'active':'' }}" onclick="heroGo({{ $i }})" aria-label="สไลด์ {{ $i+1 }}"></button>
@@ -515,36 +522,109 @@ document.addEventListener('keydown', function(e) { if(e.key==='Escape') homeClos
     vp.addEventListener('touchend',   e => { const dx = startX - e.changedTouches[0].clientX; if (Math.abs(dx) > 30) slide(dx > 0 ? 1 : -1); });
 })();
 
-// ── Hero slider ──
-let heroIdx = 0;
-const heroSlides = document.querySelectorAll('.hero-slide');
-const heroDots   = document.querySelectorAll('.hero-dot');
-let heroTimer;
+// ── Hero 60/20/20 slide carousel ──
+(function() {
+    const track = document.getElementById('hero-track');
+    if (!track) return;
+    const items = Array.from(track.querySelectorAll('.hero-item'));
+    const total = items.length;
+    if (total === 0) return;
 
-function heroGo(n) {
-    heroSlides[heroIdx]?.classList.remove('active');
-    heroDots[heroIdx]?.classList.remove('active');
-    heroIdx = (n + heroSlides.length) % heroSlides.length;
-    heroSlides[heroIdx]?.classList.add('active');
-    heroDots[heroIdx]?.classList.add('active');
-}
-function heroSlide(dir) {
-    clearInterval(heroTimer);
-    heroGo(heroIdx + dir);
-    heroTimer = setInterval(() => heroSlide(1), 5500);
-}
-if (heroSlides.length > 1) heroTimer = setInterval(() => heroSlide(1), 5500);
+    let cur = 0, heroTimer = null;
+    const isMob = () => window.innerWidth < 768;
 
-// Touch swipe on hero
-const heroEl = document.getElementById('hero-slider');
-if (heroEl) {
-    let tx = 0;
-    heroEl.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
-    heroEl.addEventListener('touchend',   e => {
-        const diff = tx - e.changedTouches[0].clientX;
-        if (Math.abs(diff) > 40) heroSlide(diff > 0 ? 1 : -1);
+    // 5-position table: far-left · hi-left · hi-center · hi-right · far-right
+    const DESK = {
+        fl:{ left:'-22%',            width:'20%',              top:'14px', height:'calc(100% - 28px)', opacity:0,   z:1 },
+        hl:{ left:'0%',              width:'20%',              top:'14px', height:'calc(100% - 28px)', opacity:.68, z:1 },
+        hc:{ left:'calc(20% + 8px)', width:'calc(60% - 16px)', top:'0',    height:'100%',              opacity:1,   z:2 },
+        hr:{ left:'80%',             width:'20%',              top:'14px', height:'calc(100% - 28px)', opacity:.68, z:1 },
+        fr:{ left:'102%',            width:'20%',              top:'14px', height:'calc(100% - 28px)', opacity:0,   z:1 },
+    };
+    const MOB = {
+        fl:{ left:'-100%', width:'100%', top:'0', height:'100%', opacity:0, z:1 },
+        hl:{ left:'-100%', width:'100%', top:'0', height:'100%', opacity:0, z:1 },
+        hc:{ left:'0%',    width:'100%', top:'0', height:'100%', opacity:1, z:2 },
+        hr:{ left:'100%',  width:'100%', top:'0', height:'100%', opacity:0, z:1 },
+        fr:{ left:'100%',  width:'100%', top:'0', height:'100%', opacity:0, z:1 },
+    };
+
+    function applyPos(item, key, instant) {
+        const p = (isMob() ? MOB : DESK)[key];
+        if (instant) { item.style.transition = 'none'; }
+        item.style.left = p.left; item.style.width  = p.width;
+        item.style.top  = p.top;  item.style.height = p.height;
+        item.style.opacity = p.opacity; item.style.zIndex = p.z;
+        item.style.pointerEvents = p.opacity > 0 ? 'auto' : 'none';
+        if (instant) { void item.offsetWidth; item.style.transition = ''; }
+    }
+
+    function keyFor(idx, c) {
+        const d = ((idx - c) % total + total) % total;
+        if (d === 0)         return 'hc';
+        if (d === 1)         return 'hr';
+        if (d === total - 1) return 'hl';
+        if (d === 2)         return 'fr';
+        if (d === total - 2) return 'fl';
+        return 'fr';
+    }
+
+    const curKey = items.map(() => 'fr');
+
+    function goTo(newCur, dir) {
+        cur = ((newCur % total) + total) % total;
+        items.forEach((item, i) => {
+            const oldK = curKey[i], newK = keyFor(i, cur);
+            const off = k => k === 'fr' || k === 'fl';
+            // snap incoming item to correct off-screen edge before animating in
+            if (off(oldK) && !off(newK)) {
+                const stage = dir >= 0 ? 'fr' : 'fl';
+                if (oldK !== stage) applyPos(item, stage, true);
+            }
+            applyPos(item, newK, false);
+            curKey[i] = newK;
+            item.classList.toggle('hero-item-center', newK === 'hc');
+        });
+        document.querySelectorAll('.hero-dot').forEach((d, j) => d.classList.toggle('active', j === cur));
+    }
+
+    function slide(d) { clearInterval(heroTimer); goTo(cur + d, d); startAuto(); }
+    function startAuto() { if (total > 1) heroTimer = setInterval(() => slide(1), 5500); }
+
+    document.getElementById('hero-prev')?.addEventListener('click', () => slide(-1));
+    document.getElementById('hero-next')?.addEventListener('click', () => slide(1));
+    window.heroGo = function(n) { clearInterval(heroTimer); goTo(n, n > cur ? 1 : -1); startAuto(); };
+
+    const heroVp = document.querySelector('#hero-slider .hero-viewport');
+    if (heroVp) {
+        // Touch swipe
+        let tx = 0;
+        heroVp.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+        heroVp.addEventListener('touchend',   e => { const dx = tx - e.changedTouches[0].clientX; if (Math.abs(dx) > 40) slide(dx > 0 ? 1 : -1); });
+
+        // Mouse drag — prevent click when dragged
+        let mx = 0, dragged = false;
+        heroVp.addEventListener('mousedown', e => { mx = e.clientX; dragged = false; heroVp.classList.add('dragging'); });
+        heroVp.addEventListener('mousemove', e => { if (e.buttons === 1 && Math.abs(e.clientX - mx) > 5) dragged = true; });
+        heroVp.addEventListener('mouseup',   e => {
+            heroVp.classList.remove('dragging');
+            if (dragged) { const dx = mx - e.clientX; if (Math.abs(dx) > 40) slide(dx > 0 ? 1 : -1); }
+        });
+        heroVp.addEventListener('mouseleave', () => heroVp.classList.remove('dragging'));
+        heroVp.addEventListener('click',  e => { if (dragged) { e.preventDefault(); e.stopPropagation(); } }, true);
+        heroVp.addEventListener('dragstart', e => e.preventDefault());
+    }
+
+    // init all positions instantly
+    items.forEach((item, i) => { const k = keyFor(i, 0); applyPos(item, k, true); curKey[i] = k; item.classList.toggle('hero-item-center', k === 'hc'); });
+    startAuto();
+
+    let resizeTmr;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTmr);
+        resizeTmr = setTimeout(() => { items.forEach((item, i) => { applyPos(item, curKey[i], true); item.classList.toggle('hero-item-center', curKey[i] === 'hc'); }); }, 150);
     });
-}
+})();
 
 // ── Product tabs ──
 function switchTab(name, btn) {

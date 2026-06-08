@@ -1,15 +1,37 @@
-/* ══ Hero ══ */
-.hero { position: relative; width: 100%; aspect-ratio: 1400/609; overflow: hidden; background: #111; }
-.hero-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.5s ease; will-change: opacity; }
-.hero-slide.active { opacity: 1; }
-.hero-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.hero-dots { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; }
-.hero-dot { width: 7px; height: 7px; border-radius: 999px; background: rgba(255,255,255,0.45); cursor: pointer; border: none; transition: all 0.3s; padding: 0; }
-.hero-dot.active { width: 22px; background: white; }
-.hero-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 38px; height: 38px; background: rgba(0,0,0,0.25); border: none; border-radius: 999px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: background 0.2s; }
-.hero-nav:hover { background: rgba(0,0,0,0.45); }
-.hero-nav.prev { left: 12px; }
-.hero-nav.next { right: 12px; }
+/* ══ Hero 60/20/20 slide carousel ══ */
+.hero-section { background: #f0f0f0; padding: 20px 0 14px; }
+.hero-inner { position: relative; }
+.hero-viewport { position: relative; padding-top: 26%; height: 0; cursor: grab; }
+.hero-viewport.dragging { cursor: grabbing; }
+.hero-track { position: absolute; inset: 0; }
+.hero-item {
+    position: absolute; overflow: hidden; border-radius: 12px; pointer-events: none;
+    transition: left .55s cubic-bezier(.25,.46,.45,.94),
+                width .55s cubic-bezier(.25,.46,.45,.94),
+                top .55s cubic-bezier(.25,.46,.45,.94),
+                height .55s cubic-bezier(.25,.46,.45,.94),
+                opacity .4s ease;
+}
+.hero-item img, .hero-item a img { width: 100%; height: 100%; object-fit: contain; display: block; background: #e8e8e8; }
+.hero-item-center img, .hero-item-center a img { object-fit: cover; background: none; box-shadow: 0 6px 28px rgba(0,0,0,.2); }
+.hero-item a { display: block; height: 100%; }
+.hero-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 38px; height: 38px; background: rgba(0,0,0,.3); border: none; border-radius: 999px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; transition: background .2s; z-index: 5; }
+.hero-nav:hover { background: rgba(0,0,0,.55); }
+.hero-nav.prev { left: 20px; }
+.hero-nav.next { right: 20px; }
+.hero-dots { display: flex; justify-content: center; gap: 6px; padding: 10px 0 2px; }
+.hero-dot { width: 7px; height: 7px; border-radius: 999px; background: rgba(0,0,0,.2); cursor: pointer; border: none; transition: all .3s; padding: 0; }
+.hero-dot.active { width: 22px; background: var(--kgm-green-600,#2d6a4f); }
+
+@media (max-width: 767px) {
+    .hero-section { padding: 0; background: #111; }
+    .hero-viewport { padding-top: 43.5%; }
+    .hero-nav.prev { left: 8px; }
+    .hero-nav.next { right: 8px; }
+    .hero-dots { padding: 8px 0 4px; background: #111; }
+    .hero-dot { background: rgba(255,255,255,.35); }
+    .hero-dot.active { background: white; }
+}
 
 /* ══ Features bar ══ */
 .features-bar {
