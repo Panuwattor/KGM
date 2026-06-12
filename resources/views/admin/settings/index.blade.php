@@ -5,10 +5,10 @@
     <div class="page-title">ตั้งค่าระบบ</div>
 </div>
 <div style="display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap;">
-    <a href="{{ route('admin.settings.index') }}" class="btn {{ request()->routeIs('admin.settings.index') ? 'btn-primary' : 'btn-light' }}"><i class="bi bi-gear"></i> ทั่วไป</a>
-    <a href="{{ route('admin.settings.shipping') }}" class="btn btn-light"><i class="bi bi-truck"></i> ค่าจัดส่ง</a>
-    <a href="{{ route('admin.settings.logs') }}" class="btn btn-light"><i class="bi bi-journal-text"></i> Audit Log</a>
-    <a href="{{ route('admin.settings.consent-logs') }}" class="btn btn-light"><i class="bi bi-shield-check"></i> PDPA Log</a>
+    <a href="{{ route('admin.settings.index') }}"          class="btn btn-primary"><i class="bi bi-gear"></i> ทั่วไป</a>
+    <a href="{{ route('admin.settings.shipping-rates') }}" class="btn btn-light"><i class="bi bi-truck"></i> อัตราค่าขนส่ง</a>
+    <a href="{{ route('admin.settings.logs') }}"           class="btn btn-light"><i class="bi bi-journal-text"></i> Audit Log</a>
+    <a href="{{ route('admin.settings.consent-logs') }}"   class="btn btn-light"><i class="bi bi-shield-check"></i> PDPA Log</a>
 </div>
 <form method="POST" action="{{ route('admin.settings.update') }}">
     @csrf

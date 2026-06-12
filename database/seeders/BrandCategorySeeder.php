@@ -48,7 +48,7 @@ class BrandCategorySeeder extends Seeder
                 'sort_order'  => 5,
             ],
         ] as $b) {
-            Brand::create($b + ['is_active' => true]);
+            Brand::firstOrCreate(['slug' => $b['slug']], $b + ['is_active' => true]);
         }
 
         // ── Categories ─────────────────────────────────────────────────────────
@@ -57,14 +57,16 @@ class BrandCategorySeeder extends Seeder
         //   • 3 ตราสินค้า → ไม่มีหมวดย่อย (products ผูกกับ parent โดยตรง)
 
         // ── โรงเรียนอนุบาลศรีสะเกษ ─────────────────────────────────────────
-        $siSaket = Category::create([
-            'name'        => 'โรงเรียนอนุบาลศรีสะเกษ',
-            'slug'        => 'anuban-si-saket',
-            'description' => 'เครื่องแบบนักเรียนโรงเรียนอนุบาลศรีสะเกษ ครบทุกประเภท',
-            'image'       => 'categories/anuban-si-saket.jpg',
-            'sort_order'  => 1,
-            'is_active'   => true,
-        ]);
+        $siSaket = Category::firstOrCreate(
+            ['slug' => 'anuban-si-saket'],
+            [
+                'name'        => 'โรงเรียนอนุบาลศรีสะเกษ',
+                'description' => 'เครื่องแบบนักเรียนโรงเรียนอนุบาลศรีสะเกษ ครบทุกประเภท',
+                'image'       => 'categories/anuban-si-saket.jpg',
+                'sort_order'  => 1,
+                'is_active'   => true,
+            ]
+        );
 
         foreach ([
             ['ชุดนักเรียน ระดับอนุบาล',       'nursery-si-saket',   1],
@@ -76,37 +78,33 @@ class BrandCategorySeeder extends Seeder
             ['ชุดยุวกาชาด',                   'cadet-si-saket',     7],
             ['อุปกรณ์อื่นๆ',                  'equip-si-saket',     8],
         ] as [$name, $slug, $order]) {
-            Category::create([
-                'parent_id'  => $siSaket->id,
-                'name'       => $name,
-                'slug'       => $slug,
-                'sort_order' => $order,
-                'is_active'  => true,
-            ]);
+            Category::firstOrCreate(
+                ['slug' => $slug],
+                ['parent_id' => $siSaket->id, 'name' => $name, 'sort_order' => $order, 'is_active' => true]
+            );
         }
 
         // ── โรงเรียนอนุบาลวัดพระโต ─────────────────────────────────────────
-        $phraTo = Category::create([
-            'name'        => 'โรงเรียนอนุบาลวัดพระโต',
-            'slug'        => 'anuban-phra-to',
-            'description' => 'เครื่องแบบนักเรียนโรงเรียนอนุบาลวัดพระโต ครบทุกประเภท',
-            'image'       => 'categories/anuban-phra-to.jpg',
-            'sort_order'  => 2,
-            'is_active'   => true,
-        ]);
+        $phraTo = Category::firstOrCreate(
+            ['slug' => 'anuban-phra-to'],
+            [
+                'name'        => 'โรงเรียนอนุบาลวัดพระโต',
+                'description' => 'เครื่องแบบนักเรียนโรงเรียนอนุบาลวัดพระโต ครบทุกประเภท',
+                'image'       => 'categories/anuban-phra-to.jpg',
+                'sort_order'  => 2,
+                'is_active'   => true,
+            ]
+        );
 
         foreach ([
             ['ชุดนักเรียน ระดับอนุบาล',   'nursery-phra-to', 1],
             ['ชุดนักเรียน ระดับประถม',    'primary-phra-to', 2],
             ['ชุดกีฬาและอุปกรณ์',         'sport-phra-to',   3],
         ] as [$name, $slug, $order]) {
-            Category::create([
-                'parent_id'  => $phraTo->id,
-                'name'       => $name,
-                'slug'       => $slug,
-                'sort_order' => $order,
-                'is_active'  => true,
-            ]);
+            Category::firstOrCreate(
+                ['slug' => $slug],
+                ['parent_id' => $phraTo->id, 'name' => $name, 'sort_order' => $order, 'is_active' => true]
+            );
         }
 
         // ── หมวดตราสินค้า (ไม่มีหมวดย่อย) ──────────────────────────────────
@@ -115,13 +113,10 @@ class BrandCategorySeeder extends Seeder
             ['ชุดนักเรียนตราBigSave',  'cat-bigsave',    'categories/bigsave.jpg',     4],
             ['ชุดนักเรียนชัยพฤกษ์',   'cat-chaiyapruek','categories/chaiyapruek.jpg', 5],
         ] as [$name, $slug, $img, $order]) {
-            Category::create([
-                'name'       => $name,
-                'slug'       => $slug,
-                'image'      => $img,
-                'sort_order' => $order,
-                'is_active'  => true,
-            ]);
+            Category::firstOrCreate(
+                ['slug' => $slug],
+                ['name' => $name, 'image' => $img, 'sort_order' => $order, 'is_active' => true]
+            );
         }
     }
 }

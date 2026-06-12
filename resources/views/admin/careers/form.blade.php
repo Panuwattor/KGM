@@ -22,7 +22,7 @@
             </div>
             <div class="form-group"><label class="form-label">สถานที่</label><input type="text" name="location" class="form-control" value="{{ old('location',$career->location??'') }}"></div>
             <div class="form-group"><label class="form-label">จำนวนอัตรา</label><input type="number" name="vacancies" class="form-control" min="1" value="{{ old('vacancies',$career->vacancies??1) }}"></div>
-            <div class="form-group"><label class="form-label">ปิดรับสมัคร</label><input type="date" name="closes_at" class="form-control" value="{{ old('closes_at',$career->closes_at?->format('Y-m-d')??'') }}"></div>
+            <div class="form-group"><label class="form-label">ปิดรับสมัคร</label><input type="date" name="closes_at" class="form-control" value="{{ old('closes_at', isset($career) ? $career->closes_at?->format('Y-m-d') : '') }}"></div>
         </div>
         <div class="form-group"><label class="form-label">รายละเอียดงาน *</label><textarea name="description" class="form-control" rows="5" required>{{ old('description',$career->description??'') }}</textarea></div>
         <div class="form-group"><label class="form-label">คุณสมบัติที่ต้องการ</label><textarea name="requirements" class="form-control" rows="5">{{ old('requirements',$career->requirements??'') }}</textarea></div>

@@ -3,6 +3,25 @@
 
 @section('content')
 
+<style>
+.ord-products-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; }
+.ord-steps-grid    { display:grid; grid-template-columns:repeat(5,1fr); gap:0; position:relative; }
+.ord-steps-line    { position:absolute; top:36px; left:10%; right:10%; height:2px;
+                     background:linear-gradient(90deg,var(--kgm-green-200),var(--kgm-gold-300)); z-index:0; }
+.ord-why-grid      { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; }
+@media(max-width:767px){
+    .ord-products-grid { grid-template-columns:repeat(2,1fr); }
+    .ord-steps-grid    { grid-template-columns:1fr; gap:24px; }
+    .ord-steps-line    { display:none; }
+    .ord-why-grid      { grid-template-columns:1fr; gap:28px; }
+}
+@media(min-width:768px) and (max-width:991px){
+    .ord-products-grid { grid-template-columns:repeat(3,1fr); }
+    .ord-steps-grid    { grid-template-columns:repeat(3,1fr); gap:16px; }
+    .ord-steps-line    { display:none; }
+}
+</style>
+
 {{-- ══ HERO ══ --}}
 <div style="background:linear-gradient(135deg,var(--kgm-green-900),var(--kgm-green-700));padding:80px 0 60px;text-align:center;">
     <div class="container">
@@ -27,7 +46,7 @@
             <div class="section-title">ผลิตได้ทุกประเภท</div>
             <div class="section-divider" style="margin:10px auto 0;"></div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;">
+        <div class="ord-products-grid">
             @foreach([
                 ['bi-person-badge-fill',     'เสื้อยูนิฟอร์ม',         'ยูนิฟอร์มองค์กร บริษัท โรงแรม ร้านอาหาร ทุกสไตล์'],
                 ['bi-building-fill',         'เสื้อหน่วยงาน',           'ออกแบบตามอัตลักษณ์องค์กร โลโก้คมชัด ทนทาน'],
@@ -60,9 +79,9 @@
             <div class="section-title">สั่งผลิตง่ายๆ 5 ขั้นตอน</div>
             <div class="section-divider" style="margin:10px auto 0;"></div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0;position:relative;">
+        <div class="ord-steps-grid">
             {{-- Connector line --}}
-            <div style="position:absolute;top:36px;left:10%;right:10%;height:2px;background:linear-gradient(90deg,var(--kgm-green-200),var(--kgm-gold-300));z-index:0;"></div>
+            <div class="ord-steps-line"></div>
             @foreach([
                 ['bi-chat-dots-fill',    '01','ติดต่อสอบถาม',          'โทรหาทีมขายหรือส่งข้อความผ่าน Line @KGM444'],
                 ['bi-file-earmark-text', '02','รับใบเสนอราคา',         'เราประเมินราคาและส่งใบเสนอราคาให้ภายใน 1-2 วัน'],
@@ -86,7 +105,7 @@
 {{-- ══ WHY KGM ══ --}}
 <section class="section" style="background:white;">
     <div class="container">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;">
+        <div class="ord-why-grid">
             <div>
                 <div class="section-subtitle">ทำไมต้องเลือก KGM</div>
                 <div class="section-title" style="margin-bottom:20px;">มั่นใจทุกขั้นตอน<br>ตั้งแต่ออกแบบจนส่งมอบ</div>

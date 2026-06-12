@@ -158,7 +158,39 @@
         @media(max-width: 768px) { .sidebar { transform: translateX(-100%); } .main-wrapper { margin-left: 0; } .stats-grid { grid-template-columns: 1fr 1fr; } }
         @media(max-width: 480px) { .stats-grid { grid-template-columns: 1fr; } .form-grid { grid-template-columns: 1fr; } }
         [x-cloak] { display: none; }
+
+        /* ===== Custom Select ===== */
+        .kgm-select { position: relative; display: block; }
+        .kgm-select-btn {
+            width: 100%; display: flex; align-items: center; gap: 8px;
+            padding: 10px 14px 10px 16px; border: 2px solid #e8ecef; border-radius: 14px;
+            font-size: 14px; font-family: inherit; background: #fafafa; color: #2c3e50;
+            text-align: left; cursor: pointer; transition: border-color .2s, box-shadow .2s, background .2s;
+            outline: none; line-height: 1.4;
+        }
+        .kgm-select-btn:hover { border-color: #c8d8c8; background: #f5f7f5; }
+        .kgm-select-btn.open { border-color: var(--g500); background: white; box-shadow: 0 0 0 3px rgba(64,145,108,.1); }
+        .kgm-select-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .kgm-select-arrow { flex-shrink: 0; font-size: 13px; color: #888; transition: transform .2s; }
+        .kgm-select-btn.open .kgm-select-arrow { transform: rotate(180deg); }
+        .kgm-select-dropdown {
+            display: none; position: fixed;
+            background: white; border: 2px solid #e0e8e0; border-radius: 14px;
+            box-shadow: 0 8px 28px rgba(0,0,0,.12); z-index: 9999;
+            max-height: 256px; overflow-y: auto; padding: 6px;
+        }
+        .kgm-select-dropdown.open { display: block; }
+        .kgm-select-opt {
+            padding: 9px 12px; font-size: 14px; cursor: pointer; border-radius: 10px;
+            color: #2c3e50; transition: background .1s; white-space: nowrap;
+        }
+        .kgm-select-opt:hover { background: #f0f4f0; color: var(--g700); }
+        .kgm-select-opt.is-selected { background: var(--g100); color: var(--g700); font-weight: 600; }
+        .kgm-select-opt.is-placeholder { color: #aaa; }
+        .kgm-select-dropdown::-webkit-scrollbar { width: 5px; }
+        .kgm-select-dropdown::-webkit-scrollbar-thumb { background: #d0d8d0; border-radius: 999px; }
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     @stack('styles')
 </head>
 <body x-data="{ sidebarOpen: true }">
@@ -203,6 +235,9 @@
             <a href="{{ route('admin.quotes.index') }}" class="nav-item {{ request()->routeIs('admin.quotes*') ? 'active' : '' }}">
                 <i class="bi bi-file-earmark-text"></i> ใบเสนอราคา
             </a>
+            <a href="{{ route('admin.settings.shipping-rates') }}" class="nav-item {{ request()->routeIs('admin.settings.shipping-rates') ? 'active' : '' }}">
+                <i class="bi bi-truck"></i> อัตราค่าขนส่ง
+            </a>
         </div>
         <div class="nav-section">
             <div class="nav-section-title">การตลาด</div>
@@ -229,6 +264,11 @@
             </a>
             <a href="{{ route('admin.users.index') }}" class="nav-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
                 <i class="bi bi-person-badge"></i> ผู้ใช้งานระบบ
+            </a>
+            <a href="{{ route('admin.reviews.index') }}" class="nav-item {{ request()->routeIs('admin.reviews*') ? 'active' : '' }}">
+                <i class="bi bi-star-half"></i> รีวิวสินค้า
+                @php $pendingReviews = \App\Models\Review::where('is_approved', false)->count(); @endphp
+                @if($pendingReviews > 0)<span class="badge-dot">{{ $pendingReviews }}</span>@endif
             </a>
             <a href="{{ route('admin.contacts.index') }}" class="nav-item {{ request()->routeIs('admin.contacts*') ? 'active' : '' }}">
                 <i class="bi bi-chat-left-text"></i> ข้อความติดต่อ
@@ -311,6 +351,42 @@
 </div>
 
 @stack('scripts')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('input[type="date"]').forEach(function (el) {
+        flatpickr(el, {
+            locale: 'th',
+            dateFormat: 'Y-m-d',
+            altInput: true,
+            altFormat: 'd/m/Y',
+            allowInput: true,
+        });
+    });
+    document.querySelectorAll('input[type="datetime-local"]').forEach(function (el) {
+        flatpickr(el, {
+            locale: 'th',
+            dateFormat: 'Y-m-d H:i',
+            altInput: true,
+            altFormat: 'd/m/Y H:i',
+            enableTime: true,
+            time_24hr: true,
+            allowInput: true,
+        });
+    });
+    document.querySelectorAll('input[type="time"]').forEach(function (el) {
+        flatpickr(el, {
+            locale: 'th',
+            dateFormat: 'H:i',
+            enableTime: true,
+            noCalendar: true,
+            time_24hr: true,
+            allowInput: true,
+        });
+    });
+});
+</script>
 <script>
     const sidebar = document.querySelector('.sidebar');
     const active = sidebar?.querySelector('.nav-item.active');
@@ -318,6 +394,97 @@
         const offset = active.offsetTop - sidebar.clientHeight / 2 + active.clientHeight / 2;
         sidebar.scrollTop = Math.max(0, offset);
     }
+</script>
+<script>
+(function () {
+    function enhance(select) {
+        if (select.dataset.kgmEnhanced) return;
+        select.dataset.kgmEnhanced = '1';
+        select.style.display = 'none';
+
+        const wrap = document.createElement('div');
+        wrap.className = 'kgm-select';
+        select.parentNode.insertBefore(wrap, select);
+        wrap.appendChild(select);
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'kgm-select-btn';
+
+        const textEl = document.createElement('span');
+        textEl.className = 'kgm-select-text';
+
+        const arrow = document.createElement('i');
+        arrow.className = 'bi bi-chevron-down kgm-select-arrow';
+
+        btn.appendChild(textEl);
+        btn.appendChild(arrow);
+
+        const dd = document.createElement('div');
+        dd.className = 'kgm-select-dropdown';
+
+        wrap.insertBefore(btn, select);
+        wrap.insertBefore(dd, select);
+
+        function sync() {
+            const o = select.options[select.selectedIndex];
+            if (!o) return;
+            textEl.textContent = o.text;
+            textEl.style.color = o.value === '' ? '#aaa' : '';
+        }
+
+        function build() {
+            dd.innerHTML = '';
+            Array.from(select.options).forEach((o, i) => {
+                const item = document.createElement('div');
+                item.className = 'kgm-select-opt';
+                if (o.value === '') item.classList.add('is-placeholder');
+                if (select.selectedIndex === i) item.classList.add('is-selected');
+                item.textContent = o.text;
+                item.addEventListener('mousedown', e => {
+                    e.preventDefault();
+                    select.selectedIndex = i;
+                    select.dispatchEvent(new Event('change', { bubbles: true }));
+                    select.dispatchEvent(new Event('input', { bubbles: true }));
+                    close();
+                });
+                dd.appendChild(item);
+            });
+        }
+
+        function open() {
+            build();
+            const r = btn.getBoundingClientRect();
+            dd.style.top      = (r.bottom + 5) + 'px';
+            dd.style.left     = r.left + 'px';
+            dd.style.minWidth = r.width + 'px';
+            dd.style.width    = 'auto';
+            dd.classList.add('open');
+            btn.classList.add('open');
+        }
+        function close() { dd.classList.remove('open'); btn.classList.remove('open'); }
+
+        btn.addEventListener('click', e => {
+            e.stopPropagation();
+            dd.classList.contains('open') ? close() : open();
+        });
+
+        select.addEventListener('change', sync);
+        select.addEventListener('input', sync);
+        document.addEventListener('click', close);
+
+        sync();
+        setTimeout(sync, 0);
+    }
+
+    function run() {
+        document.querySelectorAll('select.form-control').forEach(enhance);
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run);
+    else run();
+    document.addEventListener('alpine:initialized', run);
+})();
 </script>
 </body>
 </html>

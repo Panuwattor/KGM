@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Cart;
 use App\Models\Coupon;
+use App\Models\ShippingRate;
 use Illuminate\Support\Collection;
 
 class CartService
@@ -64,10 +65,10 @@ class CartService
         }
     }
 
-    public function mergeSessionCart(): void
+    public function mergeSessionCart(?string $sessionId = null): void
     {
         if (!$this->customer()->check()) return;
-        $sessionId = session()->getId();
+        $sessionId = $sessionId ?? session()->getId();
         $sessionItems = Cart::where('session_id', $sessionId)->get();
 
         foreach ($sessionItems as $item) {
@@ -90,17 +91,15 @@ class CartService
         return $this->getCartItems()->sum(fn($item) => $item->subtotal);
     }
 
-    public function getShippingFee(float $subtotal, ?string $couponCode = null): float
+    public function getShippingFee(float $subtotal, ?string $couponCode = null, ?string $stackedCouponCode = null): float
     {
-        $freeThreshold = (float) env('FREE_SHIPPING_AMOUNT', 1000);
-        if ($subtotal >= $freeThreshold) return 0;
-
-        if ($couponCode) {
-            $coupon = Coupon::where('code', $couponCode)->first();
-            if ($coupon && $coupon->isValid() && $coupon->type === 'free_shipping' && $subtotal >= $coupon->minimum_order) return 0;
+        foreach (array_filter([$couponCode, $stackedCouponCode]) as $code) {
+            $coupon = Coupon::where('code', $code)->first();
+            if ($coupon && $coupon->isValid() && $coupon->type === 'free_shipping' && $subtotal >= $coupon->minimum_order) {
+                return 0;
+            }
         }
-
-        return 50;
+        return ShippingRate::feeForQty($this->getCount());
     }
 
     public function getCount(): int

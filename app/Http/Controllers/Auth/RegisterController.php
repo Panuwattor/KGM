@@ -92,8 +92,10 @@ class RegisterController extends Controller
             'status'   => 'active',
         ]);
 
+        $oldSessionId = session()->getId();
         Auth::guard('customer')->login($customer);
-        app(CartService::class)->mergeSessionCart();
+        session()->regenerate();
+        app(CartService::class)->mergeSessionCart($oldSessionId);
 
         return redirect()->route('home')->with('success', 'สมัครสมาชิกสำเร็จ! ยินดีต้อนรับครับ');
     }

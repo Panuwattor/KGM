@@ -7,6 +7,7 @@ use App\Models\Career;
 use App\Models\Customer;
 use App\Models\Post;
 use App\Models\PostCategory;
+use App\Models\ShippingRate;
 use App\Models\ShippingSetting;
 use App\Models\Showroom;
 use App\Models\SiteSetting;
@@ -19,22 +20,12 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // ── Users ─────────────────────────────────────────────────────────────
-        User::create([
-            'name'      => 'แอดมิน KGM',
-            'email'     => 'admin@admin.com',
-            'password'  => Hash::make('a12345678'),
-            'role'      => 'admin',
-            'is_active' => true,
-        ]);
-
-        Customer::create([
-            'name'     => 'ลูกค้าทดสอบ',
-            'email'    => 'customer@test.com',
-            'phone'    => '0812345678',
-            'password' => Hash::make('Password@1'),
-            'status'   => 'active',
-        ]);
-
+        if(User::count() == 0) {
+            User::firstOrCreate(
+                ['email' => 'admin@admin.com'],
+                ['name' => 'แอดมิน KGM', 'password' => Hash::make('a12345678'), 'role' => 'admin', 'is_active' => true]
+            );
+        }
         // ── Site Settings ──────────────────────────────────────────────────────
         foreach ([
             ['key' => 'site_name',         'value' => 'กิจเจริญการ์เมนท์ (1993) จำกัด'],
@@ -46,16 +37,16 @@ class DatabaseSeeder extends Seeder
             ['key' => 'meta_title',        'value' => 'กิจเจริญการ์เมนท์ | เครื่องแบบนักเรียนและยูนิฟอร์มคุณภาพ'],
             ['key' => 'meta_description',  'value' => 'โรงงานผลิตเครื่องแบบนักเรียน ยูนิฟอร์ม บริการปักและสกรีน ประสบการณ์กว่า 30 ปี'],
         ] as $s) {
-            SiteSetting::create($s + ['group' => 'general']);
+            SiteSetting::updateOrCreate(['key' => $s['key']], ['value' => $s['value'], 'group' => 'general']);
         }
 
-        ShippingSetting::create([
-            'provider_name'           => 'Kerry Express',
-            'flat_rate'               => 50,
-            'free_shipping_threshold' => 1000,
-            'is_active'               => true,
-            'sort_order'              => 1,
-        ]);
+        ShippingSetting::firstOrCreate(
+            ['provider_name' => 'Kerry Express'],
+            ['flat_rate' => 50, 'free_shipping_threshold' => 1000, 'is_active' => true, 'sort_order' => 1]
+        );
+
+        // ── Shipping Rates ─────────────────────────────────────────────────────
+        $this->call(ShippingRateSeeder::class);
 
         // ── Brands & Categories & Products ────────────────────────────────────
         $this->call([
@@ -65,51 +56,62 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // ── Banners ───────────────────────────────────────────────────────────
-        Banner::create([
-            'image_path' => 'banners/default.jpg',
-            'link_url'   => '/shop',
-            'is_active'  => true,
-            'sort_order' => 1,
-        ]);
+        if(Banner::count() == 0) {
+            Banner::create([
+                'image_path' => 'banners/default.jpg',
+                'link_url'   => '/shop',
+                'is_active'  => true,
+                'sort_order' => 1,
+            ]);
+        }
 
         // ── Showrooms ──────────────────────────────────────────────────────────
-        Showroom::create([
-            'name'       => 'สำนักงานใหญ่ บางรัก',
-            'address'    => '123 ถนนเจริญกรุง แขวงบางรัก เขตบางรัก กรุงเทพฯ 10500',
-            'phone'      => '02-000-1234',
-            'line_id'    => '@KGM1993',
-            'open_hours' => 'จันทร์-ศุกร์ 08:00-17:30 น.',
-            'is_active'  => true,
-            'is_main'    => true,
-            'sort_order' => 1,
-        ]);
-
+        if(Showroom::count() == 0) {
+            Showroom::firstOrCreate(
+                ['name' => 'สำนักงานใหญ่ บางรัก'],
+                [
+                    'address'    => '123 ถนนเจริญกรุง แขวงบางรัก เขตบางรัก กรุงเทพฯ 10500',
+                    'phone'      => '02-000-1234',
+                    'line_id'    => '@KGM1993',
+                    'open_hours' => 'จันทร์-ศุกร์ 08:00-17:30 น.',
+                    'is_active'  => true,
+                    'is_main'    => true,
+                    'sort_order' => 1,
+                ]
+            );
+        }
         // ── Careers ───────────────────────────────────────────────────────────
-        Career::create([
-            'title'        => 'พนักงานขาย (Sales)',
-            'department'   => 'ฝ่ายขาย',
-            'type'         => 'full_time',
-            'description'  => "รับผิดชอบการขายสินค้าและให้คำปรึกษาลูกค้า\nดูแลฐานลูกค้าเดิมและหาลูกค้าใหม่",
-            'requirements' => "- จบการศึกษาระดับปริญญาตรีขึ้นไป\n- มีประสบการณ์งานขาย 1-2 ปี",
-            'benefits'     => "- เงินเดือน + Commission\n- ประกันสุขภาพ\n- โบนัสประจำปี",
-            'location'     => 'กรุงเทพฯ',
-            'vacancies'    => 3,
-            'is_active'    => true,
-        ]);
+        if(Career::count() == 0) {
+            Career::firstOrCreate(
+                ['title' => 'พนักงานขาย (Sales)'],
+                [
+                    'department'   => 'ฝ่ายขาย',
+                    'type'         => 'full_time',
+                    'description'  => "รับผิดชอบการขายสินค้าและให้คำปรึกษาลูกค้า\nดูแลฐานลูกค้าเดิมและหาลูกค้าใหม่",
+                    'requirements' => "- จบการศึกษาระดับปริญญาตรีขึ้นไป\n- มีประสบการณ์งานขาย 1-2 ปี",
+                    'benefits'     => "- เงินเดือน + Commission\n- ประกันสุขภาพ\n- โบนัสประจำปี",
+                    'location'     => 'กรุงเทพฯ',
+                    'vacancies'    => 3,
+                    'is_active'    => true,
+                ]
+            );
+        }
 
         // ── Posts ──────────────────────────────────────────────────────────────
-        $newscat = PostCategory::create(['name' => 'ข่าวสาร',   'slug' => 'news',      'type' => 'news']);
-        PostCategory::create(['name' => 'โปรโมชั่น', 'slug' => 'promotion', 'type' => 'promotion']);
+        $newscat = PostCategory::firstOrCreate(['slug' => 'news'],      ['name' => 'ข่าวสาร',   'type' => 'news']);
+        PostCategory::firstOrCreate(['slug' => 'promotion'], ['name' => 'โปรโมชั่น', 'type' => 'promotion']);
 
-        Post::create([
-            'post_category_id' => $newscat->id,
-            'author_id'        => 1,
-            'title'            => 'KGM เปิดตัวสินค้าใหม่ เครื่องแบบนักเรียน Season 2024',
-            'slug'             => 'kgm-new-products-2024',
-            'excerpt'          => 'บริษัท กิจเจริญการ์เมนท์ เปิดตัวสินค้าใหม่สำหรับปีการศึกษา 2024',
-            'body'             => '<p>บริษัท กิจเจริญการ์เมนท์ (1993) จำกัด ขอแนะนำเครื่องแบบนักเรียนรุ่นใหม่ล่าสุดสำหรับปีการศึกษา 2024</p>',
-            'status'           => 'published',
-            'published_at'     => now()->subDays(5),
-        ]);
+        Post::firstOrCreate(
+            ['slug' => 'kgm-new-products-2024'],
+            [
+                'post_category_id' => $newscat->id,
+                'author_id'        => 1,
+                'title'            => 'KGM เปิดตัวสินค้าใหม่ เครื่องแบบนักเรียน Season 2024',
+                'excerpt'          => 'บริษัท กิจเจริญการ์เมนท์ เปิดตัวสินค้าใหม่สำหรับปีการศึกษา 2024',
+                'body'             => '<p>บริษัท กิจเจริญการ์เมนท์ (1993) จำกัด ขอแนะนำเครื่องแบบนักเรียนรุ่นใหม่ล่าสุดสำหรับปีการศึกษา 2024</p>',
+                'status'           => 'published',
+                'published_at'     => now()->subDays(5),
+            ]
+        );
     }
 }

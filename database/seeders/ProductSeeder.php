@@ -84,6 +84,8 @@ class ProductSeeder extends Seeder
         $noSize = [['size' => null, 'adj' => 0, 'stock' => rand(10, 30)]];
 
         $make = function (array $p) use ($img, $makeSlug, $typeOf) {
+            if (Product::where('name', $p['name'])->exists()) return;
+
             $variants   = $p['variants'] ?? [];
             $totalStock = (int) array_sum(array_column($variants, 'stock'));
 

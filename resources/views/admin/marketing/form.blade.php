@@ -12,8 +12,8 @@
         <div class="form-grid">
             <div class="form-group"><label class="form-label">ชื่อ Flash Sale *</label><input type="text" name="name" class="form-control" value="{{ old('name',$flashSale->name??'') }}" required></div>
             <div class="form-group col-span-full" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-                <div><label class="form-label">เวลาเริ่มต้น *</label><input type="datetime-local" name="starts_at" class="form-control" value="{{ old('starts_at',$flashSale->starts_at?->format('Y-m-d\TH:i')??'') }}" required></div>
-                <div><label class="form-label">เวลาสิ้นสุด *</label><input type="datetime-local" name="ends_at" class="form-control" value="{{ old('ends_at',$flashSale->ends_at?->format('Y-m-d\TH:i')??'') }}" required></div>
+                <div><label class="form-label">เวลาเริ่มต้น *</label><input type="datetime-local" name="starts_at" class="form-control" value="{{ old('starts_at',$flashSale->starts_at?->format('Y-m-d H:i')??'') }}" required></div>
+                <div><label class="form-label">เวลาสิ้นสุด *</label><input type="datetime-local" name="ends_at" class="form-control" value="{{ old('ends_at',$flashSale->ends_at?->format('Y-m-d H:i')??'') }}" required></div>
             </div>
         </div>
         <div class="form-check"><input type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active',$flashSale->is_active??true)?'checked':'' }}><label for="is_active">เปิดใช้งาน</label></div>

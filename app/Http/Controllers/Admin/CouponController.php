@@ -30,8 +30,9 @@ class CouponController extends Controller
     {
         $data = $this->validateCoupon($request);
         $data['code']      = strtoupper($data['code']);
-        $data['is_active'] = $request->boolean('is_active');
-        $data['is_public'] = $request->boolean('is_public');
+        $data['is_active']    = $request->boolean('is_active');
+        $data['is_public']    = $request->boolean('is_public');
+        $data['is_stackable'] = $request->boolean('is_stackable');
         if ($data['type'] === 'free_shipping') $data['value'] = 0;
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('coupons', 'public');
@@ -54,8 +55,9 @@ class CouponController extends Controller
     public function update(Request $request, Coupon $coupon)
     {
         $data = $this->validateCoupon($request, $coupon->id);
-        $data['is_active'] = $request->boolean('is_active');
-        $data['is_public'] = $request->boolean('is_public');
+        $data['is_active']    = $request->boolean('is_active');
+        $data['is_public']    = $request->boolean('is_public');
+        $data['is_stackable'] = $request->boolean('is_stackable');
         if ($data['type'] === 'free_shipping') $data['value'] = 0;
         unset($data['image']);
         if ($request->hasFile('image')) {

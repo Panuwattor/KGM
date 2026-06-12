@@ -85,7 +85,7 @@
                 </div>
                 <div class="form-group">
                     <label class="form-label">วันที่เผยแพร่</label>
-                    <input type="datetime-local" name="published_at" class="form-control" value="{{ old('published_at', ($post??null)?->published_at?->format('Y-m-d\TH:i')??'') }}">
+                    <input type="datetime-local" name="published_at" class="form-control" value="{{ old('published_at', ($post??null)?->published_at?->format('Y-m-d H:i')??'') }}">
                 </div>
                 <div class="form-group" style="background:#fffbeb;border-radius:14px;padding:14px 16px;border:2px solid #fde68a;">
                     <div class="form-check" style="margin:0;">

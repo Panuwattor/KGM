@@ -3,6 +3,16 @@
 
 @section('content')
 
+<style>
+.emb-intro-grid   { display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center; }
+.emb-gallery-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; align-items:start; }
+@media(max-width:767px){
+    .emb-intro-grid   { grid-template-columns:1fr; gap:24px; }
+    .emb-gallery-grid { grid-template-columns:1fr; }
+    .grid.grid-2      { grid-template-columns:1fr !important; }
+}
+</style>
+
 {{-- ══ HERO ══ --}}
 <div style="background:linear-gradient(135deg,var(--kgm-green-900),var(--kgm-green-700));padding:80px 0 60px;text-align:center;">
     <div class="container">
@@ -22,9 +32,9 @@
 {{-- ══ INTRO WITH IMAGE ══ --}}
 <section class="section" style="background:white;">
     <div class="container">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;">
+        <div class="emb-intro-grid">
             <div>
-                <img src="https://www.kgm.co.th/wp-content/uploads/2018/03/pak_1500.jpg"
+                <img src="/images/screen/pak_1500.jpg"
                      alt="เครื่องปักอัตโนมัติ KGM"
                      style="width:100%;border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,0.12);"
                      loading="eager">
@@ -119,25 +129,14 @@
             <div class="section-title">ตัวอย่างงานปักของเรา</div>
             <div class="section-divider" style="margin:10px auto 0;"></div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;">
-            <div>
-                <img src="https://www.kgm.co.th/wp-content/uploads/2018/03/pak_1500.jpg"
-                     alt="โรงงานเครื่องปักอัตโนมัติ KGM"
-                     style="width:100%;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.1);"
-                     loading="lazy">
-                <p style="margin-top:10px;font-size:13px;color:#888;text-align:center;">
-                    <i class="bi bi-building"></i> เครื่องปักอัตโนมัติ ภายในโรงงาน KGM จ.ศรีสะเกษ
-                </p>
-            </div>
-            <div>
-                <img src="https://www.kgm.co.th/wp-content/uploads/2024/02/KGM-pak-scaled.jpg"
-                     alt="ตัวอย่างงานปักตราสัญลักษณ์โรงเรียน KGM"
-                     style="width:100%;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.1);"
-                     loading="lazy">
-                <p style="margin-top:10px;font-size:13px;color:#888;text-align:center;">
-                    <i class="bi bi-patch-check"></i> ตัวอย่างงานปักตราสัญลักษณ์โรงเรียนต่างๆ ทั่วประเทศ
-                </p>
-            </div>
+        <div style="max-width:760px;margin:0 auto;text-align:center;">
+            <img src="/images/screen/KGM-pak-scaled.jpg"
+                 alt="ตัวอย่างงานปักตราสัญลักษณ์โรงเรียน KGM"
+                 style="width:100%;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.1);"
+                 loading="lazy">
+            <p style="margin-top:10px;font-size:13px;color:#888;">
+                <i class="bi bi-patch-check"></i> ตัวอย่างงานปักตราสัญลักษณ์โรงเรียนต่างๆ ทั่วประเทศ
+            </p>
         </div>
     </div>
 </section>

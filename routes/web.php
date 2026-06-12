@@ -24,6 +24,7 @@ use App\Http\Controllers\Admin\CareerController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\QuoteAdminController;
 use App\Http\Controllers\Admin\CouponController;
+use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\MarketingController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ShowroomController;
@@ -77,7 +78,7 @@ Route::post('/dealer', [DealerController::class, 'submit'])->name('dealer.submit
 Route::get('/shop', [ShopController::class, 'index'])->name('shop');
 Route::get('/shop/category/{slug}', [ShopController::class, 'category'])->name('shop.category');
 Route::get('/shop/{slug}', [ShopController::class, 'show'])->name('shop.show');
-Route::post('/shop/{product}/review', [ShopController::class, 'submitReview'])->name('shop.review')->middleware('auth');
+Route::post('/shop/{product}/review', [ShopController::class, 'submitReview'])->name('shop.review')->middleware('auth:customer');
 
 // Coupons
 Route::get('/coupons', [FrontendCouponController::class, 'index'])->name('coupons.index');
@@ -165,6 +166,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::resource('careers', CareerController::class);
     Route::get('careers/{career}/applications', [CareerController::class, 'applications'])->name('careers.applications');
     Route::patch('career-applications/{application}/status', [CareerController::class, 'updateApplicationStatus'])->name('career-applications.status');
+    Route::get('career-applications/{application}/resume', [CareerController::class, 'downloadResume'])->name('career-applications.resume');
 
     Route::get('contacts', [ContactController::class, 'index'])->name('contacts.index');
     Route::get('contacts/{message}', [ContactController::class, 'show'])->name('contacts.show');
@@ -175,6 +177,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('quotes/{quote}', [QuoteAdminController::class, 'show'])->name('quotes.show');
     Route::post('quotes/{quote}/respond', [QuoteAdminController::class, 'respond'])->name('quotes.respond');
     Route::patch('quotes/{quote}/status', [QuoteAdminController::class, 'updateStatus'])->name('quotes.status');
+
+    Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    Route::put('reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::post('reviews/{review}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
+    Route::post('reviews/{review}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
+    Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 
     Route::resource('coupons', CouponController::class);
     Route::get('marketing', [MarketingController::class, 'index'])->name('marketing.index');
@@ -191,6 +199,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
     Route::get('settings/shipping', [SettingController::class, 'shipping'])->name('settings.shipping');
     Route::post('settings/shipping', [SettingController::class, 'updateShipping'])->name('settings.shipping.update');
+    Route::get('settings/shipping-rates', [SettingController::class, 'shippingRates'])->name('settings.shipping-rates');
+    Route::post('settings/shipping-rates', [SettingController::class, 'updateShippingRates'])->name('settings.shipping-rates.update');
     Route::get('settings/logs', [SettingController::class, 'logs'])->name('settings.logs');
     Route::get('settings/consent-logs', [SettingController::class, 'consentLogs'])->name('settings.consent-logs');
 });

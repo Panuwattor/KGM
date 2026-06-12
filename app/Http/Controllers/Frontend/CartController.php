@@ -14,24 +14,24 @@ class CartController extends Controller
 
     public function index()
     {
-        $cartItems   = $this->cart->getCartItems();
-        $subtotal    = $this->cart->getSubtotal();
-        $couponCode  = session('coupon_code');
-        $coupon      = $couponCode
+        $cartItems         = $this->cart->getCartItems();
+        $subtotal          = $this->cart->getSubtotal();
+        $couponCode        = session('coupon_code');
+        $stackedCouponCode = session('stacked_coupon_code');
+        $coupon            = $couponCode
             ? Coupon::where('code', $couponCode)->with(['products', 'categories'])->first()
             : null;
-        $discountAmount          = $coupon ? $coupon->calculateDiscount($subtotal, $cartItems) : 0;
-        $shippingFee             = $this->cart->getShippingFee($subtotal, $couponCode);
-        $total                   = $subtotal - $discountAmount + $shippingFee;
-        $freeShippingThreshold   = (float) env('FREE_SHIPPING_AMOUNT', 1000);
-        $amountForFreeShipping   = ($shippingFee == 0) ? 0 : max(0, $freeShippingThreshold - $subtotal);
-
-        $collectedCoupons = $this->getCollectedCoupons($couponCode);
+        $stackedCoupon     = $stackedCouponCode
+            ? Coupon::where('code', $stackedCouponCode)->first()
+            : null;
+        $discountAmount    = $coupon ? $coupon->calculateDiscount($subtotal, $cartItems) : 0;
+        $shippingFee       = $this->cart->getShippingFee($subtotal, $couponCode, $stackedCouponCode);
+        $total             = $subtotal - $discountAmount + $shippingFee;
+        $collectedCoupons  = $this->getCollectedCoupons($couponCode, $stackedCouponCode);
 
         return view('frontend.cart', compact(
-            'cartItems', 'subtotal', 'coupon', 'discountAmount',
-            'shippingFee', 'total', 'freeShippingThreshold', 'amountForFreeShipping',
-            'collectedCoupons'
+            'cartItems', 'subtotal', 'coupon', 'stackedCoupon', 'discountAmount',
+            'shippingFee', 'total', 'collectedCoupons'
         ));
     }
 
@@ -73,25 +73,27 @@ class CartController extends Controller
 
     private function cartSummaryJson(): array
     {
-        $cartItems             = $this->cart->getCartItems();
-        $subtotal              = $this->cart->getSubtotal();
-        $couponCode            = session('coupon_code');
-        $coupon                = $couponCode
+        $cartItems         = $this->cart->getCartItems();
+        $subtotal          = $this->cart->getSubtotal();
+        $couponCode        = session('coupon_code');
+        $stackedCouponCode = session('stacked_coupon_code');
+        $coupon            = $couponCode
             ? Coupon::where('code', $couponCode)->with(['products', 'categories'])->first()
             : null;
-        $discountAmount        = $coupon ? $coupon->calculateDiscount($subtotal, $cartItems) : 0;
-        $shippingFee           = $this->cart->getShippingFee($subtotal, $couponCode);
-        $freeShippingThreshold = (float) env('FREE_SHIPPING_AMOUNT', 1000);
+        $stackedCoupon     = $stackedCouponCode
+            ? Coupon::where('code', $stackedCouponCode)->with(['products', 'categories'])->first()
+            : null;
+        $discountAmount    = ($coupon ? $coupon->calculateDiscount($subtotal, $cartItems) : 0)
+                           + ($stackedCoupon ? $stackedCoupon->calculateDiscount($subtotal, $cartItems) : 0);
+        $shippingFee       = $this->cart->getShippingFee($subtotal, $couponCode, $stackedCouponCode);
 
         return [
-            'count'                    => $this->cart->getCount(),
-            'subtotal'                 => $subtotal,
-            'discount_amount'          => $discountAmount,
-            'shipping_fee'             => $shippingFee,
-            'total'                    => $subtotal - $discountAmount + $shippingFee,
-            'free_shipping_threshold'  => $freeShippingThreshold,
-            'amount_for_free_shipping' => ($shippingFee == 0) ? 0 : max(0, $freeShippingThreshold - $subtotal),
-            'is_empty'                 => $cartItems->isEmpty(),
+            'count'           => $this->cart->getCount(),
+            'subtotal'        => $subtotal,
+            'discount_amount' => $discountAmount,
+            'shipping_fee'    => $shippingFee,
+            'total'           => $subtotal - $discountAmount + $shippingFee,
+            'is_empty'        => $cartItems->isEmpty(),
         ];
     }
 
@@ -127,13 +129,18 @@ class CartController extends Controller
             }
         }
 
-        session(['coupon_code' => $coupon->code]);
+        $sessionKey = $coupon->is_stackable ? 'stacked_coupon_code' : 'coupon_code';
+        session([$sessionKey => $coupon->code]);
         return back()->with('success', 'ใช้คูปอง "' . $coupon->code . '" สำเร็จ');
     }
 
-    public function removeCoupon()
+    public function removeCoupon(Request $request)
     {
-        session()->forget('coupon_code');
+        if ($request->boolean('stacked')) {
+            session()->forget('stacked_coupon_code');
+        } else {
+            session()->forget('coupon_code');
+        }
         return back()->with('success', 'ลบคูปองออกแล้ว');
     }
 
@@ -142,9 +149,11 @@ class CartController extends Controller
         return response()->json(['count' => $this->cart->getCount()]);
     }
 
-    private function getCollectedCoupons(?string $activeCouponCode): \Illuminate\Support\Collection
+    private function getCollectedCoupons(?string $activeCouponCode, ?string $activeStackedCode = null): \Illuminate\Support\Collection
     {
         if (!auth('customer')->check()) return collect();
+
+        $activeCodes = array_filter([$activeCouponCode, $activeStackedCode]);
 
         return CustomerCoupon::where('customer_id', auth('customer')->id())
             ->with(['coupon.products', 'coupon.categories'])
@@ -153,7 +162,7 @@ class CartController extends Controller
                 $cc->coupon &&
                 $cc->coupon->isValid() &&
                 $cc->coupon->isValidForCustomer(auth('customer')->id()) &&
-                $cc->coupon->code !== $activeCouponCode
+                !in_array($cc->coupon->code, $activeCodes)
             )
             ->values();
     }

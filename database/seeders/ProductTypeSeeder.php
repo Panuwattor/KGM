@@ -53,7 +53,10 @@ class ProductTypeSeeder extends Seeder
                 'sort_order'   => 6,
             ],
         ] as $data) {
-            ProductType::create($data + ['is_active' => true]);
+            ProductType::firstOrCreate(
+                ['slug' => $data['slug']],
+                $data + ['is_active' => true]
+            );
         }
     }
 }

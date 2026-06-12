@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Career;
 use App\Models\JobApplication;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CareerController extends Controller
 {
@@ -72,5 +73,11 @@ class CareerController extends Controller
         $request->validate(['status' => 'required|in:new,reviewing,interviewed,hired,rejected']);
         $application->update(['status' => $request->status, 'admin_note' => $request->admin_note]);
         return back()->with('success', 'อัปเดตสถานะผู้สมัครแล้ว');
+    }
+
+    public function downloadResume(JobApplication $application)
+    {
+        abort_unless($application->resume_path && Storage::disk('local')->exists($application->resume_path), 404);
+        return Storage::disk('local')->download($application->resume_path);
     }
 }

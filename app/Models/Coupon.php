@@ -11,13 +11,14 @@ class Coupon extends Model
 {
     protected $fillable = [
         'code', 'name', 'image', 'type', 'value', 'minimum_order', 'maximum_discount',
-        'usage_limit', 'used_count', 'per_user_limit', 'is_active', 'is_public',
+        'usage_limit', 'used_count', 'per_user_limit', 'is_active', 'is_public', 'is_stackable',
         'starts_at', 'expires_at',
     ];
 
     protected $casts = [
         'is_active'        => 'boolean',
         'is_public'        => 'boolean',
+        'is_stackable'     => 'boolean',
         'value'            => 'decimal:2',
         'minimum_order'    => 'decimal:2',
         'maximum_discount' => 'decimal:2',

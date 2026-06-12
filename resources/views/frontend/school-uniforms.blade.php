@@ -3,6 +3,19 @@
 
 @section('content')
 
+<style>
+.sch-uniforms-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:16px; }
+.sch-scout-grid    { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; max-width:900px; margin:0 auto; }
+@media(max-width:767px){
+    .sch-uniforms-grid        { grid-template-columns:repeat(2,1fr); }
+    .sch-scout-grid           { grid-template-columns:repeat(2,1fr); }
+    .grid.grid-4              { grid-template-columns:repeat(2,1fr) !important; }
+}
+@media(min-width:768px) and (max-width:991px){
+    .sch-uniforms-grid { grid-template-columns:repeat(3,1fr); }
+}
+</style>
+
 {{-- ══ HERO ══ --}}
 <div style="background:linear-gradient(135deg,var(--kgm-green-900),var(--kgm-green-700));padding:80px 0 60px;text-align:center;">
     <div class="container">
@@ -27,22 +40,22 @@
             <div class="section-title">ตัวอย่างเครื่องแบบนักเรียน</div>
             <div class="section-divider" style="margin:10px auto 0;"></div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;">
+        <div class="sch-uniforms-grid">
             @foreach([
-                ['กระโปรงดุมเอว-ลายน้ำ-450x800.jpg',               'เสื้ออนุบาลปกบัว+กระโปรง'],
-                ['10-เสื้ออนุบาลฮาวายดุมเอว-450x800.jpg',          'เสื้อฮาวายดุมเอว+กางเกงสีแดง'],
-                ['09-เสื้อปกบัวดุมเอวกระโปรงรุงดุมสีแดง-450x800.jpg','กระโปรงอนุบาลรังดุม-สีแดง'],
-                ['S__434223ลายน้ำ-450x800.jpg',                     'เสื้อเชิ้ตนักเรียนชาย+กางเกงกากี'],
-                ['07-เสื้อเชิ้ตนักเรียนชาย-กางเกงดำ-450x800.jpg',  'เสื้อเชิ้ตนักเรียนชาย+กางเกงดำ'],
-                ['08-เสื้อเชิ้ต-กางเกงกรมท่า-450x800.jpg',          'เสื้อเชิ้ตนักเรียนชาย+กางเกงกรมท่า'],
-                ['เสื้อปกบัวผ่าตลอด-450x800.jpg',                   'เสื้อปกบัวผ่าตลอด+กระโปรงจีบรอบ'],
-                ['เสื้อปกทหารเรือ-450x800.jpg',                     'เสื้อปกทหารเรือ+กระโปรง 6 จีบ'],
-                ['เสื้อปกบัวโปโล-450x800.jpg',                      'เสื้อปกบัวโปโล+กระโปรงจีบรอบ'],
-                ['เสื้อเตรียมแขนพอง-450x800.jpg',                   'เสื้อเตรียมแขนพอง+กระโปรง 6 จีบ'],
-            ] as [$file, $name])
+                ['01', 'เสื้ออนุบาลปกบัว+กระโปรง'],
+                ['02', 'เสื้อฮาวายดุมเอว+กางเกงสีแดง'],
+                ['03', 'กระโปรงอนุบาลรังดุม-สีแดง'],
+                ['04', 'เสื้อเชิ้ตนักเรียนชาย+กางเกงกากี'],
+                ['05', 'เสื้อเชิ้ตนักเรียนชาย+กางเกงดำ'],
+                ['06', 'เสื้อเชิ้ตนักเรียนชาย+กางเกงกรมท่า'],
+                ['07', 'เสื้อปกบัวผ่าตลอด+กระโปรงจีบรอบ'],
+                ['08', 'เสื้อปกทหารเรือ+กระโปรง 6 จีบ'],
+                ['09', 'เสื้อปกบัวโปโล+กระโปรงจีบรอบ'],
+                ['10', 'เสื้อเตรียมแขนพอง+กระโปรง 6 จีบ'],
+            ] as [$num, $name])
             <div style="border-radius:14px;overflow:hidden;background:#f8f8f8;box-shadow:0 2px 10px rgba(0,0,0,0.07);">
                 <div style="aspect-ratio:9/16;overflow:hidden;background:#eee;">
-                    <img src="https://www.kgm.co.th/wp-content/uploads/2023/01/{{ $file }}"
+                    <img src="/images/uniforms/{{ $num }}.jpg"
                          alt="{{ $name }}"
                          loading="lazy"
                          style="width:100%;height:100%;object-fit:cover;transition:transform 0.3s;"
@@ -66,16 +79,16 @@
             <div class="section-title">เครื่องแบบลูกเสือ-เนตรนารี-ยุวกาชาด</div>
             <div class="section-divider" style="margin:10px auto 0;"></div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;max-width:900px;margin:0 auto;">
+        <div class="sch-scout-grid">
             @foreach([
-                ['11-ชุดนักเรียนสำรอง-450x800.jpg', 'ชุดลูกเสือสำรอง'],
-                ['12-ชุดลูกเสือสามัญ-450x800.jpg',  'ชุดลูกเสือสามัญ'],
-                ['13-ชุดยุวกาชาด-450x800.jpg',       'ชุดยุวกาชาด'],
-                ['14-ชุดเนตรนารี-450x800.jpg',        'ชุดเนตรนารี'],
-            ] as [$file, $name])
+                ['11', 'ชุดลูกเสือสำรอง'],
+                ['12', 'ชุดลูกเสือสามัญ'],
+                ['13', 'ชุดยุวกาชาด'],
+                ['14', 'ชุดเนตรนารี'],
+            ] as [$num, $name])
             <div style="border-radius:14px;overflow:hidden;background:white;box-shadow:0 2px 10px rgba(0,0,0,0.07);">
                 <div style="aspect-ratio:9/16;overflow:hidden;background:#eee;">
-                    <img src="https://www.kgm.co.th/wp-content/uploads/2023/01/{{ $file }}"
+                    <img src="/images/uniforms/{{ $num }}.jpg"
                          alt="{{ $name }}"
                          loading="lazy"
                          style="width:100%;height:100%;object-fit:cover;transition:transform 0.3s;"

@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     @stack('styles')
 </head>
 <body>
@@ -84,6 +85,7 @@
             <a href="{{ route('services') }}"  class="nav-link {{ request()->routeIs('services')  ? 'active' : '' }}">บริการ</a>
             <a href="{{ route('about') }}"     class="nav-link {{ request()->routeIs('about')     ? 'active' : '' }}">เกี่ยวกับเรา</a>
             <a href="{{ route('news') }}"      class="nav-link {{ request()->routeIs('news*')     ? 'active' : '' }}">ข่าวสาร</a>
+            <a href="{{ route('careers') }}"   class="nav-link {{ request()->routeIs('careers*')  ? 'active' : '' }}">ร่วมงานกับเรา</a>
             <a href="{{ route('contact') }}"   class="nav-link {{ request()->routeIs('contact')   ? 'active' : '' }}">ติดต่อเรา</a>
         </div>
 
@@ -536,6 +538,42 @@ function toggleWishlist(btn) {
 }
 </script>
 @stack('scripts')
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('input[type="date"]').forEach(function (el) {
+        flatpickr(el, {
+            locale: 'th',
+            dateFormat: 'Y-m-d',
+            altInput: true,
+            altFormat: 'd/m/Y',
+            allowInput: true,
+        });
+    });
+    document.querySelectorAll('input[type="datetime-local"]').forEach(function (el) {
+        flatpickr(el, {
+            locale: 'th',
+            dateFormat: 'Y-m-d H:i',
+            altInput: true,
+            altFormat: 'd/m/Y H:i',
+            enableTime: true,
+            time_24hr: true,
+            allowInput: true,
+        });
+    });
+    document.querySelectorAll('input[type="time"]').forEach(function (el) {
+        flatpickr(el, {
+            locale: 'th',
+            dateFormat: 'H:i',
+            enableTime: true,
+            noCalendar: true,
+            time_24hr: true,
+            allowInput: true,
+        });
+    });
+});
+</script>
 <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
 
 {{-- ── Floating Contact ── --}}

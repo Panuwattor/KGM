@@ -4,9 +4,12 @@
 <div class="page-header">
     <div class="page-title">ตั้งค่าค่าจัดส่ง</div>
 </div>
-<div style="display:flex;gap:16px;margin-bottom:20px;">
-    <a href="{{ route('admin.settings.index') }}" class="btn btn-light"><i class="bi bi-gear"></i> ตั้งค่าทั่วไป</a>
-    <a href="{{ route('admin.settings.shipping') }}" class="btn btn-primary"><i class="bi bi-truck"></i> ค่าจัดส่ง</a>
+<div style="display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap;">
+    <a href="{{ route('admin.settings.index') }}"          class="btn btn-light"><i class="bi bi-gear"></i> ทั่วไป</a>
+    <a href="{{ route('admin.settings.shipping') }}"       class="btn btn-primary"><i class="bi bi-truck"></i> ผู้ให้บริการขนส่ง</a>
+    <a href="{{ route('admin.settings.shipping-rates') }}" class="btn btn-light"><i class="bi bi-table"></i> อัตราค่าขนส่ง</a>
+    <a href="{{ route('admin.settings.logs') }}"           class="btn btn-light"><i class="bi bi-journal-text"></i> Audit Log</a>
+    <a href="{{ route('admin.settings.consent-logs') }}"   class="btn btn-light"><i class="bi bi-shield-check"></i> PDPA Log</a>
 </div>
 <form method="POST" action="{{ route('admin.settings.shipping.update') }}" x-data="{ rows: {{ json_encode($shippings) }} }">
     @csrf

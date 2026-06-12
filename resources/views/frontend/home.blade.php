@@ -170,46 +170,25 @@
 @endif
 
 {{-- ══ ABOUT + SERVICE HIGHLIGHTS ══ --}}
-<img src="/images/cartoon.jpg" alt="KGM" class="">
-<section style="background:#E1CD94;" class="pt-0 pb-5">
+<img src="/images/cartoon.jpg" alt="KGM" class="w-100">
+<section style="background:#E1CD94;" class="pt-0 pb-3">
     <div class="container">
         <div class="grid" style="gap:24px;align-items:stretch;">
             <div class="row justify-content-center g-0">
-                <div class="col-md-10">
+                <div class="col-md-8">
                     <div class="row">
-                        <div class="col-md-6  mb-3">
-                            <div class="card" style="height:100%;padding:32px 36px;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box;">
-                                <h2 style="font-size:19px;color:#236237;font-weight:800;color:var(--kgm-green-900);margin:0 0 12px;">บริษัท กิจเจริญการ์เมนท์ (1993) จำกัด</h2>
-                                <p style="font-size:14px;color:#555;line-height:1.95;margin:0;text-indent:2em;">
-                                    เราคือผู้ผลิตและจำหน่ายเครื่องแบบนักเรียนมากกว่า 40 ปี เรามุ่งมั่นสร้างสรรค์ชุดเครื่องแบบเพื่อคนไทยและเด็กนักเรียนทั่วประเทศ
-                                    โดยคำนึงถึงคุณภาพและความคุ้มค่ามาเป็นที่หนึ่ง ใส่ใจในทุกรายละเอียด และพิถีพิถันทุกขั้นตอนการผลิตอย่างที่สุด
-                                </p>
-                                <a href="{{ route('about') }}" class="btn btn-outline" style="display:inline-flex;align-items:center;gap:6px;margin-top:20px;font-size:13px;font-weight:700;text-decoration:none;">
-                                    อ่านเพิ่มเติมเกี่ยวกับเรา <i class="bi bi-arrow-right"></i>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div style="display:flex;flex-direction:column;gap:12px;justify-content:space-between;">
-                                @foreach([
-                                    ['bi-palette-fill',      'Design & Production Services', 'บริการออกแบบและสั่งผลิต',      'order'],
-                                    ['bi-layers-fill',        'Embroidery and Screen Printing','บริการงานปักและสกรีน',         'embroidery-screen'],
-                                    ['bi-mortarboard-fill',   'School & Corporate Uniforms',  'เครื่องแบบนักเรียนและองค์กร',  'school-uniforms'],
-                                ] as [$icon, $title, $sub, $r])
-                                <a href="{{ route($r) }}" class="card" style="display:flex;flex-direction:row;align-items:stretch;padding:0;overflow:hidden;text-decoration:none;transition:box-shadow 0.2s,transform 0.2s;"
-                                onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.13)'"
-                                onmouseout="this.style.transform='';this.style.boxShadow=''">
-                                    {{-- col-4: icon --}}
-                                    <div style="flex:0 0 33.33%;background:var(--kgm-green-100);display:flex;align-items:center;justify-content:center;">
-                                        <i class="bi {{ $icon }}" style="font-size:40px;color:var(--kgm-green-600);"></i>
-                                    </div>
-                                    {{-- col-8: text --}}
-                                    <div style="flex:0 0 66.66%;padding:18px 20px;display:flex;flex-direction:column;justify-content:center;gap:4px;">
-                                        <div style="font-size:15px;font-weight:800;color:var(--kgm-green-900);line-height:1.3;">{{ $title }}</div>
-                                        <div style="font-size:12px;color:#999;">{{ $sub }}</div>
-                                    </div>
-                                </a>
-                                @endforeach
+                        <div class="col-md-12  mb-3">
+                            <div class="card">
+                               <div class="card-body text-center">
+                                     <h2 style="font-size:19px;color:#236237;font-weight:800;color:var(--kgm-green-900);margin:0 0 12px;">บริษัท กิจเจริญการ์เมนท์ (1993) จำกัด</h2>
+                                    <p style="font-size:14px;color:#555;line-height:1.95;margin:0;text-indent:2em;">
+                                        เราคือผู้ผลิตและจำหน่ายเครื่องแบบนักเรียนมากกว่า 40 ปี เรามุ่งมั่นสร้างสรรค์ชุดเครื่องแบบเพื่อคนไทยและเด็กนักเรียนทั่วประเทศ
+                                        โดยคำนึงถึงคุณภาพและความคุ้มค่ามาเป็นที่หนึ่ง ใส่ใจในทุกรายละเอียด และพิถีพิถันทุกขั้นตอนการผลิตอย่างที่สุด
+                                    </p>
+                                    <a href="{{ route('about') }}" class="btn btn-outline" style="display:inline-flex;align-items:center;gap:6px;margin-top:20px;font-size:13px;font-weight:700;text-decoration:none;">
+                                        อ่านเพิ่มเติมเกี่ยวกับเรา <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -220,22 +199,32 @@
 </section>
 
 {{-- ══ PROMO BANNERS ══ --}}
-<section style="padding:28px 0;">
+<section class="py-4">
     <div class="container">
-        <div class="grid grid-2" style="gap:14px;">
-            <div class="promo-banner green">
-                <div>
-                    <div style="color:rgba(255,255,255,0.65);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">บริการพิเศษ</div>
-                    <div class="promo-title" style="color:white;">ออกแบบเครื่องแบบ<br>ตามสั่งได้ทุกแบบ</div>
-                    <a href="{{ route('quote') }}" class="btn btn-gold btn-sm"><i class="bi bi-file-earmark-text"></i> ขอใบเสนอราคา</a>
-                </div>
+        <div class="row g-3">
+            <div class="col-12 col-sm-6">
+                <a href="{{ route('careers') }}" class="promo-banner green text-decoration-none">
+                    <div class="promo-banner-img-wrap">
+                        <img src="{{ asset('images/job/job1.jpg') }}" alt="สมัคร PC" class="promo-banner-img">
+                    </div>
+                    <div class="promo-banner-body">
+                        <div class="promo-tag">รับสมัคร PC</div>
+                        <div class="promo-title">ปิดรับสมัคร PC<br>ชุดนักเรียน</div>
+                        <span class="btn btn-gold btn-sm align-self-start"><i class="bi bi-file-earmark-text"></i> ดูตำแหน่งว่าง</span>
+                    </div>
+                </a>
             </div>
-            <div class="promo-banner gold">
-                <div>
-                    <div style="color:rgba(0,0,0,0.4);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">ตัวแทนจำหน่าย</div>
-                    <div class="promo-title" style="color:var(--kgm-green-900);">สนใจเป็นตัวแทน<br>จำหน่าย KGM</div>
-                    <a href="{{ route('dealer') }}" class="btn btn-sm" style="background:var(--kgm-green-800);color:white;"><i class="bi bi-shop"></i> สมัครตัวแทน</a>
-                </div>
+            <div class="col-12 col-sm-6">
+                <a href="{{ route('dealer') }}" class="promo-banner gold text-decoration-none">
+                    <div class="promo-banner-img-wrap">
+                        <img src="{{ asset('images/job/job2.jpg') }}" alt="ตัวแทนจำหน่าย" class="promo-banner-img">
+                    </div>
+                    <div class="promo-banner-body">
+                        <div class="promo-tag">ตัวแทนจำหน่าย</div>
+                        <div class="promo-title">สนใจเป็นตัวแทน<br>จำหน่าย KGM</div>
+                        <span class="btn btn-gold btn-sm align-self-start"><i class="bi bi-shop"></i> สมัครตัวแทน</span>
+                    </div>
+                </a>
             </div>
         </div>
     </div>
@@ -249,21 +238,122 @@
             <div class="section-title">บริการของเรา</div>
             <div class="section-divider" style="margin:10px auto 0;"></div>
         </div>
-        <div class="grid grid-3" style="gap:14px;">
-            @foreach([
-                ['bi-mortarboard-fill','เครื่องแบบนักเรียน','ผลิตครบชุดทุกระดับชั้น ชาย-หญิง ได้มาตรฐาน MOE'],
-                ['bi-person-badge-fill','ยูนิฟอร์มองค์กร','ออกแบบและผลิตสำหรับบริษัท โรงแรม โรงพยาบาล'],
-                ['bi-scissors','ปักและสกรีน','ปักโลโก้ สกรีนลาย ด้วยเครื่องจักรทันสมัย คมชัด ทนทาน'],
-            ] as [$icon,$title,$desc])
-            <div class="card" style="text-align:center;padding:24px 18px;">
-                <div style="width:54px;height:54px;background:var(--kgm-green-100);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--kgm-green-600);margin:0 auto 12px;">
-                    <i class="bi {{ $icon }}"></i>
+        @php
+        $services = [
+            ['service1.jpg','บริการออกแบบและสั่งผลิต','บริการงานปักและสกรีน เรามีจักรปักคุณภาพมาตรฐานสากล มีทั้งประเภท 20 หัวปัก 4 หัวปัก และ 1 หัวปัก พร้อมด้วยทีมงานออกแบบลายปัก ที่มีประสบการณ์มากว่า 40 ปี รองรับงานปักจำนวนมาก ด้วยไหมปักที่มีคุณภาพ', 'order'],
+            ['service2.jpg','เครื่องแบบนักเรียนและองค์กร','ออกแบบและผลิตชุดนักเรียนและชุดยูนิฟอร์มองค์กรตามความต้องการของลูกค้า เราผลิตชุดนักเรียนครบชุดทุกระดับชั้น ชาย-หญิง พร้อมชุดพลศึกษา ชุดเครื่องแบบลูกเสือ-เนตรนารี และยูนิฟอร์มสำหรับบริษัทและองค์กรทุกประเภท', 'school-uniforms'],
+            ['service3.jpg','บริการงานปักและสกรีน','บริการออกแบบและสั่งผลิต เสื้อยูนิฟอร์ม เสื้อหน่วยงาน เครื่องแบบนักเรียน เสื้อโปโล เสื้อแจ็คเก็ต เสื้อยืดคอกลม ชุดพนักงานราชการ ชุดคนไข้โรงพยาบาล ชุดกีฬา ถุงผ้า เรามีพนักงานที่มีความสามารถและมีประสบการณ์ กว่า 40 ปี', 'embroidery-screen'],
+        ];
+        @endphp
+
+        {{-- Desktop (≥768px): 3 columns --}}
+        <div class="grid grid-3 svc-desktop" style="gap:14px;">
+            @foreach($services as [$img,$title,$desc,$route])
+            <a href="{{ route($route) }}" style="text-decoration:none;display:block;">
+                <div class="card" style="text-align:center;padding:0;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                    <img src="{{ asset('images/service/'.$img) }}" alt="{{ $title }}" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px 12px 0 0;display:block;">
+                    <div style="padding:18px 16px;">
+                        <h3 style="font-size:15px;font-weight:700;color:var(--kgm-green-800);margin:0 0 8px;">{{ $title }}</h3>
+                        <p style="font-size:13px;color:#666;line-height:1.7;margin:0;">{{ $desc }}</p>
+                    </div>
                 </div>
-                <h3 style="font-size:15px;font-weight:700;color:var(--kgm-green-800);margin:0 0 8px;">{{ $title }}</h3>
-                <p style="font-size:13px;color:#666;line-height:1.7;margin:0;">{{ $desc }}</p>
-            </div>
+            </a>
             @endforeach
         </div>
+
+        {{-- Mobile (<768px): slideshow --}}
+        <div class="svc-mobile" style="position:relative;padding:0 20px;">
+            <div id="svc-track-wrap" style="overflow:hidden;border-radius:16px;width:100%;">
+                <div id="svc-track" style="display:flex;width:100%;transition:transform 0.35s ease;">
+                    @foreach($services as $i => [$img,$title,$desc,$route])
+                    <div style="flex:0 0 100%;width:100%;box-sizing:border-box;">
+                        <a href="{{ route($route) }}" style="text-decoration:none;display:block;">
+                            <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
+                                <img src="{{ asset('images/service/'.$img) }}" alt="{{ $title }}" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block;">
+                                <div style="padding:16px;text-align:center;">
+                                    <h3 style="font-size:15px;font-weight:700;color:var(--kgm-green-800);margin:0 0 8px;">{{ $title }}</h3>
+                                    <p style="font-size:13px;color:#666;line-height:1.7;margin:0;">{{ $desc }}</p>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            <button id="svc-prev" onclick="svcGo(-1)" style="position:absolute;top:35%;left:0;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:white;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--kgm-green-700);font-size:13px;z-index:2;">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <button id="svc-next" onclick="svcGo(1)" style="position:absolute;top:35%;right:0;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:white;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--kgm-green-700);font-size:13px;z-index:2;">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+            <div style="display:flex;justify-content:center;gap:6px;margin-top:14px;">
+                @foreach($services as $i => [$img,$title,$desc,$route])
+                <button onclick="svcSet({{ $i }})" id="svc-dot-{{ $i }}" style="width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;padding:0;transition:all 0.2s;background:{{ $i===0 ? 'var(--kgm-green-600)' : '#ccc' }};{{ $i===0 ? 'transform:scale(1.3);' : '' }}"></button>
+                @endforeach
+            </div>
+        </div>
+
+        <style>
+            @media(min-width:768px){ .svc-mobile{display:none!important;} }
+            @media(max-width:767px){ .svc-desktop{display:none!important;} }
+        </style>
+        <script>
+            var svcIdx=0,svcTotal=3;
+            function svcSet(n){
+                svcIdx=n;
+                var tw=document.getElementById('svc-track-wrap').offsetWidth;
+                var track=document.getElementById('svc-track');
+                track.style.transition='transform 0.35s ease';
+                track.style.transform='translateX(-'+(svcIdx*tw)+'px)';
+                document.getElementById('svc-prev').style.opacity=svcIdx===0?'0.3':'1';
+                document.getElementById('svc-next').style.opacity=svcIdx===svcTotal-1?'0.3':'1';
+                for(var i=0;i<svcTotal;i++){
+                    var d=document.getElementById('svc-dot-'+i);
+                    d.style.background=i===svcIdx?'var(--kgm-green-600)':'#ccc';
+                    d.style.transform=i===svcIdx?'scale(1.3)':'scale(1)';
+                }
+            }
+            function svcGo(dir){ svcSet(Math.max(0,Math.min(svcTotal-1,svcIdx+dir))); }
+            svcSet(0);
+
+            (function(){
+                var wrap=document.getElementById('svc-track-wrap');
+                var track=document.getElementById('svc-track');
+                var startX=0,isDragging=false,dragX=0,threshold=50;
+
+                function onStart(x){
+                    startX=x; isDragging=true;
+                    track.style.transition='none';
+                }
+                function onMove(x){
+                    if(!isDragging) return;
+                    dragX=x-startX;
+                    var tw=wrap.offsetWidth;
+                    track.style.transform='translateX('+(-svcIdx*tw+dragX)+'px)';
+                }
+                function onEnd(){
+                    if(!isDragging) return;
+                    isDragging=false;
+                    if(dragX<-threshold) svcGo(1);
+                    else if(dragX>threshold) svcGo(-1);
+                    else svcSet(svcIdx);
+                    dragX=0;
+                }
+
+                /* touch */
+                wrap.addEventListener('touchstart',function(e){ onStart(e.touches[0].clientX); },{passive:true});
+                wrap.addEventListener('touchmove',function(e){ onMove(e.touches[0].clientX); },{passive:true});
+                wrap.addEventListener('touchend',onEnd);
+
+                /* mouse */
+                wrap.addEventListener('mousedown',function(e){ onStart(e.clientX); e.preventDefault(); });
+                window.addEventListener('mousemove',function(e){ onMove(e.clientX); });
+                window.addEventListener('mouseup',onEnd);
+
+                /* ป้องกัน link ถูก trigger เวลา drag */
+                wrap.addEventListener('click',function(e){ if(Math.abs(dragX)>5) e.preventDefault(); },{capture:true});
+            })();
+        </script>
         <div style="text-align:center;margin-top:22px;">
             <a href="{{ route('services') }}" class="btn btn-outline"><i class="bi bi-arrow-right-circle"></i> ดูบริการทั้งหมด</a>
         </div>

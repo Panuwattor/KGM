@@ -74,12 +74,12 @@
             <div class="form-group">
                 <label class="form-label">วันเริ่มต้น <span style="color:#aaa;font-weight:400;">(แสดงตั้งแต่วันนี้ถ้าว่าง)</span></label>
                 <input type="datetime-local" name="starts_at" class="form-control"
-                       value="{{ old('starts_at', $coupon?->starts_at?->format('Y-m-d\TH:i') ?? '') }}">
+                       value="{{ old('starts_at', $coupon?->starts_at?->format('Y-m-d H:i') ?? '') }}">
             </div>
             <div class="form-group">
                 <label class="form-label">วันหมดอายุ</label>
                 <input type="datetime-local" name="expires_at" class="form-control"
-                       value="{{ old('expires_at', $coupon?->expires_at?->format('Y-m-d\TH:i') ?? '') }}">
+                       value="{{ old('expires_at', $coupon?->expires_at?->format('Y-m-d H:i') ?? '') }}">
             </div>
             <div class="form-group">
                 <label class="form-label">จำกัดจำนวนสิทธิ์ทั้งหมด</label>
@@ -104,6 +104,14 @@
                        {{ old('is_public', $coupon?->is_public ?? true) ? 'checked' : '' }}>
                 <label for="is_public"><i class="bi bi-eye"></i> แสดงในหน้าคูปองสาธารณะ</label>
             </div>
+            <div class="form-check">
+                <input type="checkbox" name="is_stackable" id="is_stackable" value="1"
+                       {{ old('is_stackable', $coupon?->is_stackable ?? false) ? 'checked' : '' }}>
+                <label for="is_stackable"><i class="bi bi-layers"></i> ใช้คู่กับคูปองอื่นได้</label>
+            </div>
+        </div>
+        <div style="font-size:12px;color:#888;margin-top:8px;">
+            <i class="bi bi-info-circle"></i> คูปองที่ติ๊ก "ใช้คู่ได้" จะสามารถใช้ร่วมกับคูปองส่วนลดอีกใบได้พร้อมกัน เช่น คูปองส่งฟรี + คูปองลด %
         </div>
     </div>
 

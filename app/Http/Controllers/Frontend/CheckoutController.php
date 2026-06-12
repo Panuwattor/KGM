@@ -24,13 +24,17 @@ class CheckoutController extends Controller
         $cartItems = $this->cart->getCartItems();
         if ($cartItems->isEmpty()) return redirect()->route('cart')->with('error', 'ตะกร้าของคุณว่างเปล่า');
 
-        $subtotal       = $this->cart->getSubtotal();
-        $couponCode     = session('coupon_code');
-        $coupon         = $couponCode
+        $subtotal          = $this->cart->getSubtotal();
+        $couponCode        = session('coupon_code');
+        $stackedCouponCode = session('stacked_coupon_code');
+        $coupon            = $couponCode
             ? Coupon::where('code', $couponCode)->with(['products', 'categories'])->first()
             : null;
+        $stackedCoupon         = $stackedCouponCode
+            ? Coupon::where('code', $stackedCouponCode)->first()
+            : null;
         $discountAmount        = $coupon ? $coupon->calculateDiscount($subtotal, $cartItems) : 0;
-        $shippingFee           = $this->cart->getShippingFee($subtotal, $couponCode);
+        $shippingFee           = $this->cart->getShippingFee($subtotal, $couponCode, $stackedCouponCode);
         $subtotalAfterDiscount = $subtotal - $discountAmount;
         $vatAmount             = round($subtotalAfterDiscount * 0.07, 2);
         $total                 = $subtotalAfterDiscount + $shippingFee;
@@ -41,7 +45,7 @@ class CheckoutController extends Controller
         $defaultAddress = $addresses->where('is_default', true)->first();
 
         return view('frontend.checkout', compact(
-            'cartItems', 'subtotal', 'coupon', 'discountAmount',
+            'cartItems', 'subtotal', 'coupon', 'stackedCoupon', 'discountAmount',
             'shippingFee', 'vatAmount', 'total', 'addresses', 'defaultAddress'
         ));
     }
@@ -61,13 +65,17 @@ class CheckoutController extends Controller
         $cartItems = $this->cart->getCartItems();
         if ($cartItems->isEmpty()) return redirect()->route('cart');
 
-        $subtotal       = $this->cart->getSubtotal();
-        $couponCode     = session('coupon_code');
-        $coupon         = $couponCode
+        $subtotal          = $this->cart->getSubtotal();
+        $couponCode        = session('coupon_code');
+        $stackedCouponCode = session('stacked_coupon_code');
+        $coupon            = $couponCode
             ? Coupon::where('code', $couponCode)->with(['products', 'categories'])->first()
             : null;
+        $stackedCoupon         = $stackedCouponCode
+            ? Coupon::where('code', $stackedCouponCode)->first()
+            : null;
         $discountAmount        = $coupon ? $coupon->calculateDiscount($subtotal, $cartItems) : 0;
-        $shippingFee           = $this->cart->getShippingFee($subtotal, $couponCode);
+        $shippingFee           = $this->cart->getShippingFee($subtotal, $couponCode, $stackedCouponCode);
         $subtotalAfterDiscount = $subtotal - $discountAmount;
         $vatAmount             = $request->boolean('needs_tax_invoice') ? round($subtotalAfterDiscount * 0.07, 2) : 0;
         $total                 = $subtotalAfterDiscount + $shippingFee;
@@ -76,7 +84,7 @@ class CheckoutController extends Controller
         $customer = auth('customer')->user();
         $order = null;
 
-        DB::transaction(function () use ($request, $cartItems, $subtotal, $coupon, $discountAmount, $shippingFee, $vatAmount, $total, $customer, &$order) {
+        DB::transaction(function () use ($request, $cartItems, $subtotal, $coupon, $stackedCoupon, $discountAmount, $shippingFee, $vatAmount, $total, $customer, &$order) {
             $order = Order::create([
                 'order_number'     => Order::generateOrderNumber(),
                 'customer_id'      => $customer->id,
@@ -127,9 +135,15 @@ class CheckoutController extends Controller
                     ->where('coupon_id', $coupon->id)
                     ->first()?->update(['updated_at' => now()]);
             }
+            if ($stackedCoupon) {
+                $stackedCoupon->increment('used_count');
+                CustomerCoupon::where('customer_id', $customer->id)
+                    ->where('coupon_id', $stackedCoupon->id)
+                    ->first()?->update(['updated_at' => now()]);
+            }
 
             $this->cart->clearCart();
-            session()->forget('coupon_code');
+            session()->forget(['coupon_code', 'stacked_coupon_code']);
         });
 
         assert($order instanceof Order);

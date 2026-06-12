@@ -50,7 +50,7 @@ class ShopController extends Controller
 
     public function show(string $slug)
     {
-        $product = Product::where('slug', $slug)->active()->with(['images', 'variants', 'category', 'reviews.user'])->firstOrFail();
+        $product = Product::where('slug', $slug)->active()->with(['images', 'variants', 'category', 'reviews.customer'])->firstOrFail();
         $product->increment('view_count');
 
         $relatedProducts = Product::active()
@@ -74,8 +74,10 @@ class ShopController extends Controller
             'body' => 'nullable|string|max:1000',
         ]);
 
-        $hasPurchased = auth()->user()->orders()
-            ->whereIn('status', ['delivered', 'payment_verified'])
+        $customer = auth('customer')->user();
+
+        $hasPurchased = $customer->orders()
+            ->whereIn('status', ['delivered', 'payment_verified', 'shipped', 'processing'])
             ->whereHas('items', fn($q) => $q->where('product_id', $product->id))
             ->exists();
 
@@ -84,8 +86,8 @@ class ShopController extends Controller
         }
 
         Review::updateOrCreate(
-            ['product_id' => $product->id, 'user_id' => auth()->id()],
-            ['rating' => $request->rating, 'title' => $request->title, 'body' => $request->body, 'is_approved' => false]
+            ['product_id' => $product->id, 'customer_id' => $customer->id],
+            ['rating' => $request->rating, 'title' => $request->title, 'body' => $request->body, 'is_approved' => $request->rating >= 4]
         );
 
         return back()->with('success', 'ขอบคุณสำหรับรีวิวของคุณ จะแสดงหลังผ่านการตรวจสอบ');

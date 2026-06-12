@@ -29,6 +29,7 @@
 .qty-control { display: flex; align-items: center; border: 2px solid #e8ecef; border-radius: 999px; overflow: hidden; }
 .qty-btn { width: 36px; height: 36px; background: none; border: none; cursor: pointer; font-size: 16px; color: var(--kgm-green-600); }
 
+
 @media (max-width: 767px) {
     .cart-layout {
         grid-template-columns: 1fr;
@@ -36,7 +37,6 @@
     }
     .cart-summary {
         position: static;
-        order: -1;
     }
     .cart-item-row {
         padding: 14px;
@@ -51,9 +51,14 @@
 
 @section('content')
 <div class="container" style="padding-top:32px;padding-bottom:64px;">
-    <h1 style="font-size:clamp(20px,5vw,28px);font-weight:800;color:var(--kgm-green-800);margin-bottom:24px;">
-        <i class="bi bi-cart3"></i> ตะกร้าสินค้า
-    </h1>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px;">
+        <h1 style="font-size:clamp(20px,5vw,28px);font-weight:800;color:var(--kgm-green-800);margin:0;">
+            <i class="bi bi-cart3"></i> ตะกร้าสินค้า
+        </h1>
+        <a href="{{ route('shop') }}" class="btn btn-outline" style="white-space:nowrap;flex-shrink:0;">
+            <i class="bi bi-arrow-left"></i> ช็อปปิ้งต่อ
+        </a>
+    </div>
 
     @if($cartItems->isEmpty())
     <div style="text-align:center;padding:80px 0;background:white;border-radius:24px;">
@@ -67,22 +72,6 @@
 
         {{-- Cart Items --}}
         <div>
-            {{-- Free Shipping Bar --}}
-            <div id="shipping-bar-wrap" data-threshold="{{ $freeShippingThreshold }}"
-                style="{{ $amountForFreeShipping > 0 ? 'background:linear-gradient(135deg,var(--kgm-gold-100),white);border:2px solid var(--kgm-gold-300);border-radius:16px;padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;gap:10px;' : 'background:var(--kgm-green-100);border-radius:16px;padding:12px 20px;margin-bottom:16px;display:flex;align-items:center;gap:8px;color:var(--kgm-green-700);font-weight:700;font-size:14px;' }}">
-                @if($amountForFreeShipping > 0)
-                <i class="bi bi-truck" style="color:var(--kgm-gold-600);font-size:20px;flex-shrink:0;"></i>
-                <div style="flex:1;min-width:0;">
-                    <span style="font-weight:700;color:var(--kgm-green-800);font-size:14px;">ซื้อเพิ่มอีก ฿{{ number_format($amountForFreeShipping, 0) }} จะได้ส่งฟรี!</span>
-                    <div style="background:#e8ecef;border-radius:999px;height:6px;margin-top:6px;overflow:hidden;">
-                        <div style="background:linear-gradient(to right,var(--kgm-gold-500),var(--kgm-gold-300));height:100%;border-radius:999px;width:{{ min(100, ($subtotal/$freeShippingThreshold)*100) }}%;transition:width 0.5s;"></div>
-                    </div>
-                </div>
-                @else
-                <i class="bi bi-truck-flatbed"></i> คุณได้รับการจัดส่งฟรี!
-                @endif
-            </div>
-
             <div style="background:white;border-radius:20px;box-shadow:0 2px 10px rgba(0,0,0,0.06);overflow:hidden;">
                 @foreach($cartItems as $item)
                 <div class="cart-item-row" id="cart-item-{{ $item->id }}">
@@ -115,9 +104,6 @@
                 @endforeach
             </div>
 
-            <div style="margin-top:16px;">
-                <a href="{{ route('shop') }}" class="btn btn-outline"><i class="bi bi-arrow-left"></i> ช็อปปิ้งต่อ</a>
-            </div>
         </div>
 
         {{-- Summary --}}
@@ -126,49 +112,57 @@
                 <i class="bi bi-receipt"></i> สรุปรายการ
             </h3>
 
-            {{-- Coupon --}}
-            @if($coupon)
-            <div style="background:var(--kgm-green-100);border-radius:12px;padding:12px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;">
-                <span style="font-weight:700;color:var(--kgm-green-700);">
-                    <i class="bi bi-ticket-perforated"></i> {{ $coupon->code }}
-                    <span style="font-weight:400;font-size:13px;"> — {{ $coupon->getTypeLabel() }}</span>
-                </span>
-                <form method="POST" action="{{ route('cart.coupon.remove') }}">
-                    @csrf @method('DELETE')
-                    <button type="submit" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:14px;"><i class="bi bi-x-lg"></i></button>
-                </form>
+            {{-- Applied coupons --}}
+            @if($coupon || $stackedCoupon)
+            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+                @if($coupon)
+                <div style="background:var(--kgm-green-100);border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                    <span style="font-weight:700;color:var(--kgm-green-700);font-size:13px;">
+                        <i class="bi bi-ticket-perforated"></i> {{ $coupon->code }}
+                        <span style="font-weight:400;font-size:12px;"> — {{ $coupon->getTypeLabel() }}</span>
+                    </span>
+                    <form method="POST" action="{{ route('cart.coupon.remove') }}" style="margin:0;">
+                        @csrf @method('DELETE')
+                        <button type="submit" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:14px;padding:0;"><i class="bi bi-x-lg"></i></button>
+                    </form>
+                </div>
+                @endif
+                @if($stackedCoupon)
+                <div style="background:#e8f4fd;border-radius:12px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                    <span style="font-weight:700;color:#0369a1;font-size:13px;">
+                        <i class="bi bi-truck"></i> {{ $stackedCoupon->code }}
+                        <span style="font-weight:400;font-size:12px;"> — {{ $stackedCoupon->getTypeLabel() }}</span>
+                    </span>
+                    <form method="POST" action="{{ route('cart.coupon.remove') }}" style="margin:0;">
+                        @csrf @method('DELETE')
+                        <input type="hidden" name="stacked" value="1">
+                        <button type="submit" style="background:none;border:none;color:#e74c3c;cursor:pointer;font-size:14px;padding:0;"><i class="bi bi-x-lg"></i></button>
+                    </form>
+                </div>
+                @endif
             </div>
-            @else
+            @endif
+
+            {{-- Input form --}}
             <form method="POST" action="{{ route('cart.coupon') }}" style="display:flex;gap:8px;margin-bottom:8px;">
                 @csrf
                 <input type="text" name="coupon_code" class="form-control" placeholder="รหัสคูปอง" style="border-radius:12px;flex:1;min-width:0;" value="{{ old('coupon_code') }}">
                 <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-check-lg"></i></button>
             </form>
-            {{-- คูปองที่เก็บไว้ --}}
+
+            {{-- คูปองของฉัน --}}
             @auth('customer')
             @if($collectedCoupons->isNotEmpty())
-            <div style="margin-bottom:16px;">
-                <div style="font-size:12px;color:#888;font-weight:600;margin-bottom:8px;"><i class="bi bi-collection"></i> คูปองของฉัน</div>
-                <div style="display:flex;flex-direction:column;gap:6px;">
-                    @foreach($collectedCoupons as $cc)
-                    <form method="POST" action="{{ route('cart.coupon') }}" style="display:flex;align-items:center;gap:8px;background:#f8f9fa;border-radius:12px;padding:8px 12px;">
-                        @csrf
-                        <input type="hidden" name="coupon_code" value="{{ $cc->coupon->code }}">
-                        <div style="flex:1;min-width:0;">
-                            <span style="font-weight:700;font-size:13px;color:var(--kgm-green-800);">{{ $cc->coupon->code }}</span>
-                            <span style="font-size:12px;color:#888;margin-left:6px;">{{ $cc->coupon->getTypeLabel() }}</span>
-                            @if($cc->coupon->expires_at)
-                            <span style="font-size:11px;color:#e74c3c;margin-left:6px;">หมด {{ $cc->coupon->expires_at->format('d/m/y') }}</span>
-                            @endif
-                        </div>
-                        <button type="submit" class="btn btn-sm btn-primary" style="padding:4px 12px;font-size:12px;white-space:nowrap;">ใช้</button>
-                    </form>
-                    @endforeach
-                </div>
+            <div style="margin-bottom:8px;">
+                <button type="button" data-bs-toggle="modal" data-bs-target="#couponModal"
+                    style="width:100%;display:flex;align-items:center;justify-content:space-between;background:#f0faf4;border:1.5px dashed var(--kgm-green-400);border-radius:12px;padding:10px 14px;cursor:pointer;font-size:13px;font-weight:600;color:var(--kgm-green-700);">
+                    <span><i class="bi bi-ticket-perforated"></i> คูปองของฉัน</span>
+                    <span style="background:var(--kgm-green-500);color:white;border-radius:999px;padding:1px 8px;font-size:11px;">{{ $collectedCoupons->count() }}</span>
+                </button>
             </div>
             @endif
             @endauth
-            @endif
+
             @if($errors->has('coupon_code') || session('error'))
             <div style="color:#e74c3c;font-size:13px;margin-bottom:10px;"><i class="bi bi-exclamation-circle"></i> {{ $errors->first('coupon_code') ?? session('error') }}</div>
             @endif
@@ -197,6 +191,105 @@
     </div>
     @endif
 </div>
+
+{{-- ── Coupon Modal ──────────────────────────────────────────────────── --}}
+@auth('customer')
+@if(isset($collectedCoupons) && $collectedCoupons->isNotEmpty())
+<div class="modal fade" id="couponModal" tabindex="-1" aria-labelledby="couponModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width:460px;">
+        <div class="modal-content" style="border-radius:20px;border:none;">
+
+            <div class="modal-header" style="background:linear-gradient(135deg,var(--kgm-green-700),var(--kgm-green-500));border:none;padding:18px 20px;border-radius:20px 20px 0 0;">
+                <div>
+                    <h5 class="modal-title" id="couponModalLabel" style="color:white;font-weight:800;margin:0;font-size:16px;">
+                        <i class="bi bi-ticket-perforated"></i> คูปองของฉัน
+                    </h5>
+                    <div style="font-size:12px;color:rgba(255,255,255,0.8);margin-top:2px;">{{ $collectedCoupons->count() }} คูปองที่ใช้ได้</div>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body" style="padding:12px;">
+                @foreach($collectedCoupons as $cc)
+                @php
+                    $c        = $cc->coupon;
+                    $canUse   = $subtotal >= $c->minimum_order;
+                    $need     = $c->minimum_order - $subtotal;
+                    $daysLeft = $c->expires_at ? now()->diffInDays($c->expires_at, false) : null;
+                    $urgent   = $daysLeft !== null && $daysLeft <= 3;
+                @endphp
+                <div data-coupon-item data-minimum="{{ (float) $c->minimum_order }}"
+                     style="border:1.5px solid {{ $canUse ? '#d4edda' : '#e0e0e0' }};border-radius:12px;overflow:hidden;margin-bottom:10px;background:{{ $canUse ? '#fff' : '#fafafa' }};">
+
+                    {{-- Single-row header --}}
+                    <div style="padding:12px 14px;display:flex;align-items:center;gap:10px;">
+                        @if($c->image)
+                            <img src="{{ asset('storage/'.$c->image) }}" style="width:36px;height:36px;object-fit:cover;border-radius:8px;flex-shrink:0;{{ $canUse ? '' : 'opacity:.5' }}">
+                        @else
+                            <div style="width:36px;height:36px;background:{{ $canUse ? 'var(--kgm-green-100)' : '#eee' }};border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="bi bi-ticket-perforated" style="color:{{ $canUse ? 'var(--kgm-green-600)' : '#bbb' }};font-size:16px;"></i>
+                            </div>
+                        @endif
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:14px;font-weight:800;color:{{ $canUse ? 'var(--kgm-green-800)' : '#999' }};letter-spacing:.5px;">{{ $c->code }}</div>
+                            @if($c->name)
+                            <div style="font-size:11px;color:#888;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ $c->name }}</div>
+                            @endif
+                        </div>
+                        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
+                            <span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;white-space:nowrap;background:{{ $canUse ? 'var(--kgm-green-100)' : '#eee' }};color:{{ $canUse ? 'var(--kgm-green-700)' : '#999' }};">
+                                {{ $c->getTypeLabel() }}
+                            </span>
+                            @if($c->is_stackable)
+                            <span style="font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;background:#dbeafe;color:#1d4ed8;white-space:nowrap;">
+                                <i class="bi bi-layers"></i> ใช้คู่ได้
+                            </span>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Compact meta row --}}
+                    <div style="padding:0 14px 10px;display:flex;align-items:center;gap:12px;font-size:11px;color:#888;flex-wrap:wrap;">
+                        @if($c->minimum_order > 0)
+                        <span><i class="bi bi-cart-check"></i> ขั้นต่ำ ฿{{ number_format($c->minimum_order, 0) }}</span>
+                        @endif
+                        @if($c->expires_at)
+                        <span style="color:{{ $urgent ? '#e74c3c' : '#888' }};">
+                            <i class="bi bi-clock"></i>
+                            หมด {{ $c->expires_at->format('d/m/') }}{{ $c->expires_at->year + 543 }}
+                            @if($urgent)<strong> ({{ $daysLeft }}ว.)</strong>@endif
+                        </span>
+                        @endif
+                        @if($c->hasProductScope())
+                        <span><i class="bi bi-tag"></i> เฉพาะสินค้าที่กำหนด</span>
+                        @endif
+                    </div>
+
+                    {{-- Button / cannot-use state (both rendered, JS toggles) --}}
+                    <div style="padding:0 12px 12px;">
+                        <div class="coupon-action-can" style="display:{{ $canUse ? 'block' : 'none' }}">
+                            <form method="POST" action="{{ route('cart.coupon') }}">
+                                @csrf
+                                <input type="hidden" name="coupon_code" value="{{ $c->code }}">
+                                <button type="submit" class="btn btn-primary w-100" style="font-size:13px;" data-bs-dismiss="modal">
+                                    <i class="bi bi-check-lg"></i> ใช้คูปองนี้
+                                </button>
+                            </form>
+                        </div>
+                        <div class="coupon-action-cannot" style="display:{{ $canUse ? 'none' : 'flex' }};background:#fff3cd;border-radius:8px;padding:8px 12px;font-size:12px;color:#856404;align-items:center;gap:6px;">
+                            <i class="bi bi-exclamation-triangle-fill" style="flex-shrink:0;"></i>
+                            ซื้อเพิ่มอีก <strong class="coupon-need">฿{{ number_format($need, 0) }}</strong> จึงจะใช้คูปองนี้ได้
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+
+        </div>
+    </div>
+</div>
+@endif
+@endauth
 @endsection
 
 @push('scripts')
@@ -212,39 +305,44 @@ function fmtWhole(n) {
 
 function updateSummary(data) {
     updateCartBadge(data.count);
-    document.getElementById('summary-subtotal').textContent = fmtDec(data.subtotal);
 
-    const discRow = document.getElementById('summary-discount-row');
-    if (data.discount_amount > 0) {
-        discRow.style.display = 'flex';
-        document.getElementById('summary-discount').textContent = '-' + fmtDec(data.discount_amount);
-    } else {
-        discRow.style.display = 'none';
+    const subtotalEl = document.getElementById('summary-subtotal');
+    const discRow    = document.getElementById('summary-discount-row');
+    const discEl     = document.getElementById('summary-discount');
+    const shippingEl = document.getElementById('summary-shipping');
+    const totalEl    = document.getElementById('summary-total');
+
+    if (subtotalEl) subtotalEl.textContent = fmtDec(data.subtotal);
+
+    if (discRow) {
+        if (data.discount_amount > 0) {
+            discRow.style.display = 'flex';
+            if (discEl) discEl.textContent = '-' + fmtDec(data.discount_amount);
+        } else {
+            discRow.style.display = 'none';
+        }
     }
 
-    document.getElementById('summary-shipping').textContent = data.shipping_fee > 0 ? fmtDec(data.shipping_fee) : 'ฟรี';
-    document.getElementById('summary-total').textContent = fmtDec(data.total);
-    updateShippingBar(data);
-}
+    if (shippingEl) shippingEl.textContent = data.shipping_fee > 0 ? fmtDec(data.shipping_fee) : 'ฟรี';
+    if (totalEl)    totalEl.textContent    = fmtDec(data.total);
 
-function updateShippingBar(data) {
-    const el = document.getElementById('shipping-bar-wrap');
-    if (!el) return;
-    const threshold = parseFloat(el.dataset.threshold);
-    if (data.amount_for_free_shipping > 0) {
-        const pct = Math.min(100, (threshold - data.amount_for_free_shipping) / threshold * 100);
-        el.style.cssText = 'background:linear-gradient(135deg,var(--kgm-gold-100),white);border:2px solid var(--kgm-gold-300);border-radius:16px;padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;gap:10px;';
-        el.innerHTML = `<i class="bi bi-truck" style="color:var(--kgm-gold-600);font-size:20px;flex-shrink:0;"></i>
-            <div style="flex:1;min-width:0;">
-                <span style="font-weight:700;color:var(--kgm-green-800);font-size:14px;">ซื้อเพิ่มอีก ฿${Math.round(data.amount_for_free_shipping).toLocaleString('en-US')} จะได้ส่งฟรี!</span>
-                <div style="background:#e8ecef;border-radius:999px;height:6px;margin-top:6px;overflow:hidden;">
-                    <div style="background:linear-gradient(to right,var(--kgm-gold-500),var(--kgm-gold-300));height:100%;border-radius:999px;width:${pct}%;transition:width 0.5s;"></div>
-                </div>
-            </div>`;
-    } else {
-        el.style.cssText = 'background:var(--kgm-green-100);border-radius:16px;padding:12px 20px;margin-bottom:16px;display:flex;align-items:center;gap:8px;color:var(--kgm-green-700);font-weight:700;font-size:14px;';
-        el.innerHTML = '<i class="bi bi-truck-flatbed"></i> คุณได้รับการจัดส่งฟรี!';
-    }
+    // Update "คูปองของฉัน" modal coupon availability
+    document.querySelectorAll('[data-coupon-item]').forEach(item => {
+        const minimum = parseFloat(item.dataset.minimum) || 0;
+        const canUse  = data.subtotal >= minimum;
+        const need    = Math.max(0, minimum - data.subtotal);
+
+        const canEl    = item.querySelector('.coupon-action-can');
+        const cannotEl = item.querySelector('.coupon-action-cannot');
+        const needEl   = item.querySelector('.coupon-need');
+
+        if (canEl)    canEl.style.display    = canUse ? 'block' : 'none';
+        if (cannotEl) cannotEl.style.display = canUse ? 'none'  : 'flex';
+        if (needEl)   needEl.textContent     = '฿' + Math.round(need).toLocaleString('en-US');
+
+        item.style.borderColor = canUse ? '#d4edda' : '#e0e0e0';
+        item.style.background  = canUse ? '#fff'    : '#fafafa';
+    });
 }
 
 function cartQty(id, delta) {
@@ -259,14 +357,19 @@ function cartUpdate(id, qty) {
         headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json', 'Content-Type': 'application/json' },
         body: JSON.stringify({ quantity: qty })
     })
-    .then(r => r.json())
+    .then(r => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+    })
     .then(data => {
         if (data.is_empty) { location.reload(); return; }
         if (data.item_removed) {
             document.getElementById('cart-item-' + id)?.remove();
         } else {
-            document.getElementById('qty-' + id).textContent = data.item_quantity;
-            document.getElementById('item-subtotal-' + id).textContent = fmtWhole(data.item_subtotal);
+            const qtyEl      = document.getElementById('qty-' + id);
+            const subtotalEl = document.getElementById('item-subtotal-' + id);
+            if (qtyEl)      qtyEl.textContent      = data.item_quantity;
+            if (subtotalEl) subtotalEl.textContent  = fmtWhole(data.item_subtotal);
         }
         updateSummary(data);
     })
@@ -279,7 +382,10 @@ function cartRemove(id, btn) {
         method: 'DELETE',
         headers: { 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' }
     })
-    .then(r => r.json())
+    .then(r => {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+    })
     .then(data => {
         if (data.is_empty) { location.reload(); return; }
         document.getElementById('cart-item-' + id)?.remove();

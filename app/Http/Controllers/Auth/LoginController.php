@@ -23,6 +23,7 @@ class LoginController extends Controller
             'password' => 'required',
         ]);
 
+        $oldSessionId = session()->getId();
         if (Auth::guard('customer')->attempt($credentials, $request->boolean('remember'))) {
             if (!Auth::guard('customer')->user()->isActive()) {
                 Auth::guard('customer')->logout();
@@ -30,7 +31,7 @@ class LoginController extends Controller
             }
 
             $request->session()->regenerate();
-            app(CartService::class)->mergeSessionCart();
+            app(CartService::class)->mergeSessionCart($oldSessionId);
 
             $intended = session()->pull('url.intended', route('home'));
             if (str_contains($intended, '/admin')) {
@@ -103,9 +104,11 @@ class LoginController extends Controller
 
         session()->forget(['login_otp', 'login_otp_last_sent']);
 
+        $oldSessionId = session()->getId();
         $customer = Customer::where('phone', $phone)->firstOrFail();
         Auth::guard('customer')->login($customer);
-        app(CartService::class)->mergeSessionCart();
+        session()->regenerate();
+        app(CartService::class)->mergeSessionCart($oldSessionId);
 
         $intended = session()->pull('url.intended', route('home'));
         if (str_contains($intended, '/admin')) {

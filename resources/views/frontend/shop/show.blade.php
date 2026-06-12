@@ -212,9 +212,9 @@
                 @foreach($product->reviews as $review)
                 <div class="review-item">
                     <div class="review-header">
-                        <div class="review-avatar">{{ strtoupper(substr($review->user->name,0,1)) }}</div>
+                        <div class="review-avatar">{{ strtoupper(substr($review->customer->name,0,1)) }}</div>
                         <div>
-                            <div class="review-name">{{ $review->user->name }}</div>
+                            <div class="review-name">{{ $review->customer->name }}</div>
                             <div class="review-stars">@for($i=1;$i<=5;$i++)<i class="bi bi-star{{ $i<=$review->rating?'-fill':'' }}"></i>@endfor</div>
                         </div>
                         <span class="review-date">{{ $review->created_at->format('d/m/Y') }}</span>
@@ -225,31 +225,39 @@
                 @endforeach
                 @endif
 
-                @auth
-                <div class="review-form">
+                @auth('customer')
+                <div class="review-form" x-data="reviewForm()">
                     <h4>เขียนรีวิวของคุณ</h4>
+                    @if(session('success'))
+                    <div class="alert alert-success" style="padding:10px 14px;background:#d1fae5;color:#065f46;border-radius:8px;margin-bottom:12px;">{{ session('success') }}</div>
+                    @endif
+                    @if(session('error'))
+                    <div class="alert alert-error" style="padding:10px 14px;background:#fee2e2;color:#991b1b;border-radius:8px;margin-bottom:12px;">{{ session('error') }}</div>
+                    @endif
                     <form method="POST" action="{{ route('shop.review', $product) }}">
                         @csrf
                         <div class="rating-row">
-                            <label class="rating-heading">คะแนน</label>
-                            <div class="rating-stars">
+                            <label class="rating-heading">คะแนน <span style="color:#ef4444">*</span></label>
+                            <div class="rating-stars" @mouseleave="hovered=0">
                                 @for($i=1;$i<=5;$i++)
-                                <label>
-                                    <input type="radio" name="rating" value="{{ $i }}" style="display:none;" required>
-                                    <i class="bi bi-star-fill"></i>
+                                <label @mouseenter="hovered={{ $i }}" @click="selected={{ $i }}">
+                                    <input type="radio" name="rating" value="{{ $i }}" x-model="selected" style="display:none;" required>
+                                    <i :class="(hovered||selected) >= {{ $i }} ? 'bi bi-star-fill' : 'bi bi-star'"></i>
                                 </label>
                                 @endfor
                             </div>
                         </div>
                         <div class="form-group">
-                            <input type="text" name="title" class="form-control" placeholder="หัวข้อรีวิว (ไม่บังคับ)">
+                            <input type="text" name="title" class="form-control" placeholder="หัวข้อรีวิว (ไม่บังคับ)" value="{{ old('title') }}">
                         </div>
                         <div class="form-group">
-                            <textarea name="body" class="form-control" rows="4" placeholder="แชร์ประสบการณ์การใช้งาน..."></textarea>
+                            <textarea name="body" class="form-control" rows="4" placeholder="แชร์ประสบการณ์การใช้งาน...">{{ old('body') }}</textarea>
                         </div>
                         <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> ส่งรีวิว</button>
                     </form>
                 </div>
+                @else
+                <p style="margin-top:16px;color:#6b7280;font-size:14px;"><a href="{{ route('login') }}" style="color:var(--kgm-gold-500)">เข้าสู่ระบบ</a> เพื่อเขียนรีวิว</p>
                 @endauth
             </div>
         </div>
@@ -316,6 +324,9 @@ function productPage(productId, variants, basePrice, initialImage, allImages) {
             if (redirect) setTimeout(() => window.location = '/cart', 500);
         }
     };
+}
+function reviewForm() {
+    return { selected: 0, hovered: 0 };
 }
 function setImage(src, thumb) {
     const root = thumb.closest('[x-data]');

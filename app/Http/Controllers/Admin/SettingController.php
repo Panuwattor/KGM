@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AdminLog;
 use App\Models\ConsentLog;
 use App\Models\DealerApplication;
+use App\Models\ShippingRate;
 use App\Models\ShippingSetting;
 use App\Models\SiteSetting;
 use Illuminate\Http\Request;
@@ -39,6 +40,32 @@ class SettingController extends Controller
             ShippingSetting::create($s);
         }
         return back()->with('success', 'บันทึกการตั้งค่าการจัดส่งแล้ว');
+    }
+
+    public function shippingRates()
+    {
+        $rates = ShippingRate::orderBy('min_qty')->get();
+        return view('admin.settings.shipping-rates', compact('rates'));
+    }
+
+    public function updateShippingRates(Request $request)
+    {
+        $request->validate([
+            'rates'           => 'required|array|min:1',
+            'rates.*.min_qty' => 'required|integer|min:1',
+            'rates.*.price'   => 'required|numeric|min:0',
+        ]);
+
+        ShippingRate::truncate();
+        foreach ($request->rates as $i => $r) {
+            ShippingRate::create([
+                'min_qty'   => $r['min_qty'],
+                'max_qty'   => $r['max_qty'] ?: null,
+                'price'     => $r['price'],
+                'is_active' => isset($r['is_active']),
+            ]);
+        }
+        return back()->with('success', 'บันทึกอัตราค่าขนส่งแล้ว');
     }
 
     public function logs(Request $request)
