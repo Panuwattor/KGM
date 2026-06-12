@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\ShowroomController;
 use App\Http\Controllers\Admin\VideoController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\LandingPageController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
@@ -203,6 +204,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('settings/shipping-rates', [SettingController::class, 'updateShippingRates'])->name('settings.shipping-rates.update');
     Route::get('settings/logs', [SettingController::class, 'logs'])->name('settings.logs');
     Route::get('settings/consent-logs', [SettingController::class, 'consentLogs'])->name('settings.consent-logs');
+
+    Route::get('landing-pages', [LandingPageController::class, 'index'])->name('landing-pages.index');
+    Route::post('landing-pages', [LandingPageController::class, 'store'])->name('landing-pages.store');
+    Route::post('landing-pages/{landingPage}/toggle', [LandingPageController::class, 'toggle'])->name('landing-pages.toggle');
+    Route::delete('landing-pages/{landingPage}', [LandingPageController::class, 'destroy'])->name('landing-pages.destroy');
 });
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');

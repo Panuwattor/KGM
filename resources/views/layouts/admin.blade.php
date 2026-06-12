@@ -250,6 +250,9 @@
             <a href="{{ route('admin.banners.index') }}" class="nav-item {{ request()->routeIs('admin.banners*') ? 'active' : '' }}">
                 <i class="bi bi-image"></i> จัดการ Banner
             </a>
+            <a href="{{ route('admin.landing-pages.index') }}" class="nav-item {{ request()->routeIs('admin.landing-pages*') ? 'active' : '' }}">
+                <i class="bi bi-easel2"></i> Landing Page
+            </a>
             <a href="{{ route('admin.posts.index') }}" class="nav-item {{ request()->routeIs('admin.posts*') ? 'active' : '' }}">
                 <i class="bi bi-newspaper"></i> บทความ/ข่าวสาร
             </a>
@@ -334,6 +337,7 @@
 
     {{-- Content --}}
     <main class="admin-content">
+        @unless(View::hasSection('suppress_alerts'))
         @if(session('success'))
             <div class="alert alert-success"><i class="bi bi-check-circle-fill"></i> {{ session('success') }}</div>
         @endif
@@ -346,6 +350,7 @@
                 <div><strong>กรุณาตรวจสอบข้อมูล:</strong><ul style="margin:4px 0 0 16px;">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>
             </div>
         @endif
+        @endunless
         @yield('content')
     </main>
 </div>

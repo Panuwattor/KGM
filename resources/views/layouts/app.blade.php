@@ -574,6 +574,43 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+{{-- ══ Landing Page Popup ══ --}}
+@if(!empty($activeLandingPage))
+<div id="lp-overlay"
+     style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px;">
+    <div id="lp-modal" style="animation:lpFadeIn .35s ease;display:inline-flex;flex-direction:column;align-items:center;gap:16px;">
+        <img src="{{ asset('storage/'.$activeLandingPage->image_path) }}"
+             alt="ยินดีต้อนรับ"
+             style="display:block;max-width:min(680px,90vw);max-height:72vh;object-fit:contain;border-radius:16px;box-shadow:0 24px 64px rgba(0,0,0,0.5);">
+        <button onclick="closeLandingPage()"
+                style="background:linear-gradient(135deg,#c9a84c,#f0c040);color:#1a3a2a;font-weight:700;font-size:15px;border:none;padding:12px 40px;border-radius:40px;cursor:pointer;font-family:inherit;"
+        >เข้าสู่หน้าหลัก</button>
+    </div>
+</div>
+<style>
+@keyframes lpFadeIn { from { opacity:0; transform:scale(.94); } to { opacity:1; transform:scale(1); } }
+</style>
+<script>
+(function(){
+    var KEY = 'lp_closed_at';
+    var HOURS = 24;
+    var last = localStorage.getItem(KEY);
+    var show = !last || (Date.now() - parseInt(last)) > HOURS * 3600 * 1000;
+    if (show) {
+        var el = document.getElementById('lp-overlay');
+        if (el) { el.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+    }
+})();
+function closeLandingPage() {
+    localStorage.setItem('lp_closed_at', Date.now());
+    var el = document.getElementById('lp-overlay');
+    if (el) { el.style.opacity = '0'; el.style.transition = 'opacity .25s'; setTimeout(function(){ el.style.display = 'none'; }, 250); }
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLandingPage(); });
+</script>
+@endif
+
 <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
 
 {{-- ── Floating Contact ── --}}

@@ -1,52 +1,115 @@
 @extends('layouts.app')
 @section('title', 'ข่าวสารและบทความ')
 @push('styles')
-<style>
-.news-layout { display:grid; grid-template-columns:3fr 1fr; gap:28px; }
-.news-grid   { display:grid; grid-template-columns:repeat(2,1fr); gap:20px; }
-@media(max-width:768px) {
-    .news-layout { grid-template-columns:1fr; }
-    .news-sidebar { order:-1; }
-    .news-sidebar-inner { display:flex; gap:8px; flex-wrap:wrap; }
-    .news-sidebar-inner a { flex:1; min-width:140px; }
-}
-@media(max-width:480px) {
-    .news-grid { grid-template-columns:1fr; }
-}
-</style>
+<link rel="stylesheet" href="{{ asset('css/pages/news.css') }}">
 @endpush
 @section('content')
-<div class="container" style="padding:32px 16px 64px;">
-    <div class="news-layout">
-        <div>
-            <h1 style="font-size:24px;font-weight:800;color:var(--kgm-green-800);margin-bottom:20px;"><i class="bi bi-newspaper"></i> ข่าวสารและบทความ</h1>
-            <div class="news-grid">
-                @forelse($posts as $post)
-                <div class="card">
-                    @if($post->featured_image)<div style="height:180px;overflow:hidden;"><img src="{{ asset('storage/'.$post->featured_image) }}" style="width:100%;height:100%;object-fit:cover;"></div>@endif
-                    <div class="card-body">
-                        <div style="font-size:12px;color:var(--kgm-green-500);font-weight:600;margin-bottom:6px;">{{ $post->postCategory?->name }}</div>
-                        <h3 style="font-weight:800;font-size:16px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:8px;">{{ $post->title }}</h3>
-                        <p style="font-size:13px;color:#666;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;margin-bottom:12px;">{{ $post->excerpt }}</p>
-                        <a href="{{ route('news.show', $post->slug) }}" class="btn btn-sm btn-outline"><i class="bi bi-arrow-right"></i> อ่านต่อ</a>
-                    </div>
-                </div>
-                @empty
-                <div style="grid-column:1/-1;text-align:center;padding:48px;color:#aaa;">ยังไม่มีบทความ</div>
-                @endforelse
-            </div>
-            <div class="pagination">{{ $posts->links() }}</div>
-        </div>
-        <div class="news-sidebar">
-            <div class="news-sidebar-inner" style="background:white;border-radius:20px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
-                <h3 style="width:100%;font-weight:800;margin-bottom:12px;font-size:15px;color:var(--kgm-green-800);">หมวดหมู่</h3>
+
+{{-- Hero --}}
+<div class="news-hero">
+    <div class="container news-hero-inner">
+        <div class="news-hero-title"><i class="bi bi-newspaper" style="margin-right:10px;"></i>ข่าวสารและบทความ</div>
+        <div class="news-hero-sub">อัปเดตข่าวสาร เทรนด์แฟชั่น และเรื่องราวจากกิจเจริญการ์เมนท์</div>
+    </div>
+    {{-- Category pills --}}
+    <div class="cat-tab-bar">
+        <div class="container">
+            <div class="cat-pills">
+                <a href="{{ route('news') }}"
+                   class="cat-pill {{ !request('category') ? 'active' : '' }}">
+                    <i class="bi bi-grid-3x3-gap-fill"></i> ทั้งหมด
+                </a>
                 @foreach($categories as $cat)
-                <a href="{{ route('news', ['category'=>$cat->slug]) }}" style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f5f7f5;font-size:14px;color:#555;text-decoration:none;">
-                    {{ $cat->name }}<span style="background:#f0f4f0;border-radius:999px;padding:2px 8px;font-size:12px;">{{ $cat->posts_count }}</span>
+                <a href="{{ route('news', ['category' => $cat->slug]) }}"
+                   class="cat-pill {{ request('category') === $cat->slug ? 'active' : '' }}">
+                    {{ $cat->name }}
+                    <span style="opacity:.6;font-size:11px;">{{ $cat->posts_count }}</span>
                 </a>
                 @endforeach
             </div>
         </div>
     </div>
 </div>
+
+{{-- Main --}}
+<div class="container">
+    <div class="news-main">
+
+        <div>
+            @php $featured = $posts->first(); $rest = $posts->skip(1); @endphp
+
+            {{-- Featured post (first item only on page 1) --}}
+            @if($featured && !request('page') || request('page') == 1)
+            @if($featured)
+            <a href="{{ route('news.show', $featured->slug) }}" class="featured-card">
+                <div class="featured-card-img">
+                    @if($featured->featured_image)
+                        <img src="{{ asset('storage/'.$featured->featured_image) }}" alt="{{ $featured->title }}" loading="lazy" onerror="this.src='/images/logo.png'">
+                    @else
+                        <div style="width:100%;height:100%;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);display:flex;align-items:center;justify-content:center;">
+                            <i class="bi bi-newspaper" style="font-size:56px;color:#a5d6a7;"></i>
+                        </div>
+                    @endif
+                </div>
+                <div class="featured-card-body">
+                    @if($featured->postCategory)
+                    <span class="post-cat">{{ $featured->postCategory->name }}</span>
+                    @endif
+                    <h2 style="font-size:20px;font-weight:900;line-height:1.4;margin-bottom:10px;color:#1a2e22;">{{ $featured->title }}</h2>
+                    <p style="font-size:14px;color:#777;line-height:1.65;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;margin-bottom:0;">{{ $featured->excerpt }}</p>
+                    <div style="display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid #f0f2f0;">
+                        <span style="font-size:12px;color:#aaa;display:flex;align-items:center;gap:4px;"><i class="bi bi-calendar3"></i> {{ $featured->published_at->locale('th')->translatedFormat('d M Y') }}</span>
+                    </div>
+                    <span class="read-more">อ่านบทความ <i class="bi bi-arrow-right"></i></span>
+                </div>
+            </a>
+            @endif
+            @endif
+
+            {{-- Grid --}}
+            @if($posts->isEmpty())
+            <div class="news-empty">
+                <i class="bi bi-newspaper"></i>
+                <div style="font-size:16px;font-weight:600;">ยังไม่มีบทความ</div>
+                <div style="font-size:14px;margin-top:6px;">ลองเลือกหมวดหมู่อื่น</div>
+            </div>
+            @else
+            <div class="post-grid">
+                @foreach(( (!request('page') || request('page') == 1) ? $rest : $posts ) as $post)
+                <a href="{{ route('news.show', $post->slug) }}" class="post-card">
+                    <div class="post-card-img">
+                        @if($post->featured_image)
+                            <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ $post->title }}" loading="lazy" onerror="this.src='/images/logo.png'">
+                        @else
+                            <div style="width:100%;height:100%;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);display:flex;align-items:center;justify-content:center;">
+                                <i class="bi bi-newspaper" style="font-size:36px;color:#a5d6a7;"></i>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="post-card-body">
+                        @if($post->postCategory)
+                        <span class="post-cat">{{ $post->postCategory->name }}</span>
+                        @endif
+                        <div class="post-title">{{ $post->title }}</div>
+                        @if($post->excerpt)
+                        <div class="post-excerpt">{{ $post->excerpt }}</div>
+                        @endif
+                        <div class="post-meta">
+                            <span><i class="bi bi-calendar3"></i> {{ $post->published_at->locale('th')->translatedFormat('d M Y') }}</span>
+                        </div>
+                    </div>
+                </a>
+                @endforeach
+            </div>
+            @endif
+
+            {{-- Pagination --}}
+            @if($posts->hasPages())
+            <div style="margin-top:36px;">{{ $posts->links() }}</div>
+            @endif
+        </div>
+
+    </div>
+</div>
+
 @endsection

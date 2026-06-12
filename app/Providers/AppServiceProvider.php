@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Category;
+use App\Models\LandingPage;
 use App\Models\ProductType;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
@@ -19,8 +20,9 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer('layouts.app', function ($view) {
             $view->with([
-                'navProductTypes' => ProductType::active()->orderBy('sort_order')->get(),
-                'navCategories'   => Category::active()->parents()->with(['children' => fn($q) => $q->active()->orderBy('sort_order')])->orderBy('sort_order')->get(),
+                'navProductTypes'   => ProductType::active()->orderBy('sort_order')->get(),
+                'navCategories'     => Category::active()->parents()->with(['children' => fn($q) => $q->active()->orderBy('sort_order')])->orderBy('sort_order')->get(),
+                'activeLandingPage' => LandingPage::where('is_active', true)->first(),
             ]);
         });
     }

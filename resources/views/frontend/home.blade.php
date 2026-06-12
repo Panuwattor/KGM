@@ -391,18 +391,18 @@
 
 {{-- ══ VIDEOS ══ --}}
 @if(isset($featuredVideos) && $featuredVideos->isNotEmpty())
+@php $videosSlice = $featuredVideos->take(3); $vidsTotal = $videosSlice->count(); @endphp
 <section class="section" style="background:#f8faf8;">
     <div class="container">
-        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px;gap:10px;flex-wrap:wrap;">
-            <div>
-                <div class="section-subtitle">YouTube</div>
-                <div class="section-title">เรื่องราวที่น่าสนใจ</div>
-                <div class="section-divider"></div>
-            </div>
-            <a href="{{ route('videos') }}" class="btn btn-outline btn-sm" style="margin-bottom:6px;"><i class="bi bi-play-circle"></i> ดูทั้งหมด</a>
+        <div style="text-align:center;margin-bottom:28px;">
+            <div class="section-subtitle" style="text-align:center;">YouTube</div>
+            <div class="section-title">เรื่องราวที่น่าสนใจ</div>
+            <div class="section-divider" style="margin:10px auto 0;"></div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
-            @foreach($featuredVideos->take(3) as $video)
+
+        {{-- Desktop (≥768px): 3 columns --}}
+        <div class="vids-desktop" style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+            @foreach($videosSlice as $video)
             <div style="background:white;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07);cursor:pointer;transition:transform .2s,box-shadow .2s;"
                  onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,.13)'"
                  onmouseleave="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.07)'"
@@ -425,6 +425,91 @@
                 </div>
             </div>
             @endforeach
+        </div>
+
+        {{-- Mobile (<768px): slideshow --}}
+        <div class="vids-mobile" style="position:relative;padding:0 20px;">
+            <div id="vids-track-wrap" style="overflow:hidden;border-radius:16px;width:100%;">
+                <div id="vids-track" style="display:flex;width:100%;transition:transform 0.35s ease;">
+                    @foreach($videosSlice as $video)
+                    <div style="flex:0 0 100%;width:100%;box-sizing:border-box;">
+                        <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.08);cursor:pointer;"
+                             onclick="homeOpenVideo('{{ $video->youtube_id }}')">
+                            <div style="position:relative;padding-bottom:56.25%;background:#111;overflow:hidden;">
+                                <img src="{{ $video->thumbnail }}" alt="{{ $video->title }}" loading="lazy"
+                                     style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"
+                                     onerror="this.src='/images/logo.png'">
+                                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25);">
+                                    <div style="width:56px;height:56px;background:rgba(255,255,255,.9);border-radius:50%;display:flex;align-items:center;justify-content:center;padding-left:4px;box-shadow:0 4px 16px rgba(0,0,0,.3);">
+                                        <i class="bi bi-play-fill" style="font-size:24px;color:#e30000;"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="padding:16px;text-align:center;">
+                                <div style="font-size:15px;font-weight:700;color:#1a2e1a;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin-bottom:6px;line-height:1.4;">{{ $video->title }}</div>
+                                @if($video->description)
+                                <div style="font-size:13px;color:#888;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">{{ $video->description }}</div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            <button id="vids-prev" onclick="vidsGo(-1)" style="position:absolute;top:30%;left:0;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:white;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--kgm-green-700);font-size:13px;z-index:2;opacity:0.3;">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <button id="vids-next" onclick="vidsGo(1)" style="position:absolute;top:30%;right:0;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:white;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--kgm-green-700);font-size:13px;z-index:2;">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+            <div style="display:flex;justify-content:center;gap:6px;margin-top:14px;">
+                @foreach($videosSlice as $video)
+                <button onclick="vidsSet({{ $loop->index }})" id="vids-dot-{{ $loop->index }}" style="width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;padding:0;transition:all 0.2s;background:{{ $loop->first ? 'var(--kgm-green-600)' : '#ccc' }};{{ $loop->first ? 'transform:scale(1.3);' : '' }}"></button>
+                @endforeach
+            </div>
+        </div>
+
+        <style>
+            @media(min-width:768px){ .vids-mobile{display:none!important;} }
+            @media(max-width:767px){ .vids-desktop{display:none!important;} }
+        </style>
+        <script>
+            var vidsIdx=0,vidsTotal={{ $vidsTotal }};
+            function vidsSet(n){
+                vidsIdx=n;
+                var tw=document.getElementById('vids-track-wrap').offsetWidth;
+                var track=document.getElementById('vids-track');
+                track.style.transition='transform 0.35s ease';
+                track.style.transform='translateX(-'+(vidsIdx*tw)+'px)';
+                document.getElementById('vids-prev').style.opacity=vidsIdx===0?'0.3':'1';
+                document.getElementById('vids-next').style.opacity=vidsIdx===vidsTotal-1?'0.3':'1';
+                for(var i=0;i<vidsTotal;i++){
+                    var d=document.getElementById('vids-dot-'+i);
+                    if(!d) continue;
+                    d.style.background=i===vidsIdx?'var(--kgm-green-600)':'#ccc';
+                    d.style.transform=i===vidsIdx?'scale(1.3)':'scale(1)';
+                }
+            }
+            function vidsGo(dir){ vidsSet(Math.max(0,Math.min(vidsTotal-1,vidsIdx+dir))); }
+            vidsSet(0);
+            (function(){
+                var wrap=document.getElementById('vids-track-wrap');
+                var track=document.getElementById('vids-track');
+                var startX=0,isDragging=false,dragX=0,threshold=50;
+                function onStart(x){ startX=x; isDragging=true; track.style.transition='none'; }
+                function onMove(x){ if(!isDragging) return; dragX=x-startX; var tw=wrap.offsetWidth; track.style.transform='translateX('+(-vidsIdx*tw+dragX)+'px)'; }
+                function onEnd(){ if(!isDragging) return; isDragging=false; if(dragX<-threshold) vidsGo(1); else if(dragX>threshold) vidsGo(-1); else vidsSet(vidsIdx); dragX=0; }
+                wrap.addEventListener('touchstart',function(e){ onStart(e.touches[0].clientX); },{passive:true});
+                wrap.addEventListener('touchmove',function(e){ onMove(e.touches[0].clientX); },{passive:true});
+                wrap.addEventListener('touchend',onEnd);
+                wrap.addEventListener('mousedown',function(e){ onStart(e.clientX); e.preventDefault(); });
+                window.addEventListener('mousemove',function(e){ onMove(e.clientX); });
+                window.addEventListener('mouseup',onEnd);
+                wrap.addEventListener('click',function(e){ if(Math.abs(dragX)>5) e.preventDefault(); },{capture:true});
+            })();
+        </script>
+        <div style="text-align:center;margin-top:22px;">
+            <a href="{{ route('videos') }}" class="btn btn-outline"><i class="bi bi-play-circle"></i> ดูวิดีโอทั้งหมด</a>
         </div>
     </div>
 </section>
@@ -463,32 +548,113 @@ document.addEventListener('keydown', function(e) { if(e.key==='Escape') homeClos
 
 {{-- ══ LATEST NEWS ══ --}}
 @if($latestPosts->isNotEmpty())
+@php $newsTotal = $latestPosts->count(); @endphp
 <section class="section">
     <div class="container">
-        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px;gap:10px;flex-wrap:wrap;">
-            <div>
-                <div class="section-subtitle">บทความและข่าวสาร</div>
-                <div class="section-title">ข่าวสารล่าสุด</div>
-                <div class="section-divider"></div>
-            </div>
-            <a href="{{ route('news') }}" class="btn btn-outline btn-sm" style="margin-bottom:6px;"><i class="bi bi-newspaper"></i> ดูทั้งหมด</a>
+        <div style="text-align:center;margin-bottom:28px;">
+            <div class="section-subtitle" style="text-align:center;">บทความและข่าวสาร</div>
+            <div class="section-title">ข่าวสารล่าสุด</div>
+            <div class="section-divider" style="margin:10px auto 0;"></div>
         </div>
-        <div class="grid grid-3" style="gap:14px;">
-            @foreach($latestPosts as $post)
-            <div class="card">
-                @if($post->featured_image)
-                <div style="height:165px;overflow:hidden;">
-                    <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ $post->title }}" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.src='/images/logo.png'">
+
+        {{-- Desktop (≥768px): 3 columns --}}
+        <div class="news-desktop">
+            <div class="grid grid-3" style="gap:14px;">
+                @foreach($latestPosts as $post)
+                <div class="card">
+                    @if($post->featured_image)
+                    <div style="height:165px;overflow:hidden;">
+                        <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ $post->title }}" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.src='/images/logo.png'">
+                    </div>
+                    @endif
+                    <div class="card-body">
+                        <div style="font-size:11px;color:var(--kgm-green-500);font-weight:700;text-transform:uppercase;margin-bottom:5px;">{{ $post->postCategory?->name }}</div>
+                        <h3 style="font-size:14px;font-weight:700;margin:0 0 7px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">{{ $post->title }}</h3>
+                        <p style="font-size:13px;color:#666;margin:0 0 10px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">{{ $post->excerpt }}</p>
+                        <a href="{{ route('news.show', $post->slug) }}" style="font-size:13px;font-weight:700;color:var(--kgm-green-600);">อ่านต่อ <i class="bi bi-arrow-right"></i></a>
+                    </div>
                 </div>
-                @endif
-                <div class="card-body">
-                    <div style="font-size:11px;color:var(--kgm-green-500);font-weight:700;text-transform:uppercase;margin-bottom:5px;">{{ $post->postCategory?->name }}</div>
-                    <h3 style="font-size:14px;font-weight:700;margin:0 0 7px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">{{ $post->title }}</h3>
-                    <p style="font-size:13px;color:#666;margin:0 0 10px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">{{ $post->excerpt }}</p>
-                    <a href="{{ route('news.show', $post->slug) }}" style="font-size:13px;font-weight:700;color:var(--kgm-green-600);">อ่านต่อ <i class="bi bi-arrow-right"></i></a>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- Mobile (<768px): slideshow --}}
+        <div class="news-mobile" style="position:relative;padding:0 20px;">
+            <div id="news-track-wrap" style="overflow:hidden;border-radius:16px;width:100%;">
+                <div id="news-track" style="display:flex;width:100%;transition:transform 0.35s ease;">
+                    @foreach($latestPosts as $post)
+                    <div style="flex:0 0 100%;width:100%;box-sizing:border-box;">
+                        <div class="card" style="border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
+                            @if($post->featured_image)
+                            <div style="height:200px;overflow:hidden;">
+                                <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ $post->title }}" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.src='/images/logo.png'">
+                            </div>
+                            @endif
+                            <div class="card-body">
+                                <div style="font-size:11px;color:var(--kgm-green-500);font-weight:700;text-transform:uppercase;margin-bottom:5px;">{{ $post->postCategory?->name }}</div>
+                                <h3 style="font-size:15px;font-weight:700;margin:0 0 8px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">{{ $post->title }}</h3>
+                                <p style="font-size:13px;color:#666;margin:0 0 12px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;">{{ $post->excerpt }}</p>
+                                <a href="{{ route('news.show', $post->slug) }}" style="font-size:13px;font-weight:700;color:var(--kgm-green-600);">อ่านต่อ <i class="bi bi-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
                 </div>
             </div>
-            @endforeach
+            <button id="news-prev" onclick="newsGo(-1)" style="position:absolute;top:40%;left:0;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:white;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--kgm-green-700);font-size:13px;z-index:2;opacity:0.3;">
+                <i class="bi bi-chevron-left"></i>
+            </button>
+            <button id="news-next" onclick="newsGo(1)" style="position:absolute;top:40%;right:0;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:white;border:none;box-shadow:0 2px 8px rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--kgm-green-700);font-size:13px;z-index:2;">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+            <div style="display:flex;justify-content:center;gap:6px;margin-top:14px;">
+                @foreach($latestPosts as $post)
+                <button onclick="newsSet({{ $loop->index }})" id="news-dot-{{ $loop->index }}" style="width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;padding:0;transition:all 0.2s;background:{{ $loop->first ? 'var(--kgm-green-600)' : '#ccc' }};{{ $loop->first ? 'transform:scale(1.3);' : '' }}"></button>
+                @endforeach
+            </div>
+        </div>
+
+        <style>
+            @media(min-width:768px){ .news-mobile{display:none!important;} }
+            @media(max-width:767px){ .news-desktop{display:none!important;} }
+        </style>
+        <script>
+            var newsIdx=0,newsTotal={{ $newsTotal }};
+            function newsSet(n){
+                newsIdx=n;
+                var tw=document.getElementById('news-track-wrap').offsetWidth;
+                var track=document.getElementById('news-track');
+                track.style.transition='transform 0.35s ease';
+                track.style.transform='translateX(-'+(newsIdx*tw)+'px)';
+                document.getElementById('news-prev').style.opacity=newsIdx===0?'0.3':'1';
+                document.getElementById('news-next').style.opacity=newsIdx===newsTotal-1?'0.3':'1';
+                for(var i=0;i<newsTotal;i++){
+                    var d=document.getElementById('news-dot-'+i);
+                    if(!d) continue;
+                    d.style.background=i===newsIdx?'var(--kgm-green-600)':'#ccc';
+                    d.style.transform=i===newsIdx?'scale(1.3)':'scale(1)';
+                }
+            }
+            function newsGo(dir){ newsSet(Math.max(0,Math.min(newsTotal-1,newsIdx+dir))); }
+            newsSet(0);
+            (function(){
+                var wrap=document.getElementById('news-track-wrap');
+                var track=document.getElementById('news-track');
+                var startX=0,isDragging=false,dragX=0,threshold=50;
+                function onStart(x){ startX=x; isDragging=true; track.style.transition='none'; }
+                function onMove(x){ if(!isDragging) return; dragX=x-startX; var tw=wrap.offsetWidth; track.style.transform='translateX('+(-newsIdx*tw+dragX)+'px)'; }
+                function onEnd(){ if(!isDragging) return; isDragging=false; if(dragX<-threshold) newsGo(1); else if(dragX>threshold) newsGo(-1); else newsSet(newsIdx); dragX=0; }
+                wrap.addEventListener('touchstart',function(e){ onStart(e.touches[0].clientX); },{passive:true});
+                wrap.addEventListener('touchmove',function(e){ onMove(e.touches[0].clientX); },{passive:true});
+                wrap.addEventListener('touchend',onEnd);
+                wrap.addEventListener('mousedown',function(e){ onStart(e.clientX); e.preventDefault(); });
+                window.addEventListener('mousemove',function(e){ onMove(e.clientX); });
+                window.addEventListener('mouseup',onEnd);
+                wrap.addEventListener('click',function(e){ if(Math.abs(dragX)>5) e.preventDefault(); },{capture:true});
+            })();
+        </script>
+        <div style="text-align:center;margin-top:22px;">
+            <a href="{{ route('news') }}" class="btn btn-outline"><i class="bi bi-newspaper"></i> ดูบทความทั้งหมด</a>
         </div>
     </div>
 </section>
