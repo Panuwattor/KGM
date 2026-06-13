@@ -26,4 +26,9 @@ class ProductType extends Model
     {
         return $query->where('is_active', true);
     }
+
+    public function getImageUrlAttribute()
+    {
+        return $this->image ? asset('storage/' . $this->image) : null;
+    }
 }
