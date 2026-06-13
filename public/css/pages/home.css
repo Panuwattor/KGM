@@ -124,7 +124,7 @@
 .online-channels-title { font-size: clamp(28px, 5vw, 48px); font-weight: 900; color: var(--kgm-green-900, #1a3a2a); line-height: 1.5; margin: 0 0 6px; }
 .online-channels-subtitle { font-size: clamp(14px, 2vw, 18px); color: var(--kgm-green-800, #1f4d32); font-weight: 600; margin: 0 0 36px; }
 .online-channels-grid { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; align-items: center; }
-.online-channel-card { display: block; text-decoration: none; width: 290px; transition: transform 0.25s, filter 0.25s; }
+.online-channel-card { display: block; text-decoration: none; width: 290px; max-width: 100%; transition: transform 0.25s, filter 0.25s; }
 .online-channel-card:hover { transform: translateY(-7px); }
 .online-channel-card img { width: 100%; height: auto; border-radius: 18px; display: block; filter: drop-shadow(0 4px 14px rgba(0,0,0,0.13)); transition: filter 0.25s; }
 .online-channel-card:hover img { filter: drop-shadow(0 10px 24px rgba(0,0,0,0.22)); }
@@ -298,13 +298,15 @@
     .cat-name { font-size: 12px; max-width: 90px; }
     .cat-grid { gap: 10px; }
 }
+@media (max-width: 640px) {
+    .online-channel-card { width: calc(50% - 12px); min-width: 140px; max-width: 290px; }
+}
 @media (max-width: 600px) {
     .promo-banner { min-height: 150px; grid-template-columns: 5fr 7fr; }
     .testimonials-grid { grid-template-columns: 1fr; }
     .feature-text span { display: none; }
     .cta-btns { flex-direction: column; align-items: stretch; }
     .cta-btns .btn { justify-content: center; }
-    .online-channel-card { width: calc(50% - 12px); min-width: 140px; }
     .cq-prev { left:0; } .cq-next { right:0; }
 }
 @media (max-width: 480px) {
