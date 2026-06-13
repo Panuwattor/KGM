@@ -8,7 +8,7 @@
         <div class="product-img-wrap">
             <a href="{{ route('shop.show', $product->slug) }}" style="display:block;line-height:0;">
                 <img src="{{ $product->main_image ? asset('storage/'.$product->main_image) : asset('images/logo.png') }}"
-                    alt="{{ $product->name }}" class="product-img" loading="lazy"
+                    alt="{{ $product->name }}" class="product-img" width="400" height="400" loading="lazy"
                     onerror="this.onerror=null;this.src='/images/logo.png'">
             </a>
             @auth('customer')

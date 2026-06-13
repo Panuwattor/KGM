@@ -135,12 +135,13 @@
             @php $sizes = $product->variants->pluck('size')->filter()->unique(); $colors = $product->variants->pluck('color')->filter()->unique(); @endphp
             @if($sizes->isNotEmpty())
             <div class="variant-section">
-                <div class="variant-label">ไซส์: <span class="variant-label-value" x-text="selectedSize || 'เลือกไซส์'"></span></div>
-                <div class="variant-options">
+                <div class="variant-label">ไซส์: <span class="variant-label-value" x-text="selectedSize || 'เลือกไซส์'"></span> <span style="color:#ef4444">*</span></div>
+                <div class="variant-options" :class="{ 'shake': showSizeError }">
                     @foreach($sizes as $size)
-                    <button class="variant-btn" :class="{ 'active': selectedSize === '{{ $size }}' }" @click="selectVariant('{{ $size }}', null)">{{ $size }}</button>
+                    <button class="variant-btn" :class="{ 'active': selectedSize === '{{ $size }}', 'error-highlight': showSizeError && !selectedSize }" @click="selectVariant('{{ $size }}', null); showSizeError = false">{{ $size }}</button>
                     @endforeach
                 </div>
+                <p x-show="showSizeError" x-cloak style="color:#ef4444;font-size:13px;margin-top:6px;"><i class="bi bi-exclamation-circle"></i> กรุณาเลือกไซส์ก่อน</p>
             </div>
             @endif
             @if($colors->isNotEmpty())
@@ -288,6 +289,8 @@ function productPage(productId, variants, basePrice, initialImage, allImages) {
         selectedVariantId: null,
         selectedSize: null,
         selectedColor: null,
+        showSizeError: false,
+        hasSizes: variants.some(v => v.size),
         qty: 1,
         currentImage: initialImage || '',
         allImages: allImages || [],
@@ -320,6 +323,11 @@ function productPage(productId, variants, basePrice, initialImage, allImages) {
             }
         },
         addToCartFn(redirect = false) {
+            if (this.hasSizes && !this.selectedSize) {
+                this.showSizeError = true;
+                document.querySelector('.variant-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
             addToCart(this.productId, this.selectedVariantId, this.qty);
             if (redirect) setTimeout(() => window.location = '/cart', 500);
         }

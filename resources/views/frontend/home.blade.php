@@ -17,10 +17,10 @@
                 <div class="hero-item">
                     @if($banner->link_url)
                     <a href="{{ $banner->link_url }}">
-                        <img src="{{ asset('storage/'.$banner->image_path) }}" alt="Banner {{ $i+1 }}" loading="{{ $i === 0 ? 'eager' : 'lazy' }}" onerror="this.onerror=null;this.src='/images/logo.png'">
+                        <img src="{{ asset('storage/'.$banner->image_path) }}" alt="Banner {{ $i+1 }}" width="1200" height="600" loading="{{ $i === 0 ? 'eager' : 'lazy' }}" {{ $i === 0 ? 'fetchpriority="high"' : '' }} onerror="this.onerror=null;this.src='/images/logo.png'">
                     </a>
                     @else
-                    <img src="{{ asset('storage/'.$banner->image_path) }}" alt="Banner {{ $i+1 }}" loading="{{ $i === 0 ? 'eager' : 'lazy' }}" onerror="this.onerror=null;this.src='/images/logo.png'">
+                    <img src="{{ asset('storage/'.$banner->image_path) }}" alt="Banner {{ $i+1 }}" width="1200" height="600" loading="{{ $i === 0 ? 'eager' : 'lazy' }}" {{ $i === 0 ? 'fetchpriority="high"' : '' }} onerror="this.onerror=null;this.src='/images/logo.png'">
                     @endif
                 </div>
                 @endforeach
@@ -100,7 +100,7 @@
             <a href="{{ route('shop') }}?type={{ $pt->slug }}" class="type-card">
                 <div class="type-img-wrap">
                     @if($pt->image)
-                        <img src="{{ asset('storage/'.$pt->image) }}" alt="{{ $pt->name }}" loading="lazy">
+                        <img src="{{ asset('storage/'.$pt->image) }}" alt="{{ $pt->name }}" width="110" height="110" loading="lazy">
                     @else
                         <div class="type-img-placeholder"><i class="bi bi-grid-3x3-gap"></i></div>
                     @endif
@@ -127,7 +127,7 @@
             @foreach($categories as $cat)
             <a href="{{ route('shop.category', $cat->slug) }}" class="cat-card">
                 <div class="cat-img-wrap">
-                    <img src="{{ asset('storage/'.$cat->image) }}" alt="{{ $cat->name }}" loading="lazy">
+                    <img src="{{ asset('storage/'.$cat->image) }}" alt="{{ $cat->name }}" width="150" height="150" loading="lazy">
                 </div>
                 <div class="cat-name">{{ $cat->name }}</div>
             </a>
@@ -170,7 +170,7 @@
 @endif
 
 {{-- ══ ABOUT + SERVICE HIGHLIGHTS ══ --}}
-<img src="/images/cartoon.jpg" alt="KGM" class="w-100">
+<img src="/images/cartoon.jpg" alt="KGM" class="w-100" loading="lazy">
 <section style="background:#E1CD94;" class="pt-0 pb-3">
     <div class="container">
         <div class="grid" style="gap:24px;align-items:stretch;">
@@ -180,7 +180,7 @@
                         <div class="col-md-12  mb-3">
                             <div class="card">
                                <div class="card-body text-center">
-                                     <h2 style="font-size:19px;color:#236237;font-weight:800;color:var(--kgm-green-900);margin:0 0 12px;">บริษัท กิจเจริญการ์เมนท์ (1993) จำกัด</h2>
+                                     <h2 style="font-size:19px;color:#185c2e;font-weight:800;margin:0 0 12px;">บริษัท กิจเจริญการ์เมนท์ (1993) จำกัด</h2>
                                     <p style="font-size:14px;color:#555;line-height:1.95;margin:0;text-indent:2em;">
                                         เราคือผู้ผลิตและจำหน่ายเครื่องแบบนักเรียนมากกว่า 40 ปี เรามุ่งมั่นสร้างสรรค์ชุดเครื่องแบบเพื่อคนไทยและเด็กนักเรียนทั่วประเทศ
                                         โดยคำนึงถึงคุณภาพและความคุ้มค่ามาเป็นที่หนึ่ง ใส่ใจในทุกรายละเอียด และพิถีพิถันทุกขั้นตอนการผลิตอย่างที่สุด
@@ -205,7 +205,7 @@
             <div class="col-12 col-sm-6">
                 <a href="{{ route('careers') }}" class="promo-banner green text-decoration-none">
                     <div class="promo-banner-img-wrap">
-                        <img src="{{ asset('images/job/job1.jpg') }}" alt="สมัคร PC" class="promo-banner-img">
+                        <img src="{{ asset('images/job/job1.jpg') }}" alt="สมัคร PC" class="promo-banner-img" width="900" height="500" loading="lazy">
                     </div>
                     <div class="promo-banner-body">
                         <div class="promo-tag">รับสมัคร PC</div>
@@ -217,7 +217,7 @@
             <div class="col-12 col-sm-6">
                 <a href="{{ route('dealer') }}" class="promo-banner gold text-decoration-none">
                     <div class="promo-banner-img-wrap">
-                        <img src="{{ asset('images/job/job2.jpg') }}" alt="ตัวแทนจำหน่าย" class="promo-banner-img">
+                        <img src="{{ asset('images/job/job2.jpg') }}" alt="ตัวแทนจำหน่าย" class="promo-banner-img" width="900" height="500" loading="lazy">
                     </div>
                     <div class="promo-banner-body">
                         <div class="promo-tag">ตัวแทนจำหน่าย</div>
@@ -251,7 +251,7 @@
             @foreach($services as [$img,$title,$desc,$route])
             <a href="{{ route($route) }}" style="text-decoration:none;display:block;">
                 <div class="card" style="text-align:center;padding:0;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
-                    <img src="{{ asset('images/service/'.$img) }}" alt="{{ $title }}" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px 12px 0 0;display:block;">
+                    <img src="{{ asset('images/service/'.$img) }}" alt="{{ $title }}" loading="lazy" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px 12px 0 0;display:block;">
                     <div style="padding:18px 16px;">
                         <h3 style="font-size:15px;font-weight:700;color:var(--kgm-green-800);margin:0 0 8px;">{{ $title }}</h3>
                         <p style="font-size:13px;color:#666;line-height:1.7;margin:0;">{{ $desc }}</p>
@@ -269,7 +269,7 @@
                     <div style="flex:0 0 100%;width:100%;box-sizing:border-box;">
                         <a href="{{ route($route) }}" style="text-decoration:none;display:block;">
                             <div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
-                                <img src="{{ asset('images/service/'.$img) }}" alt="{{ $title }}" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block;">
+                                <img src="{{ asset('images/service/'.$img) }}" alt="{{ $title }}" loading="lazy" style="width:100%;aspect-ratio:4/3;object-fit:cover;display:block;">
                                 <div style="padding:16px;text-align:center;">
                                     <h3 style="font-size:15px;font-weight:700;color:var(--kgm-green-800);margin:0 0 8px;">{{ $title }}</h3>
                                     <p style="font-size:13px;color:#666;line-height:1.7;margin:0;">{{ $desc }}</p>
@@ -408,7 +408,7 @@
                  onmouseleave="this.style.transform='';this.style.boxShadow='0 2px 12px rgba(0,0,0,.07)'"
                  onclick="homeOpenVideo('{{ $video->youtube_id }}')">
                 <div style="position:relative;padding-bottom:56.25%;background:#111;overflow:hidden;">
-                    <img src="{{ $video->thumbnail }}" alt="{{ $video->title }}" loading="lazy"
+                    <img src="{{ $video->thumbnail }}" alt="{{ $video->title }}" width="480" height="270" loading="lazy"
                          style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;"
                          onerror="this.src='/images/logo.png'">
                     <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25);">
@@ -564,7 +564,7 @@ document.addEventListener('keydown', function(e) { if(e.key==='Escape') homeClos
                 <div class="card">
                     @if($post->featured_image)
                     <div style="height:165px;overflow:hidden;">
-                        <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ $post->title }}" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.src='/images/logo.png'">
+                        <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ $post->title }}" width="600" height="165" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.src='/images/logo.png'">
                     </div>
                     @endif
                     <div class="card-body">
@@ -587,7 +587,7 @@ document.addEventListener('keydown', function(e) { if(e.key==='Escape') homeClos
                         <div class="card" style="border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
                             @if($post->featured_image)
                             <div style="height:200px;overflow:hidden;">
-                                <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ $post->title }}" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.src='/images/logo.png'">
+                                <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ $post->title }}" width="600" height="200" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.src='/images/logo.png'">
                             </div>
                             @endif
                             <div class="card-body">
@@ -674,7 +674,7 @@ document.addEventListener('keydown', function(e) { if(e.key==='Escape') homeClos
                 ['https://www.tiktok.com/@kgmuniform',       '/images/online/online_shopping_tiktok.jpg',  'TikTok Shop'],
             ] as [$url, $img, $name])
             <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" class="online-channel-card">
-                <img src="{{ $img }}" alt="{{ $name }}" loading="lazy">
+                <img src="{{ $img }}" alt="{{ $name }}" width="515" height="233" loading="lazy">
             </a>
             @endforeach
         </div>

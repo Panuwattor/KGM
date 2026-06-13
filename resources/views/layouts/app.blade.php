@@ -14,7 +14,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"></noscript>
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css"></noscript>
     @stack('styles')
 </head>
 <body>
@@ -25,7 +28,7 @@
 
         {{-- Brand --}}
         <a href="{{ route('home') }}" class="navbar-brand">
-            <img src="{{ asset('images/kgm_logo.png') }}" alt="KGM Logo" class="brand-logo">
+            <img src="{{ asset('images/kgm_logo.png') }}" alt="KGM Logo" class="brand-logo" width="718" height="334">
         </a>
 
         {{-- Desktop links --}}
@@ -154,7 +157,7 @@
     <div class="mobile-drawer" :class="{ open: open }">
         <div class="mobile-drawer-header">
             <div style="display:flex;align-items:center;gap:10px;">
-                <img src="{{ asset('images/kgm_logo.png') }}" alt="KGM" style="height:36px;width:auto;object-fit:contain;">
+                <img src="{{ asset('images/kgm_logo.png') }}" alt="KGM" style="height:36px;width:auto;object-fit:contain;" width="718" height="334">
                 <span style="color:white;font-weight:700;font-size:15px;"></span>
             </div>
             <button class="mobile-drawer-close" @click="open = false"><i class="bi bi-x-lg"></i></button>
@@ -231,15 +234,16 @@
     </div>
 </nav>
 
-{{-- ══ Alerts ══ --}}
-<div class="container">
-    @if(session('success'))
-        <div class="alert alert-success" style="margin-top:14px;"><i class="bi bi-check-circle-fill"></i> {{ session('success') }}</div>
-    @endif
-    @if(session('error'))
-        <div class="alert alert-danger" style="margin-top:14px;"><i class="bi bi-exclamation-circle-fill"></i> {{ session('error') }}</div>
-    @endif
-</div>
+{{-- ══ Alerts (SweetAlert2) ══ --}}
+@if(session('success'))
+<div id="__swal_success" data-msg="{{ session('success') }}" style="display:none;"></div>
+@endif
+@if(session('error'))
+<div id="__swal_error" data-msg="{{ session('error') }}" style="display:none;"></div>
+@endif
+@if(session('info'))
+<div id="__swal_info" data-msg="{{ session('info') }}" style="display:none;"></div>
+@endif
 
 @yield('content')
 
@@ -250,7 +254,7 @@
             {{-- Brand --}}
             <div>
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-                    <img src="{{ asset('images/kgm_logo.png') }}" alt="KGM" style="width:70px;height:70px;object-fit:contain;">
+                    <img src="{{ asset('images/kgm_logo.png') }}" alt="KGM" width="718" height="334" style="width:70px;height:70px;object-fit:contain;">
                     <div style="color:white;font-weight:700;font-size:15px;">กิจเจริญการ์เมนท์<span style="display:block;color:rgba(255,255,255,0.45);font-size:11px;font-weight:400;">(1993) จำกัด</span></div>
                 </div>
                 <p style="font-size:13px;line-height:1.8;color:rgba(255,255,255,0.55);margin:0 0 4px;">โรงงานผลิตเครื่องแบบนักเรียนและยูนิฟอร์มคุณภาพสูง ประสบการณ์กว่า 30 ปี</p>
@@ -537,6 +541,21 @@ function toggleWishlist(btn) {
     .finally(() => { btn.disabled = false; });
 }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const okEl   = document.getElementById('__swal_success');
+    const errEl  = document.getElementById('__swal_error');
+    const infoEl = document.getElementById('__swal_info');
+    if (okEl) {
+        Swal.fire({ icon: 'success', title: 'สำเร็จ', text: okEl.dataset.msg, timer: 2500, showConfirmButton: false });
+    } else if (errEl) {
+        Swal.fire({ icon: 'error', title: 'เกิดข้อผิดพลาด', text: errEl.dataset.msg, confirmButtonText: 'ตกลง', confirmButtonColor: 'var(--kgm-green-600)' });
+    } else if (infoEl) {
+        Swal.fire({ icon: 'info', title: 'แจ้งเตือน', text: infoEl.dataset.msg, confirmButtonText: 'ตกลง', confirmButtonColor: 'var(--kgm-green-600)' });
+    }
+});
+</script>
 @stack('scripts')
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
@@ -581,6 +600,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <div id="lp-modal" style="animation:lpFadeIn .35s ease;display:inline-flex;flex-direction:column;align-items:center;gap:16px;">
         <img src="{{ asset('storage/'.$activeLandingPage->image_path) }}"
              alt="ยินดีต้อนรับ"
+             width="680" height="480"
              style="display:block;max-width:min(680px,90vw);max-height:72vh;object-fit:contain;border-radius:16px;box-shadow:0 24px 64px rgba(0,0,0,0.5);">
         <button onclick="closeLandingPage()"
                 style="background:linear-gradient(135deg,#c9a84c,#f0c040);color:#1a3a2a;font-weight:700;font-size:15px;border:none;padding:12px 40px;border-radius:40px;cursor:pointer;font-family:inherit;"
@@ -668,7 +688,7 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLa
 
     {{-- ปุ่มหลัก --}}
     <button class="fc-main" :class="{ 'is-open': open }" @click="open = !open">
-        <img src="{{ asset('images/contact.png') }}" alt="ติดต่อเรา" style="width:100%;height:100%;object-fit:cover;display:block;">
+        <img src="{{ asset('images/contact.png') }}" alt="ติดต่อเรา" width="58" height="58" style="width:100%;height:100%;object-fit:cover;display:block;">
     </button>
 </div>
 

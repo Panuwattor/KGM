@@ -144,9 +144,9 @@
             @endif
 
             {{-- Input form --}}
-            <form method="POST" action="{{ route('cart.coupon') }}" style="display:flex;gap:8px;margin-bottom:8px;">
+            <form id="coupon-form" method="POST" action="{{ route('cart.coupon') }}" style="display:flex;gap:8px;margin-bottom:8px;">
                 @csrf
-                <input type="text" name="coupon_code" class="form-control" placeholder="รหัสคูปอง" style="border-radius:12px;flex:1;min-width:0;" value="{{ old('coupon_code') }}">
+                <input type="text" name="coupon_code" id="coupon-input" class="form-control" placeholder="รหัสคูปอง" style="border-radius:12px;flex:1;min-width:0;" value="{{ old('coupon_code') }}" required>
                 <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-check-lg"></i></button>
             </form>
 
@@ -163,8 +163,8 @@
             @endif
             @endauth
 
-            @if($errors->has('coupon_code') || session('error'))
-            <div style="color:#e74c3c;font-size:13px;margin-bottom:10px;"><i class="bi bi-exclamation-circle"></i> {{ $errors->first('coupon_code') ?? session('error') }}</div>
+            @if($errors->has('coupon_code'))
+            <div id="__swal_coupon_error" data-msg="{{ $errors->first('coupon_code') }}" style="display:none;"></div>
             @endif
 
             {{-- Totals --}}
@@ -295,6 +295,39 @@
 @push('scripts')
 <script>
 const CSRF = document.querySelector('meta[name=csrf-token]').content;
+
+// --- Coupon form validation & server-error SweetAlert ---
+document.addEventListener('DOMContentLoaded', function () {
+    const form  = document.getElementById('coupon-form');
+    const input = document.getElementById('coupon-input');
+
+    if (form) {
+        form.addEventListener('submit', function (e) {
+            if (!input.value.trim()) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'กรุณากรอกรหัสคูปอง',
+                    text: 'โปรดระบุรหัสคูปองก่อนกดยืนยัน',
+                    confirmButtonText: 'ตกลง',
+                    confirmButtonColor: 'var(--kgm-green-600)',
+                });
+                input.focus();
+            }
+        });
+    }
+
+    const couponErrEl = document.getElementById('__swal_coupon_error');
+    if (couponErrEl) {
+        Swal.fire({
+            icon: 'error',
+            title: 'ไม่สามารถใช้คูปองได้',
+            text: couponErrEl.dataset.msg,
+            confirmButtonText: 'ตกลง',
+            confirmButtonColor: 'var(--kgm-green-600)',
+        });
+    }
+});
 
 function fmtDec(n) {
     return '฿' + parseFloat(n).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
