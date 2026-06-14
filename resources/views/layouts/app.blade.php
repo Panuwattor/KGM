@@ -39,9 +39,9 @@
             {{-- ประเภทสินค้า dropdown --}}
             @if($navProductTypes->isNotEmpty())
             <div class="nav-dropdown" x-data="{ open: false, t: null }" @mouseenter="clearTimeout(t); open=true" @mouseleave="t = setTimeout(() => open=false, 120)">
-                <a href="{{ route('shop') }}" class="nav-link {{ request()->fullUrlWithQuery(['type' => '']) && request()->has('type') ? 'active' : '' }}">
+                <button type="button" class="nav-link {{ request()->has('type') ? 'active' : '' }}" style="background:none;border:none;cursor:pointer;" @click="open = !open">
                     ประเภท <i class="bi bi-chevron-down" style="font-size:10px;margin-left:2px;"></i>
-                </a>
+                </button>
                 <div class="nav-dropdown-panel nav-dropdown-panel-sm" x-show="open"
                      x-transition:enter="transition ease-out duration-150"
                      x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
@@ -63,9 +63,9 @@
             {{-- หมวดหมู่ dropdown --}}
             @if($navCategories->isNotEmpty())
             <div class="nav-dropdown" x-data="{ open: false, t: null }" @mouseenter="clearTimeout(t); open=true" @mouseleave="t = setTimeout(() => open=false, 120)">
-                <a href="{{ route('shop') }}" class="nav-link {{ request()->routeIs('shop.category') ? 'active' : '' }}">
+                <button type="button" class="nav-link {{ request()->routeIs('shop.category') ? 'active' : '' }}" style="background:none;border:none;cursor:pointer;" @click="open = !open">
                     หมวดหมู่ <i class="bi bi-chevron-down" style="font-size:10px;margin-left:2px;"></i>
-                </a>
+                </button>
                 <div class="nav-dropdown-panel nav-dropdown-panel-sm" x-show="open"
                      x-transition:enter="transition ease-out duration-150"
                      x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0"
