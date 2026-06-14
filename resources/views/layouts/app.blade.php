@@ -597,15 +597,17 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 {{-- ══ Landing Page Popup ══ --}}
 @if(!empty($activeLandingPage))
-<div id="lp-overlay"
-     style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px;">
-    <div id="lp-modal" style="animation:lpFadeIn .35s ease;display:inline-flex;flex-direction:column;align-items:center;gap:16px;">
-        <img src="{{ asset('storage/'.$activeLandingPage->image_path) }}"
-             alt="ยินดีต้อนรับ"
-             width="680" height="480"
-             style="display:block;max-width:min(680px,90vw);max-height:72vh;object-fit:contain;border-radius:16px;box-shadow:0 24px 64px rgba(0,0,0,0.5);">
+<div id="lp-overlay" onclick="if(event.target===this)closeLandingPage();"
+     style="display:none;position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,0.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:16px;cursor:pointer;">
+    <div onclick="event.stopPropagation();"
+         style="animation:lpFadeIn .35s ease;display:inline-flex;flex-direction:column;align-items:center;gap:16px;cursor:default;">
+        <div style="display:inline-block;border-radius:20px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,0.55);line-height:0;font-size:0;">
+            <img src="{{ asset('storage/'.$activeLandingPage->image_path) }}"
+                 alt="ยินดีต้อนรับ"
+                 style="display:block;max-width:min(680px,92vw);max-height:75vh;width:auto;height:auto;">
+        </div>
         <button onclick="closeLandingPage()"
-                style="background:linear-gradient(135deg,#c9a84c,#f0c040);color:#1a3a2a;font-weight:700;font-size:15px;border:none;padding:12px 40px;border-radius:40px;cursor:pointer;font-family:inherit;"
+                style="background:linear-gradient(135deg,#c9a84c,#f0c040);color:#1a3a2a;font-weight:700;font-size:15px;border:none;padding:12px 40px;border-radius:40px;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(0,0,0,0.25);"
         >เข้าสู่หน้าหลัก</button>
     </div>
 </div>
