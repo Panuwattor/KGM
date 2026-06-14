@@ -149,6 +149,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
+    Route::get('/manual', fn() => view('admin.manual.index'))->name('manual');
 
     Route::resource('categories', CategoryController::class);
     Route::resource('product-types', ProductTypeController::class);

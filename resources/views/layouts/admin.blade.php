@@ -296,6 +296,9 @@
             <a href="{{ route('admin.settings.logs') }}" class="nav-item {{ request()->routeIs('admin.settings.logs') ? 'active' : '' }}">
                 <i class="bi bi-journal-text"></i> Audit Log
             </a>
+            <a href="{{ route('admin.manual') }}" class="nav-item {{ request()->routeIs('admin.manual') ? 'active' : '' }}">
+                <i class="bi bi-book-half"></i> คู่มือการใช้งาน
+            </a>
         </div>
     </nav>
 </aside>
