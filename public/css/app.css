@@ -346,7 +346,13 @@ select.form-control { background-image: url("data:image/svg+xml,%3csvg xmlns='ht
     .navbar-main { display: flex; }
     .nav-links { display: none; }
     .hamburger { display: flex; }
-    .nav-actions { margin-left: auto; justify-content: flex-end; }
+    .nav-actions { margin-left: auto; justify-content: flex-end; gap: 2px; }
+    /* ซ่อน login button และ wishlist icon บนมือถือ — ใช้ผ่าน drawer แทน */
+    .nav-login-btn { display: none !important; }
+    .nav-wishlist-btn { display: none !important; }
+    /* เพิ่ม tap target ให้ได้ 44px (Apple HIG) */
+    .nav-btn { width: 44px; height: 44px; font-size: 20px; }
+    .hamburger { width: 44px; height: 44px; font-size: 24px; }
     .grid-3, .grid-4, .grid-5 { grid-template-columns: repeat(2, 1fr); }
     .footer-grid { grid-template-columns: repeat(2, 1fr); gap: 24px; }
     .section { padding: 40px 0; }
@@ -372,7 +378,8 @@ select.form-control { background-image: url("data:image/svg+xml,%3csvg xmlns='ht
 
 /* ── Very small (≤ 360px) ── */
 @media (max-width: 360px) {
-    .grid-2, .grid-3, .grid-4, .grid-5 { grid-template-columns: 1fr; }
+    .grid-3, .grid-4, .grid-5 { grid-template-columns: repeat(2, 1fr); }
+    .grid-2 { grid-template-columns: 1fr; }
     .brand-text small { display: none; }
 }
 

@@ -24,57 +24,11 @@
         <form method="POST" action="{{ route('register') }}" x-data="registerForm()">
             @csrf
 
+            {{-- ขั้นตอนที่ 1: ข้อมูลพื้นฐาน --}}
             <div class="form-group">
                 <label class="form-label"><i class="bi bi-person"></i> ชื่อ-นามสกุล *</label>
                 <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
                        value="{{ old('name') }}" required>
-            </div>
-
-            {{-- เบอร์โทร + ปุ่ม OTP --}}
-            <div class="form-group">
-                <label class="form-label"><i class="bi bi-telephone"></i> เบอร์โทรศัพท์ *</label>
-                <div style="display:flex;gap:8px;">
-                    <input type="tel" name="phone" class="form-control @error('phone') is-invalid @enderror"
-                           x-model="phone" :readonly="otpSent"
-                           value="{{ old('phone') }}" required placeholder="เช่น 0812345678"
-                           style="flex:1;">
-                    <button type="button" @click="sendOtp()"
-                            :disabled="sending || countdown > 0"
-                            class="btn btn-outline"
-                            style="white-space:nowrap;flex-shrink:0;padding:0 16px;">
-                        <span x-show="!sending && countdown === 0" x-cloak>
-                            <i class="bi bi-send"></i> ขอ OTP
-                        </span>
-                        <span x-show="sending" x-cloak>
-                            <i class="bi bi-arrow-repeat"></i>
-                        </span>
-                        <span x-show="!sending && countdown > 0" x-cloak x-text="countdown + 'วิ'"></span>
-                    </button>
-                </div>
-            </div>
-
-            {{-- OTP input --}}
-            <div class="form-group" x-show="otpSent" x-cloak
-                 style="background:var(--kgm-green-100);border-radius:16px;padding:16px;">
-                <label class="form-label" style="color:var(--kgm-green-800);">
-                    <i class="bi bi-shield-check"></i> รหัส OTP *
-                </label>
-                <input type="text" name="otp" class="form-control otp-input @error('otp') is-invalid @enderror"
-                       x-model="otp" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code"
-                       value="{{ old('otp') }}" placeholder="——————">
-                <div style="font-size:12px;margin-top:8px;color:var(--kgm-green-700);"
-                     x-show="otpMessage" x-text="otpMessage" x-cloak></div>
-                @error('otp')
-                <div style="color:#e74c3c;font-size:13px;margin-top:6px;"><i class="bi bi-exclamation-circle"></i> {{ $message }}</div>
-                @enderror
-                <div style="text-align:right;margin-top:8px;">
-                    <button type="button" @click="sendOtp()" :disabled="sending || countdown > 0"
-                            style="background:none;border:none;color:var(--kgm-green-600);cursor:pointer;font-size:13px;font-weight:600;">
-                        <i class="bi bi-arrow-clockwise"></i>
-                        <span x-show="countdown === 0" x-cloak>ส่งรหัสอีกครั้ง</span>
-                        <span x-show="countdown > 0" x-cloak x-text="'รออีก ' + countdown + ' วิ'"></span>
-                    </button>
-                </div>
             </div>
 
             <div class="form-group">
@@ -93,16 +47,68 @@
                 <input type="password" name="password_confirmation" class="form-control" required>
             </div>
 
-            <button type="submit" :disabled="!otpSent"
-                    class="btn btn-primary w-full btn-lg"
-                    style="justify-content:center;"
-                    :style="!otpSent ? 'opacity:.5;cursor:not-allowed;' : ''">
-                <i class="bi bi-person-plus"></i> สมัครสมาชิก
-            </button>
+            <hr style="border:none;border-top:1px dashed #e0e0e0;margin:20px 0;">
 
-            <p x-show="!otpSent" x-cloak style="text-align:center;font-size:12px;color:#aaa;margin-top:10px;">
-                <i class="bi bi-info-circle"></i> กรุณากดขอ OTP และยืนยันเบอร์โทรก่อน
+            {{-- ขั้นตอนที่ 2: ยืนยันเบอร์โทร --}}
+            <p style="font-size:13px;color:#888;margin-bottom:12px;text-align:center;">
+                <i class="bi bi-telephone-fill" style="color:var(--kgm-green-600);"></i>
+                ขั้นตอนสุดท้าย — ยืนยันเบอร์โทรศัพท์ด้วย OTP
             </p>
+
+            <div class="form-group">
+                <label class="form-label"><i class="bi bi-telephone"></i> เบอร์โทรศัพท์ *</label>
+                <div style="display:flex;gap:8px;">
+                    <input type="tel" name="phone" class="form-control @error('phone') is-invalid @enderror"
+                           x-model="phone" :readonly="otpSent"
+                           value="{{ old('phone') }}" required placeholder="เช่น 0812345678"
+                           style="flex:1;">
+                    <button type="button" @click="sendOtp()"
+                            :disabled="sending || countdown > 0"
+                            class="btn btn-outline"
+                            style="white-space:nowrap;flex-shrink:0;padding:0 16px;">
+                        <span x-show="!sending && countdown === 0" x-cloak>
+                            <i class="bi bi-send"></i> <span x-text="otpSent ? 'ส่งอีกครั้ง' : 'ขอ OTP'"></span>
+                        </span>
+                        <span x-show="sending" x-cloak>
+                            <i class="bi bi-arrow-repeat"></i>
+                        </span>
+                        <span x-show="!sending && countdown > 0" x-cloak x-text="countdown + 'วิ'"></span>
+                    </button>
+                </div>
+            </div>
+
+            {{-- OTP input + ปุ่มสมัคร โผล่หลังขอ OTP เท่านั้น --}}
+            <template x-if="otpSent">
+                <div>
+                    <div class="form-group"
+                         style="background:var(--kgm-green-100);border-radius:16px;padding:16px;">
+                        <label class="form-label" style="color:var(--kgm-green-800);">
+                            <i class="bi bi-shield-check"></i> รหัส OTP *
+                        </label>
+                        <input type="text" name="otp" class="form-control otp-input @error('otp') is-invalid @enderror"
+                               x-model="otp" maxlength="6" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code"
+                               value="{{ old('otp') }}" placeholder="——————">
+                        <div style="font-size:12px;margin-top:8px;color:var(--kgm-green-700);"
+                             x-show="otpMessage" x-text="otpMessage" x-cloak></div>
+                        @error('otp')
+                        <div style="color:#e74c3c;font-size:13px;margin-top:6px;"><i class="bi bi-exclamation-circle"></i> {{ $message }}</div>
+                        @enderror
+                        <div style="text-align:right;margin-top:8px;">
+                            <button type="button" @click="sendOtp()" :disabled="sending || countdown > 0"
+                                    style="background:none;border:none;color:var(--kgm-green-600);cursor:pointer;font-size:13px;font-weight:600;">
+                                <i class="bi bi-arrow-clockwise"></i>
+                                <span x-show="countdown === 0" x-cloak>ส่งรหัสอีกครั้ง</span>
+                                <span x-show="countdown > 0" x-cloak x-text="'รออีก ' + countdown + ' วิ'"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-full btn-lg" style="justify-content:center;">
+                        <i class="bi bi-person-plus"></i> สมัครสมาชิก
+                    </button>
+                </div>
+            </template>
+
         </form>
 
         <div style="text-align:center;margin-top:20px;font-size:14px;color:#888;">

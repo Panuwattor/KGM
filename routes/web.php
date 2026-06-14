@@ -9,6 +9,7 @@ use App\Http\Controllers\Frontend\AccountController;
 use App\Http\Controllers\Frontend\PageController;
 use App\Http\Controllers\Frontend\QuoteController;
 use App\Http\Controllers\Frontend\DealerController;
+use App\Http\Controllers\Frontend\FlashSaleController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\AdminLoginController;
@@ -82,6 +83,8 @@ Route::get('/shop/{slug}', [ShopController::class, 'show'])->name('shop.show');
 Route::post('/shop/{product}/review', [ShopController::class, 'submitReview'])->name('shop.review')->middleware('auth:customer');
 
 // Coupons
+Route::get('/flash-sales/{flashSale}', [FlashSaleController::class, 'show'])->name('flash-sales.show');
+
 Route::get('/coupons', [FrontendCouponController::class, 'index'])->name('coupons.index');
 Route::post('/coupons/{coupon}/collect', [FrontendCouponController::class, 'collect'])->name('coupons.collect')->middleware('auth:customer');
 

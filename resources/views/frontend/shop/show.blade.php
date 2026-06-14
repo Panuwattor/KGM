@@ -72,7 +72,8 @@
         $firstImage = $allImages[0] ?? '';
     @endphp
 
-    <div class="product-layout" x-data="productPage({{ $product->id }}, {{ json_encode($product->variants) }}, {{ $product->current_price }}, '{{ $firstImage }}', {{ json_encode($allImages) }})">
+    @php $flashPrice = isset($flashSaleItem) && $flashSaleItem ? (float)$flashSaleItem->sale_price : null; @endphp
+    <div class="product-layout" x-data="productPage({{ $product->id }}, {{ json_encode($product->variants) }}, {{ $flashPrice ?? $product->current_price }}, '{{ $firstImage }}', {{ json_encode($allImages) }}, {{ $flashPrice !== null ? $flashPrice : 'null' }})">
 
         {{-- Gallery --}}
         <div class="product-gallery">
@@ -118,9 +119,22 @@
             </div>
             @endif
 
+            @if($flashPrice !== null)
+            <div style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#e53935,#ff7043);color:white;border-radius:20px;padding:5px 14px;font-size:13px;font-weight:700;margin-bottom:10px;">
+                <i class="bi bi-lightning-charge-fill"></i>
+                Flash Sale — <a href="{{ route('flash-sales.show', $flashSaleItem->flashSale) }}" style="color:white;text-decoration:underline;">{{ $flashSaleItem->flashSale->name }}</a>
+                &nbsp;· สิ้นสุด {{ $flashSaleItem->flashSale->ends_at->format('d/m/Y H:i') }} น.
+            </div>
+            @endif
             <div class="product-price">
                 <span class="product-price-current" x-text="'฿' + currentPrice.toLocaleString()"></span>
-                @if($product->sale_price)
+                @if($flashPrice !== null)
+                <span class="product-price-old">฿{{ number_format($product->price, 0) }}</span>
+                @php $flashDiscount = $product->price > 0 ? (int)round(($product->price - $flashPrice) / $product->price * 100) : 0; @endphp
+                @if($flashDiscount > 0)
+                <span class="badge badge-sale">-{{ $flashDiscount }}%</span>
+                @endif
+                @elseif($product->sale_price)
                 <span class="product-price-old">฿{{ number_format($product->price, 0) }}</span>
                 <span class="badge badge-sale">-{{ $product->discount_percent }}%</span>
                 @endif
@@ -280,11 +294,12 @@
 
 @push('scripts')
 <script>
-function productPage(productId, variants, basePrice, initialImage, allImages) {
+function productPage(productId, variants, basePrice, initialImage, allImages, flashSalePrice = null) {
     return {
         productId,
         variants,
         basePrice,
+        flashSalePrice,
         currentPrice: basePrice,
         selectedVariantId: null,
         selectedSize: null,
@@ -319,7 +334,8 @@ function productPage(productId, variants, basePrice, initialImage, allImages) {
             );
             if (v) {
                 this.selectedVariantId = v.id;
-                this.currentPrice = basePrice + parseFloat(v.price_adjustment || 0);
+                const adj = parseFloat(v.price_adjustment || 0);
+                this.currentPrice = (this.flashSalePrice !== null ? this.flashSalePrice : basePrice) + adj;
             }
         },
         addToCartFn(redirect = false) {
@@ -328,7 +344,7 @@ function productPage(productId, variants, basePrice, initialImage, allImages) {
                 document.querySelector('.variant-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return;
             }
-            addToCart(this.productId, this.selectedVariantId, this.qty);
+            addToCart(this.productId, this.selectedVariantId, this.qty, this.flashSalePrice);
             if (redirect) setTimeout(() => window.location = '/cart', 500);
         }
     };

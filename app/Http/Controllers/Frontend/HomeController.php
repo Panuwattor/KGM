@@ -11,6 +11,7 @@ use App\Models\ProductType;
 use App\Models\Review;
 use App\Models\Post;
 use App\Models\Video;
+use App\Models\FlashSale;
 use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
@@ -27,9 +28,14 @@ class HomeController extends Controller
         $latestPosts      = Cache::remember('home.latest_posts',     300, fn() => Post::published()->with('postCategory')->latest('published_at')->take(3)->get());
         $homeCoupons      = Cache::remember('home.coupons',          300, fn() => Coupon::publiclyVisible()->latest()->take(5)->get());
         $featuredVideos   = Cache::remember('home.videos',           300, fn() => Video::active()->featured()->orderBy('sort_order')->latest()->take(6)->get());
+        $activeFlashSales = FlashSale::where('is_active', true)
+            ->where('starts_at', '<=', now())
+            ->where('ends_at', '>=', now())
+            ->latest()
+            ->get();
 
         return view('frontend.home', compact(
-            'banners', 'categories', 'productTypes', 'featuredProducts', 'bestsellerProducts', 'newProducts', 'testimonials', 'latestPosts', 'homeCoupons', 'featuredVideos'
+            'banners', 'categories', 'productTypes', 'featuredProducts', 'bestsellerProducts', 'newProducts', 'testimonials', 'latestPosts', 'homeCoupons', 'featuredVideos', 'activeFlashSales'
         ));
     }
 }

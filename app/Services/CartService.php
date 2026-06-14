@@ -23,7 +23,7 @@ class CartService
             ->get();
     }
 
-    public function addItem(int $productId, int $quantity = 1, ?int $variantId = null): Cart
+    public function addItem(int $productId, int $quantity = 1, ?int $variantId = null, ?float $flashSalePrice = null): Cart
     {
         $conditions = $this->customer()->check()
             ? ['customer_id' => $this->customer()->id()]
@@ -38,6 +38,11 @@ class CartService
         if ($this->customer()->check()) {
             $cart->session_id = null;
         }
+
+        if ($flashSalePrice !== null) {
+            $cart->flash_sale_price = $flashSalePrice;
+        }
+
         $cart->save();
 
         return $cart;

@@ -91,6 +91,41 @@
     </div>
 </section>
 @endif
+{{-- ══ FLASH SALE ══ --}}
+@if(isset($activeFlashSales) && $activeFlashSales->isNotEmpty())
+<section class="flash-sale-section">
+    <div class="container">
+        <div style="text-align:center;margin-bottom:20px;">
+            <div class="section-title" style="color:#e53935;"><i class="bi bi-lightning-charge-fill"></i> Flash Sale</div>
+            <div class="section-divider" style="margin:10px auto 0;background:#e53935;"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">
+            @foreach($activeFlashSales as $fs)
+            <a href="{{ route('flash-sales.show', $fs) }}" class="flash-sale-card" style="text-decoration:none;display:block;border-radius:18px;overflow:hidden;box-shadow:0 4px 20px rgba(229,57,53,0.15);border:2px solid #ffcdd2;background:white;transition:transform .2s,box-shadow .2s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 32px rgba(229,57,53,0.25)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(229,57,53,0.15)'">
+                @if($fs->image)
+                <img src="{{ asset('storage/'.$fs->image) }}" alt="{{ $fs->name }}" style="width:100%;height:160px;object-fit:cover;display:block;">
+                @else
+                <div style="width:100%;height:160px;background:linear-gradient(135deg,#e53935,#ff7043);display:flex;align-items:center;justify-content:center;">
+                    <i class="bi bi-lightning-charge-fill" style="font-size:48px;color:white;opacity:.8;"></i>
+                </div>
+                @endif
+                <div style="padding:16px;">
+                    <div style="font-size:17px;font-weight:800;color:#c62828;margin-bottom:6px;">{{ $fs->name }}</div>
+                    <div style="font-size:12px;color:#e53935;font-weight:600;display:flex;align-items:center;gap:6px;">
+                        <i class="bi bi-clock"></i>
+                        <span>สิ้นสุด {{ $fs->ends_at->format('d/m/Y H:i') }} น.</span>
+                    </div>
+                    <div style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;background:#e53935;color:white;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;">
+                        <i class="bi bi-cart-plus"></i> ดูสินค้า Flash Sale
+                    </div>
+                </div>
+            </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
 {{-- ══ PRODUCT TYPES ══ --}}
 @if($productTypes->isNotEmpty())
 <section class="type-section">

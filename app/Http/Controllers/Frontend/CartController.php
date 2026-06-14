@@ -38,7 +38,8 @@ class CartController extends Controller
     public function add(Request $request)
     {
         $request->validate(['product_id' => 'required|exists:products,id', 'quantity' => 'integer|min:1']);
-        $this->cart->addItem($request->product_id, $request->quantity ?? 1, $request->variant_id);
+        $flashPrice = $request->filled('flash_sale_price') ? (float) $request->flash_sale_price : null;
+        $this->cart->addItem($request->product_id, $request->quantity ?? 1, $request->variant_id, $flashPrice);
 
         if ($request->expectsJson()) {
             return response()->json(['count' => $this->cart->getCount(), 'message' => 'เพิ่มลงตะกร้าแล้ว']);

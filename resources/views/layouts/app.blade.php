@@ -98,7 +98,7 @@
 
             @auth('customer')
             {{-- Wishlist --}}
-            <a href="{{ route('account.wishlist') }}" class="nav-btn" title="รายการโปรด"><i class="bi bi-heart"></i></a>
+            <a href="{{ route('account.wishlist') }}" class="nav-btn nav-wishlist-btn" title="รายการโปรด"><i class="bi bi-heart"></i></a>
             @endauth
 
             {{-- Cart --}}
@@ -487,7 +487,9 @@ document.addEventListener('DOMContentLoaded', function () {
         .catch(() => {});
 });
 
-function addToCart(productId, variantId, qty = 1) {
+function addToCart(productId, variantId, qty = 1, flashSalePrice = null) {
+    const payload = { product_id: productId, variant_id: variantId, quantity: qty };
+    if (flashSalePrice !== null) payload.flash_sale_price = flashSalePrice;
     fetch('/cart/add', {
         method: 'POST',
         headers: {
@@ -495,7 +497,7 @@ function addToCart(productId, variantId, qty = 1) {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         },
-        body: JSON.stringify({ product_id: productId, variant_id: variantId, quantity: qty })
+        body: JSON.stringify(payload)
     })
     .then(r => r.json())
     .then(data => {

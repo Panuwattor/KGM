@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\FlashSaleItem;
 use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\Review;
@@ -63,7 +64,14 @@ class ShopController extends Controller
             ? auth('customer')->user()->wishlists()->where('product_id', $product->id)->exists()
             : false;
 
-        return view('frontend.shop.show', compact('product', 'relatedProducts', 'inWishlist'));
+        $flashSaleItem = FlashSaleItem::where('product_id', $product->id)
+            ->whereHas('flashSale', fn($q) => $q->where('is_active', true)
+                ->where('starts_at', '<=', now())
+                ->where('ends_at', '>=', now()))
+            ->with('flashSale')
+            ->first();
+
+        return view('frontend.shop.show', compact('product', 'relatedProducts', 'inWishlist', 'flashSaleItem'));
     }
 
     public function submitReview(Request $request, Product $product)
