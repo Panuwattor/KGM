@@ -53,6 +53,8 @@ Route::post('/contact', [PageController::class, 'contactSubmit'])->name('contact
 Route::get('/privacy-policy', [PageController::class, 'privacyPolicy'])->name('privacy-policy');
 Route::get('/terms', [PageController::class, 'terms'])->name('terms');
 Route::get('/cookie-policy', [PageController::class, 'cookiePolicy'])->name('cookie-policy');
+Route::get('/size-guide', [PageController::class, 'sizeGuide'])->name('size-guide');
+Route::get('/faq', [PageController::class, 'faq'])->name('faq');
 Route::post('/consent', [PageController::class, 'saveConsent'])->name('consent.save');
 
 // Blog/News

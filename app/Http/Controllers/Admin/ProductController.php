@@ -38,6 +38,14 @@ class ProductController extends Controller
                 default     => null,
             };
         }
+        if ($request->filled('flag')) {
+            match($request->flag) {
+                'featured'   => $query->where('is_featured', true),
+                'new'        => $query->where('is_new', true),
+                'bestseller' => $query->where('is_bestseller', true),
+                default      => null,
+            };
+        }
         $products     = $query->orderBy('sort_order')->latest()->paginate(20)->withQueryString();
         $categories   = Category::active()->get();
         $productTypes = ProductType::active()->orderBy('sort_order')->get();

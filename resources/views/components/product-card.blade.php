@@ -12,7 +12,13 @@
                     onerror="this.onerror=null;this.src='/images/logo.png'">
             </a>
             @auth('customer')
-            @php $inWishlist = auth('customer')->user()->wishlists()->where('product_id', $product->id)->exists(); @endphp
+            @php
+                static $wishlistIds = null;
+                if ($wishlistIds === null) {
+                    $wishlistIds = auth('customer')->user()->wishlists()->pluck('product_id')->all();
+                }
+                $inWishlist = in_array($product->id, $wishlistIds);
+            @endphp
             <button type="button"
                 class="product-wishlist {{ $inWishlist ? 'active' : '' }}"
                 title="รายการโปรด"

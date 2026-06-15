@@ -115,6 +115,10 @@ class PageController extends Controller
         return back()->with('success', 'ส่งใบสมัครเรียบร้อยแล้ว ทีมงานจะติดต่อกลับหากผ่านการคัดเลือก');
     }
 
+    public function sizeGuide() { return view('frontend.size-guide'); }
+
+    public function faq() { return view('frontend.faq'); }
+
     public function privacyPolicy() { return view('frontend.privacy-policy'); }
     public function terms() { return view('frontend.terms'); }
     public function cookiePolicy() { return view('frontend.cookie-policy'); }

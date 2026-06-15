@@ -183,6 +183,12 @@
                             {{ $selectedCategory->name }}
                         @elseif($selectedType)
                             <i class="bi bi-grid-3x3-gap" style="font-size:18px;margin-right:6px;"></i>{{ $selectedType->name }}
+                        @elseif(request('filter') === 'featured')
+                            <i class="bi bi-star-fill" style="font-size:18px;margin-right:6px;color:var(--kgm-gold-400,#c9a84c);"></i>สินค้าแนะนำ
+                        @elseif(request('filter') === 'new')
+                            <i class="bi bi-stars" style="font-size:18px;margin-right:6px;color:var(--kgm-green-600);"></i>สินค้าใหม่
+                        @elseif(request('filter') === 'bestseller')
+                            <i class="bi bi-fire" style="font-size:18px;margin-right:6px;color:#e74c3c;"></i>สินค้าขายดี
                         @else
                             สินค้าทั้งหมด
                         @endif

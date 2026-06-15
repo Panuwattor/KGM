@@ -116,6 +116,13 @@ class ShopController extends Controller
             $query->whereHas('variants', fn($q) => $q->where('size', $request->size));
         }
 
+        match($request->get('filter')) {
+            'featured'   => $query->where('is_featured', true),
+            'new'        => $query->where('is_new', true),
+            'bestseller' => $query->where('is_bestseller', true),
+            default      => null,
+        };
+
         match($request->get('sort')) {
             'price_asc'  => $query->orderBy('price', 'asc'),
             'price_desc' => $query->orderBy('price', 'desc'),

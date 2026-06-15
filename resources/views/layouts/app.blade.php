@@ -150,6 +150,37 @@
         </div>
     </div>
 
+    {{-- Secondary Bar --}}
+    <div class="navbar-secondary">
+        <div class="navbar-secondary-inner">
+            <div class="navbar-secondary-links">
+                <a href="{{ route('size-guide') }}" class="navbar-secondary-link {{ request()->routeIs('size-guide') ? 'active' : '' }}">วิธีวัดไซส์</a>
+                <a href="{{ route('shop') }}?filter=featured" class="navbar-secondary-link {{ request()->routeIs('shop*') && request('filter')==='featured' ? 'active' : '' }}">สินค้าแนะนำ</a>
+                <a href="{{ route('shop') }}?filter=new" class="navbar-secondary-link {{ request()->routeIs('shop*') && request('filter')==='new' ? 'active' : '' }}">สินค้าใหม่</a>
+                <a href="{{ route('shop') }}?filter=bestseller" class="navbar-secondary-link {{ request()->routeIs('shop*') && request('filter')==='bestseller' ? 'active' : '' }}">สินค้าขายดี</a>
+                <a href="{{ route('faq') }}" class="navbar-secondary-link {{ request()->routeIs('faq') ? 'active' : '' }}">คำถามที่พบบ่อย</a>
+            </div>
+            <div class="navbar-secondary-marketplaces">
+                <a href="https://shopee.co.th/kgmuniform" target="_blank" rel="noopener" class="navbar-secondary-marketplace shopee-link">
+                    <img src="{{ asset('images/online/shopee.png') }}" alt="Shopee" width="16" height="16">
+                    Shopee
+                </a>
+                <a href="https://www.lazada.co.th/shop/kgm" target="_blank" rel="noopener" class="navbar-secondary-marketplace lazada-link">
+                    <img src="{{ asset('images/online/lazada.png') }}" alt="Lazada" width="16" height="16">
+                    Lazada
+                </a>
+                <a href="https://www.tiktok.com/@kgmuniform" target="_blank" rel="noopener" class="navbar-secondary-marketplace tiktok-link">
+                    <img src="{{ asset('images/online/tiktok.png') }}" alt="TikTok" width="16" height="16">
+                    TikTok
+                </a>
+                <a href="https://www.facebook.com/KGMuniform" target="_blank" rel="noopener" class="navbar-secondary-marketplace facebook-link">
+                    <i class="bi bi-facebook"></i>
+                    Facebook
+                </a>
+            </div>
+        </div>
+    </div>
+
     {{-- Mobile Overlay --}}
     <div class="mobile-overlay" :class="{ open: open }" @click="open = false"></div>
 
@@ -164,7 +195,21 @@
         </div>
 
         <a href="{{ route('home') }}"      class="mobile-nav-link {{ request()->routeIs('home')      ? 'active' : '' }}" @click="open=false"><i class="bi bi-house"></i> หน้าแรก</a>
-        <a href="{{ route('shop') }}" class="mobile-nav-link {{ request()->routeIs('shop') ? 'active' : '' }}" @click="open=false"><i class="bi bi-bag"></i> สินค้า</a>
+
+        {{-- สินค้า accordion (mobile) --}}
+        <div x-data="{ shopOpen: false }">
+            <button class="mobile-nav-link w-full {{ request()->routeIs('shop*') ? 'active' : '' }}" @click="shopOpen = !shopOpen" style="background:none;border:none;cursor:pointer;">
+                <i class="bi bi-bag"></i>
+                <span style="flex:1;text-align:left;">สินค้า</span>
+                <i class="bi" :class="shopOpen ? 'bi-chevron-up' : 'bi-chevron-down'" style="font-size:11px;width:auto;"></i>
+            </button>
+            <div x-show="shopOpen" x-cloak style="padding:0 0 4px 0;">
+                <a href="{{ route('shop') }}" class="mobile-nav-sub" @click="open=false"><i class="bi bi-grid-3x3-gap"></i> สินค้าทั้งหมด</a>
+                <a href="{{ route('shop') }}?filter=featured" class="mobile-nav-sub" @click="open=false"><i class="bi bi-star-fill"></i> สินค้าแนะนำ</a>
+                <a href="{{ route('shop') }}?filter=new" class="mobile-nav-sub" @click="open=false"><i class="bi bi-lightning-charge-fill"></i> สินค้าใหม่</a>
+                <a href="{{ route('shop') }}?filter=bestseller" class="mobile-nav-sub" @click="open=false"><i class="bi bi-fire"></i> สินค้าขายดี</a>
+            </div>
+        </div>
 
         {{-- ประเภทสินค้า accordion (mobile) --}}
         @if($navProductTypes->isNotEmpty())
@@ -207,12 +252,29 @@
             </div>
         </div>
         @endif
+        <a href="{{ route('size-guide') }}"   class="mobile-nav-link {{ request()->routeIs('size-guide') ? 'active' : '' }}" @click="open=false"><i class="bi bi-rulers"></i> วิธีวัดไซส์</a>
         <a href="{{ route('coupons.index') }}" class="mobile-nav-link {{ request()->routeIs('coupons*')  ? 'active' : '' }}" @click="open=false"><i class="bi bi-ticket-perforated"></i> คูปอง</a>
         <a href="{{ route('about') }}"         class="mobile-nav-link {{ request()->routeIs('about')      ? 'active' : '' }}" @click="open=false"><i class="bi bi-building"></i> เกี่ยวกับเรา</a>
         <a href="{{ route('services') }}"  class="mobile-nav-link {{ request()->routeIs('services')  ? 'active' : '' }}" @click="open=false"><i class="bi bi-tools"></i> บริการ</a>
         <a href="{{ route('news') }}"      class="mobile-nav-link {{ request()->routeIs('news*')     ? 'active' : '' }}" @click="open=false"><i class="bi bi-newspaper"></i> ข่าวสาร</a>
         <a href="{{ route('careers') }}"   class="mobile-nav-link {{ request()->routeIs('careers*')  ? 'active' : '' }}" @click="open=false"><i class="bi bi-briefcase"></i> ร่วมงานกับเรา</a>
         <a href="{{ route('contact') }}"   class="mobile-nav-link {{ request()->routeIs('contact')   ? 'active' : '' }}" @click="open=false"><i class="bi bi-chat-left-text"></i> ติดต่อเรา</a>
+        <a href="{{ route('faq') }}"       class="mobile-nav-link {{ request()->routeIs('faq')        ? 'active' : '' }}" @click="open=false"><i class="bi bi-question-circle"></i> คำถามที่พบบ่อย</a>
+
+        {{-- ช่องทางออนไลน์ --}}
+        <div style="padding:12px 16px 4px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:1px;">ช่องทางออนไลน์</div>
+        <a href="https://shopee.co.th/kgmuniform" target="_blank" rel="noopener" class="mobile-nav-link" @click="open=false" style="gap:10px;">
+            <img src="{{ asset('images/online/shopee.png') }}" alt="Shopee" width="18" height="18" style="border-radius:4px;"> Shopee
+        </a>
+        <a href="https://www.lazada.co.th/shop/kgmuniform" target="_blank" rel="noopener" class="mobile-nav-link" @click="open=false" style="gap:10px;">
+            <img src="{{ asset('images/online/lazada.png') }}" alt="Lazada" width="18" height="18" style="border-radius:4px;"> Lazada
+        </a>
+        <a href="https://www.tiktok.com/@kgmuniform" target="_blank" rel="noopener" class="mobile-nav-link" @click="open=false" style="gap:10px;">
+            <img src="{{ asset('images/online/tiktok.png') }}" alt="TikTok" width="18" height="18" style="border-radius:4px;"> TikTok Shop
+        </a>
+        <a href="https://www.facebook.com/KGMuniform" target="_blank" rel="noopener" class="mobile-nav-link" @click="open=false" style="gap:10px;">
+            <img src="{{ asset('images/online/facebook.png') }}" alt="Facebook" width="18" height="18" style="border-radius:4px;"> Facebook
+        </a>
 
         <div class="mobile-drawer-footer">
             <a href="{{ route('quote') }}" class="btn btn-gold w-full" style="border-radius:14px;" @click="open=false">
@@ -473,6 +535,38 @@ function mobileNav() {
     };
 }
 
+(function () {
+    var bar = document.querySelector('.navbar-secondary');
+    if (!bar) return;
+    var lastY = window.scrollY;
+    var hidden = false;
+    var ticking = false;
+    var cooldown = false;
+    function toggle(show) {
+        if (show) { bar.classList.remove('hidden'); hidden = false; }
+        else { bar.classList.add('hidden'); hidden = true; }
+        cooldown = true;
+        setTimeout(function () { cooldown = false; }, 350);
+    }
+    window.addEventListener('scroll', function () {
+        if (ticking || cooldown) return;
+        ticking = true;
+        requestAnimationFrame(function () {
+            var y = window.scrollY;
+            var delta = y - lastY;
+            if (y <= 60) {
+                if (hidden) toggle(true);
+            } else if (delta > 6 && !hidden) {
+                toggle(false);
+            } else if (delta < -6 && hidden) {
+                toggle(true);
+            }
+            lastY = y;
+            ticking = false;
+        });
+    }, { passive: true });
+})();
+
 function updateCartBadge(count) {
     const b = document.getElementById('cart-count');
     if (!b) return;
@@ -656,6 +750,7 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLa
 .fc-anim-1 { animation: fc-pop .3s cubic-bezier(.34,1.56,.64,1) both; }
 .fc-anim-2 { animation: fc-pop .3s cubic-bezier(.34,1.56,.64,1) .08s both; }
 .fc-anim-3 { animation: fc-pop .3s cubic-bezier(.34,1.56,.64,1) .16s both; }
+.fc-anim-4 { animation: fc-pop .3s cubic-bezier(.34,1.56,.64,1) .24s both; }
 .fc-menu { display: flex; flex-direction: column; gap: 10px; align-items: flex-end; margin-bottom: 6px; }
 </style>
 
@@ -671,28 +766,29 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLa
          x-transition:leave-end="opacity-0"
          x-cloak>
 
-        <a href="tel:0851100010" class="fc-item fc-anim-3">
+        <a href="tel:0851100010" class="fc-item fc-anim-4">
             <div class="fc-icon" style="background:#34a853;">
                 <i class="bi bi-telephone-fill"></i>
             </div>
         </a>
 
-        <a href="https://line.me/ti/p/~@kgmuniform" target="_blank" class="fc-item fc-anim-2">
+        <a href="https://line.me/ti/p/~@kgmuniform" target="_blank" class="fc-item fc-anim-3">
             <div class="fc-icon" style="background:#06c755;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.281.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/></svg>
             </div>
         </a>
 
-        <a href="https://m.me/kgmuniform" target="_blank" class="fc-item fc-anim-1">
+        <a href="https://m.me/kgmuniform" target="_blank" class="fc-item fc-anim-2">
             <div class="fc-icon" style="background:linear-gradient(135deg,#0099ff,#a033ff);">
                 <i class="bi bi-messenger"></i>
             </div>
         </a>
+
     </div>
 
     {{-- ปุ่มหลัก --}}
     <button class="fc-main" :class="{ 'is-open': open }" @click="open = !open">
-        <img src="{{ asset('images/contact.png') }}" alt="ติดต่อเรา" width="58" height="58" style="width:100%;height:100%;object-fit:cover;display:block;">
+        <img src="{{ asset('images/contact.png') }}" alt="ติดต่อเรา" width="58" height="58" draggable="false" style="width:100%;height:100%;object-fit:cover;display:block;user-select:none;-webkit-user-drag:none;pointer-events:none;">
     </button>
 </div>
 

@@ -42,6 +42,15 @@
             <option value="low_stock" {{ request('status')=='low_stock' ? 'selected' : '' }}>สต๊อกใกล้หมด</option>
         </select>
     </div>
+    <div class="filter-item">
+        <label>ป้ายกำกับ</label>
+        <select name="flag" class="form-control">
+            <option value="">ทั้งหมด</option>
+            <option value="featured"   {{ request('flag')==='featured'   ? 'selected' : '' }}>⭐ สินค้าแนะนำ</option>
+            <option value="new"        {{ request('flag')==='new'        ? 'selected' : '' }}>✨ สินค้าใหม่</option>
+            <option value="bestseller" {{ request('flag')==='bestseller' ? 'selected' : '' }}>🔥 สินค้าขายดี</option>
+        </select>
+    </div>
     <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> ค้นหา</button>
     <a href="{{ route('admin.products.index') }}" class="btn btn-light"><i class="bi bi-x-lg"></i></a>
 </form>

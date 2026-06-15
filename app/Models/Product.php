@@ -86,6 +86,12 @@ class Product extends Model
 
     public function getMainImageAttribute(): string
     {
+        if ($this->relationLoaded('images')) {
+            $primary = $this->images->firstWhere('is_primary', true);
+            if ($primary) return $primary->image_path;
+            $first = $this->images->first();
+            return $first ? $first->image_path : 'images/no-product.png';
+        }
         $primary = $this->primaryImage;
         if ($primary) return $primary->image_path;
         $first = $this->images()->first();
