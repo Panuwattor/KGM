@@ -298,10 +298,10 @@
             <div>
                 <h5>ติดต่อเรา</h5>
                 <div style="display:flex;flex-direction:column;gap:10px;font-size:14px;">
-                    <div><i class="bi bi-geo-alt" style="color:var(--kgm-gold-300);margin-right:6px;"></i>123 ถ.เจริญกรุง แขวงบางรัก กรุงเทพฯ 10500</div>
-                    <div><i class="bi bi-telephone" style="color:var(--kgm-gold-300);margin-right:6px;"></i><a href="tel:020001234">02-000-1234</a></div>
+                    <div><i class="bi bi-geo-alt" style="color:var(--kgm-gold-300);margin-right:6px;"></i>364 หมู่ 6 ถ.ศรีสะเกษ-กันทรลักษ์ ต.โพนข่า อ.เมือง จ.ศรีสะเกษ</div>
+                    <div><i class="bi bi-telephone" style="color:var(--kgm-gold-300);margin-right:6px;"></i><a href="tel:020001234">(045) 611111,633111</a></div>
                     <div><i class="bi bi-envelope" style="color:var(--kgm-gold-300);margin-right:6px;"></i><a href="mailto:info@kgm1993.com">info@kgm1993.com</a></div>
-                    <div><i class="bi bi-clock" style="color:var(--kgm-gold-300);margin-right:6px;"></i>จ-ศ 08:00–17:30 น.</div>
+                    <div><i class="bi bi-clock" style="color:var(--kgm-gold-300);margin-right:6px;"></i>จ-ส 08:00–17:00 น.</div>
                 </div>
             </div>
         </div>
