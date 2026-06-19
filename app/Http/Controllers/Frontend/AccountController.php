@@ -47,7 +47,7 @@ class AccountController extends Controller
     public function orderShow(Order $order)
     {
         if ($order->customer_id !== auth('customer')->id()) abort(403);
-        $order->load('items');
+        $order->load('items', 'pickupShowroom');
         return view('frontend.account.order-show', compact('order'));
     }
 
@@ -58,6 +58,20 @@ class AccountController extends Controller
             $cart->addItem($item->product_id, $item->quantity, $item->variant_id);
         }
         return redirect()->route('cart')->with('success', 'เพิ่มสินค้าจากออเดอร์เดิมลงตะกร้าแล้ว');
+    }
+
+    public function confirmReceived(Order $order)
+    {
+        if ($order->customer_id !== auth('customer')->id()) abort(403);
+        if ($order->status !== 'shipped') {
+            return back()->with('error', 'ไม่สามารถยืนยันรับสินค้าในสถานะนี้ได้');
+        }
+        $order->update([
+            'status'       => 'delivered',
+            'delivered_at' => now(),
+            'picked_up_at' => $order->is_pickup ? now() : $order->picked_up_at,
+        ]);
+        return back()->with('success', 'ขอบคุณที่ยืนยันการรับสินค้า 🎉');
     }
 
     public function addresses()

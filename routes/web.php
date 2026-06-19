@@ -115,6 +115,7 @@ Route::middleware('auth:customer')->prefix('account')->name('account.')->group(f
     Route::get('/orders', [AccountController::class, 'orders'])->name('orders');
     Route::get('/orders/{order}', [AccountController::class, 'orderShow'])->name('orders.show');
     Route::post('/orders/{order}/reorder', [AccountController::class, 'reorder'])->name('orders.reorder');
+    Route::post('/orders/{order}/confirm-received', [AccountController::class, 'confirmReceived'])->name('orders.confirm-received');
     Route::get('/addresses', [AccountController::class, 'addresses'])->name('addresses');
     Route::post('/addresses', [AccountController::class, 'storeAddress'])->name('addresses.store');
     Route::put('/addresses/{address}', [AccountController::class, 'updateAddress'])->name('addresses.update');
@@ -208,6 +209,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::post('settings/shipping', [SettingController::class, 'updateShipping'])->name('settings.shipping.update');
     Route::get('settings/shipping-rates', [SettingController::class, 'shippingRates'])->name('settings.shipping-rates');
     Route::post('settings/shipping-rates', [SettingController::class, 'updateShippingRates'])->name('settings.shipping-rates.update');
+    Route::get('settings/shipping-providers', [SettingController::class, 'shippingProviders'])->name('settings.shipping-providers');
+    Route::post('settings/shipping-providers', [SettingController::class, 'updateShippingProviders'])->name('settings.shipping-providers.update');
     Route::get('settings/logs', [SettingController::class, 'logs'])->name('settings.logs');
     Route::get('settings/consent-logs', [SettingController::class, 'consentLogs'])->name('settings.consent-logs');
 

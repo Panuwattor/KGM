@@ -1,12 +1,11 @@
 @extends('layouts.app')
 @section('title', 'ออเดอร์ '.$order->order_number)
 @section('content')
-<div class="container" style="padding:32px 0 64px;max-width:900px;">
-    <a href="{{ route('account.orders') }}" style="display:inline-flex;align-items:center;gap:6px;color:var(--kgm-green-600);font-weight:600;margin-bottom:20px;"><i class="bi bi-arrow-left"></i> ย้อนกลับ</a>
-    <div style="background:white;border-radius:20px;padding:28px;box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-bottom:20px;">
+<div class="container" style="padding-top:clamp(16px,4vw,32px);padding-bottom:clamp(32px,8vw,64px);max-width:900px;">
+    <div style="background:white;border-radius:20px;padding:clamp(16px,4vw,28px);box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-bottom:20px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
             <div>
-                <h1 style="font-size:22px;font-weight:800;color:var(--kgm-green-800);">{{ $order->order_number }}</h1>
+                <h1 style="font-size:clamp(18px,5vw,22px);font-weight:800;color:var(--kgm-green-800);">{{ $order->order_number }}</h1>
                 <div style="font-size:13px;color:#888;">{{ $order->created_at->format('d/m/Y H:i') }}</div>
             </div>
             <span class="status-badge status-{{ $order->status_color }}" style="font-size:14px;padding:6px 16px;">{{ $order->status_label }}</span>
@@ -29,9 +28,66 @@
         </div>
     </div>
 
+    {{-- สถานะออเดอร์ --}}
+    @if(in_array($order->status, ['cancelled', 'refunded']))
+    <div style="background:#fdecea;border:1px solid #f5c6cb;border-radius:20px;padding:clamp(16px,4vw,24px);margin-bottom:20px;color:#c0392b;">
+        <h3 style="font-weight:800;margin-bottom:4px;"><i class="bi bi-x-octagon"></i> {{ $order->status_label }}</h3>
+        <div style="font-size:14px;">ออเดอร์นี้{{ $order->status === 'refunded' ? 'ได้รับการคืนเงินแล้ว' : 'ถูกยกเลิกแล้ว' }} หากมีข้อสงสัยกรุณาติดต่อทีมงาน</div>
+    </div>
+    @else
+    @php
+        $steps = $order->is_pickup ? [
+            'pending_payment'  => 'รอชำระเงิน',
+            'payment_uploaded' => 'ตรวจสอบสลิป',
+            'payment_verified' => 'ชำระเงินแล้ว',
+            'processing'       => 'กำลังเตรียมสินค้า',
+            'shipped'          => 'พร้อมรับที่ร้าน',
+            'delivered'        => 'รับสินค้าแล้ว',
+        ] : [
+            'pending_payment'  => 'รอชำระเงิน',
+            'payment_uploaded' => 'ตรวจสอบสลิป',
+            'payment_verified' => 'ชำระเงินแล้ว',
+            'processing'       => 'กำลังเตรียมส่ง',
+            'shipped'          => 'จัดส่งแล้ว',
+            'delivered'        => 'ส่งถึงแล้ว',
+        ];
+        $order_keys = array_keys($steps);
+        $currentIndex = array_search($order->status, $order_keys);
+        if ($currentIndex === false) $currentIndex = 0;
+    @endphp
+    <div style="background:white;border-radius:20px;padding:clamp(16px,4vw,24px);box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-bottom:20px;overflow-x:auto;">
+        <div style="display:flex;min-width:560px;">
+            @foreach($steps as $key => $label)
+            @php $done = $loop->index <= $currentIndex; $isCurrent = $loop->index === $currentIndex; @endphp
+            <div style="flex:1;text-align:center;position:relative;">
+                @if(! $loop->first)
+                <div style="position:absolute;top:14px;left:-50%;width:100%;height:3px;background:{{ $done ? 'var(--kgm-green-500)' : '#e5e7eb' }};z-index:0;"></div>
+                @endif
+                <div style="position:relative;z-index:1;width:30px;height:30px;border-radius:999px;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:14px;color:white;background:{{ $done ? 'var(--kgm-green-600)' : '#e5e7eb' }};{{ $isCurrent ? 'box-shadow:0 0 0 4px var(--kgm-green-100);' : '' }}">
+                    @if($done)<i class="bi bi-check-lg"></i>@else {{ $loop->iteration }} @endif
+                </div>
+                <div style="font-size:11px;margin-top:6px;font-weight:{{ $isCurrent ? '800' : '500' }};color:{{ $done ? 'var(--kgm-green-700)' : '#aaa' }};">{{ $label }}</div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
+    {{-- เหตุผลกรณีสลิปถูกปฏิเสธ --}}
+    @if($order->status === 'pending_payment' && $order->rejection_reason)
+    <div style="background:#fdecea;border:1px solid #f5c6cb;border-radius:16px;padding:16px 20px;margin-bottom:20px;color:#c0392b;">
+        <strong><i class="bi bi-exclamation-triangle"></i> สลิปไม่ผ่านการตรวจสอบ</strong>
+        <div style="font-size:14px;margin-top:4px;">เหตุผล: {{ $order->rejection_reason }} — กรุณาอัปโหลดสลิปใหม่อีกครั้ง</div>
+    </div>
+    @endif
+
     @if($order->status === 'pending_payment' || $order->status === 'payment_uploaded')
-    <div style="background:white;border-radius:20px;padding:24px;box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-bottom:20px;">
-        <h3 style="font-weight:800;margin-bottom:16px;"><i class="bi bi-credit-card"></i> อัปโหลดสลิปการชำระเงิน</h3>
+    <div style="background:white;border-radius:20px;padding:clamp(16px,4vw,24px);box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-bottom:20px;">
+        <h3 style="font-weight:800;margin-bottom:16px;"><i class="bi bi-bank"></i> ช่องทางการชำระเงิน</h3>
+        <div style="margin-bottom:20px;">
+            @include('frontend._payment-info', ['payAmount' => $order->total])
+        </div>
+        <h3 style="font-weight:800;margin-bottom:16px;border-top:1px solid #f0f2f0;padding-top:20px;"><i class="bi bi-cloud-upload"></i> อัปโหลดสลิปการชำระเงิน</h3>
         @if($order->payment_slip)
         <div style="margin-bottom:16px;"><img src="{{ asset('storage/'.$order->payment_slip) }}" style="max-width:200px;border-radius:12px;border:2px solid #eee;" alt="สลิป">
         <div style="font-size:12px;color:#888;margin-top:6px;">อัปโหลดแล้ว รอการตรวจสอบ</div></div>
@@ -39,18 +95,45 @@
         <form method="POST" action="{{ route('orders.upload-slip', $order) }}" enctype="multipart/form-data">
             @csrf
             <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                <input type="file" name="slip" accept="image/*" class="form-control" style="flex:1;border-radius:12px;" required>
-                <button type="submit" class="btn btn-gold"><i class="bi bi-cloud-upload"></i> อัปโหลดสลิป</button>
+                <input type="file" name="slip" accept="image/*" class="form-control" style="flex:2 1 180px;min-width:0;border-radius:12px;" required>
+                <button type="submit" class="btn btn-gold" style="flex:1 1 140px;justify-content:center;"><i class="bi bi-cloud-upload"></i> อัปโหลดสลิป</button>
             </div>
         </form>
     </div>
     @endif
 
-    @if($order->tracking_number)
-    <div style="background:var(--kgm-green-100);border-radius:20px;padding:20px 24px;">
+    @if($order->is_pickup)
+    <div style="background:var(--kgm-green-100);border-radius:20px;padding:clamp(16px,4vw,24px);">
+        <h3 style="font-weight:800;margin-bottom:8px;color:var(--kgm-green-800);"><i class="bi bi-shop"></i> รับเองที่ร้าน</h3>
+        @if($order->pickupShowroom)
+        <div style="font-weight:700;">{{ $order->pickupShowroom->name }}</div>
+        <div style="font-size:14px;color:#555;margin-top:4px;line-height:1.7;">
+            <i class="bi bi-geo-alt"></i> {{ $order->pickupShowroom->address }}<br>
+            @if($order->pickupShowroom->phone)<i class="bi bi-telephone"></i> {{ $order->pickupShowroom->phone }}<br>@endif
+            @if($order->pickupShowroom->open_hours)<i class="bi bi-clock"></i> {{ $order->pickupShowroom->open_hours }}@endif
+        </div>
+        @endif
+        @if($order->status === 'shipped')
+        <div style="margin-top:10px;font-weight:700;color:var(--kgm-green-700);"><i class="bi bi-check-circle"></i> สินค้าพร้อมให้เข้ามารับแล้ว</div>
+        @endif
+    </div>
+    @elseif($order->tracking_number)
+    <div style="background:var(--kgm-green-100);border-radius:20px;padding:clamp(16px,4vw,24px);">
         <h3 style="font-weight:800;margin-bottom:8px;color:var(--kgm-green-800);"><i class="bi bi-truck"></i> ติดตามพัสดุ</h3>
         <div>บริษัทขนส่ง: <strong>{{ $order->shipping_provider }}</strong></div>
         <div style="font-size:18px;font-weight:800;color:var(--kgm-green-700);margin-top:4px;">{{ $order->tracking_number }}</div>
+    </div>
+    @endif
+
+    {{-- ยืนยันรับสินค้า (ลูกค้ากดเอง) --}}
+    @if($order->status === 'shipped')
+    <div style="background:white;border-radius:20px;padding:clamp(16px,4vw,24px);box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-top:20px;text-align:center;">
+        <div style="font-weight:700;margin-bottom:4px;">{{ $order->is_pickup ? 'มารับสินค้าเรียบร้อยแล้วใช่ไหม?' : 'ได้รับสินค้าแล้วใช่ไหม?' }}</div>
+        <div style="font-size:13px;color:#888;margin-bottom:14px;">กดยืนยันเพื่อปิดออเดอร์นี้</div>
+        <form method="POST" action="{{ route('account.orders.confirm-received', $order) }}" onsubmit="return confirm('ยืนยันว่าได้รับสินค้าครบถ้วนแล้ว?')">
+            @csrf
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check2-circle"></i> ยืนยันได้รับสินค้าแล้ว</button>
+        </form>
     </div>
     @endif
 </div>

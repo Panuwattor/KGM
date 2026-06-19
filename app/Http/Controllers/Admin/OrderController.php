@@ -38,17 +38,64 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $order->load('items.product', 'customer');
-        return view('admin.orders.show', compact('order'));
+        $order->load('items.product', 'customer', 'pickupShowroom');
+        $shippingProviders = \App\Models\ShippingProvider::active()->pluck('name');
+        return view('admin.orders.show', compact('order', 'shippingProviders'));
     }
 
     public function update(Request $request, Order $order)
     {
-        $request->validate(['status' => 'required|in:' . implode(',', array_keys(Order::STATUS_LABELS))]);
+        $request->validate([
+            'status'     => 'required|in:' . implode(',', array_keys(Order::STATUS_LABELS)),
+            'admin_note' => 'nullable|string',
+        ]);
+
         $old = $order->status;
-        $order->update(['status' => $request->status]);
-        AdminLog::record('updated', "เปลี่ยนสถานะออเดอร์ {$order->order_number}: {$old} → {$request->status}", $order);
-        return back()->with('success', 'อัปเดตสถานะออเดอร์แล้ว');
+        $new = $request->status;
+
+        $data = ['status' => $new];
+
+        // ฟอร์มหมายเหตุแอดมินส่ง admin_note มาด้วย -> บันทึกให้ครบ (เดิมตกหล่น)
+        if ($request->has('admin_note')) {
+            $data['admin_note'] = $request->admin_note;
+        }
+
+        // บันทึกเวลาเมื่อเปลี่ยนสถานะแบบ manual (เผื่อแอดมินข้ามขั้นตอน)
+        if ($new === 'shipped' && ! $order->shipped_at) {
+            $data['shipped_at'] = now();
+        }
+        if ($new === 'delivered' && ! $order->delivered_at) {
+            $data['delivered_at'] = now();
+            if ($order->is_pickup && ! $order->picked_up_at) {
+                $data['picked_up_at'] = now();
+            }
+        }
+
+        // คืนสต็อก + ลดยอดขาย เมื่อยกเลิก/คืนเงิน (เฉพาะออเดอร์ที่ยังไม่เคยถูกยกเลิกมาก่อน)
+        if (in_array($new, ['cancelled', 'refunded']) && ! in_array($old, ['cancelled', 'refunded'])) {
+            $this->restoreStock($order);
+        }
+
+        $order->update($data);
+
+        if ($old !== $new) {
+            AdminLog::record('updated', "เปลี่ยนสถานะออเดอร์ {$order->order_number}: {$old} → {$new}", $order);
+            return back()->with('success', 'อัปเดตสถานะออเดอร์แล้ว');
+        }
+
+        AdminLog::record('updated', "บันทึกหมายเหตุออเดอร์ {$order->order_number}", $order);
+        return back()->with('success', 'บันทึกหมายเหตุแล้ว');
+    }
+
+    private function restoreStock(Order $order): void
+    {
+        $order->loadMissing('items.product');
+        foreach ($order->items as $item) {
+            if ($item->product && $item->product->manage_stock) {
+                $item->product->increment('stock_quantity', $item->quantity);
+                $item->product->decrement('sale_count', $item->quantity);
+            }
+        }
     }
 
     public function verifyPayment(Order $order)
@@ -57,6 +104,7 @@ class OrderController extends Controller
             'status' => 'payment_verified',
             'payment_verified_at' => now(),
             'verified_by' => auth()->id(),
+            'rejection_reason' => null,
         ]);
         AdminLog::record('approved', "อนุมัติการชำระเงิน ออเดอร์ {$order->order_number}", $order);
         return back()->with('success', 'อนุมัติการชำระเงินแล้ว');
@@ -64,10 +112,11 @@ class OrderController extends Controller
 
     public function rejectPayment(Request $request, Order $order)
     {
+        $request->validate(['reason' => 'required|string']);
         $order->update([
             'status' => 'pending_payment',
             'payment_slip' => null,
-            'admin_note' => $request->reason,
+            'rejection_reason' => $request->reason,
         ]);
         AdminLog::record('rejected', "ปฏิเสธการชำระเงิน ออเดอร์ {$order->order_number}", $order);
         return back()->with('success', 'ปฏิเสธสลิปการชำระเงินแล้ว');

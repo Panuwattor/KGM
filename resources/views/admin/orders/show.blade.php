@@ -13,8 +13,15 @@
     </div>
 </div>
 
-<div style="display:grid;grid-template-columns:2fr 1fr;gap:24px;">
-    <div>
+@if($order->status === 'pending_payment' && $order->rejection_reason)
+<div class="form-card mb-4" style="border-left:4px solid #e74c3c;background:#fdecea;margin-bottom:0;">
+    <div style="color:#c0392b;font-weight:700;"><i class="bi bi-exclamation-triangle"></i> สลิปถูกปฏิเสธ — รอลูกค้าอัปโหลดใหม่</div>
+    <div style="font-size:14px;color:#7d2d22;margin-top:4px;">เหตุผลที่แจ้งลูกค้า: {{ $order->rejection_reason }}</div>
+</div>
+@endif
+
+<div class="row g-4">
+    <div class="col-lg-8">
         {{-- Items --}}
         <div class="form-card">
             <h3><i class="bi bi-cart3"></i> รายการสินค้า</h3>
@@ -60,15 +67,25 @@
             <img src="{{ asset('storage/'.$order->payment_slip) }}" style="max-width:300px;border-radius:14px;border:2px solid #eee;" alt="สลิปโอนเงิน">
             <div style="margin-top:12px;font-size:13px;color:#888;">อัปโหลดเมื่อ: {{ $order->payment_uploaded_at?->format('d/m/Y H:i') }}</div>
             @if($order->status === 'payment_uploaded')
-            <div style="display:flex;gap:10px;margin-top:16px;">
+            <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
                 <form method="POST" action="{{ route('admin.orders.verify-payment', $order) }}">
                     @csrf
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> อนุมัติการชำระเงิน</button>
+                    <button type="submit" class="btn btn-primary"
+                        data-confirm="อนุมัติการชำระเงิน?"
+                        data-confirm-text="ยืนยันว่าตรวจสอบสลิปถูกต้องแล้ว"
+                        data-confirm-icon="question"
+                        data-confirm-yes="อนุมัติ"><i class="bi bi-check-circle"></i> อนุมัติการชำระเงิน</button>
                 </form>
-                <form method="POST" action="{{ route('admin.orders.reject-payment', $order) }}" x-data="{ reason: '' }">
+                <form method="POST" action="{{ route('admin.orders.reject-payment', $order) }}">
                     @csrf
-                    <input type="text" name="reason" placeholder="เหตุผลการปฏิเสธ" class="form-control" style="display:inline-block;width:220px;" required>
-                    <button type="submit" class="btn btn-danger" onclick="return confirm('ปฏิเสธสลิปนี้?')"><i class="bi bi-x-circle"></i> ปฏิเสธ</button>
+                    <input type="hidden" name="reason">
+                    <button type="submit" class="btn btn-danger"
+                        data-confirm="ปฏิเสธสลิปการชำระเงินนี้?"
+                        data-confirm-input="reason"
+                        data-confirm-placeholder="ระบุเหตุผลที่จะแจ้งลูกค้า เช่น ยอดเงินไม่ตรง"
+                        data-confirm-icon="warning"
+                        data-confirm-color="#e74c3c"
+                        data-confirm-yes="ปฏิเสธสลิป"><i class="bi bi-x-circle"></i> ปฏิเสธ</button>
                 </form>
             </div>
             @elseif($order->payment_verified_at)
@@ -79,7 +96,21 @@
         </div>
         @endif
 
-        {{-- Tracking --}}
+        {{-- Tracking / Pickup --}}
+        @if($order->is_pickup)
+        <div class="form-card">
+            <h3><i class="bi bi-shop"></i> รับเองที่ร้าน</h3>
+            @if($order->pickupShowroom)
+            <div style="background:var(--g100);border-radius:12px;padding:14px;">
+                <div style="font-weight:800;color:var(--g700);">{{ $order->pickupShowroom->name }}</div>
+                <div style="font-size:13px;color:#555;margin-top:4px;">{{ $order->pickupShowroom->address }}</div>
+            </div>
+            @endif
+            <div style="font-size:13px;color:#888;margin-top:12px;">
+                ลูกค้ามารับเองที่ร้าน — เปลี่ยนสถานะเป็น <strong>“พร้อมรับที่ร้าน”</strong> เมื่อสินค้าพร้อม และ <strong>“รับสินค้าแล้ว”</strong> เมื่อลูกค้ามารับ (ในกล่องเปลี่ยนสถานะด้านล่าง)
+            </div>
+        </div>
+        @else
         <div class="form-card">
             <h3><i class="bi bi-truck"></i> ข้อมูลการจัดส่ง</h3>
             @if($order->tracking_number)
@@ -92,17 +123,18 @@
             <form method="POST" action="{{ route('admin.orders.tracking', $order) }}" style="display:flex;gap:10px;flex-wrap:wrap;">
                 @csrf
                 <select name="shipping_provider" class="form-control" style="flex:1;min-width:150px;" required>
-                    <option>ไปรษณีย์ไทย</option>
-                    <option>Kerry Express</option>
-                    <option>Flash Express</option>
-                    <option>J&T Express</option>
-                    <option>DHL</option>
+                    @forelse($shippingProviders as $provider)
+                    <option value="{{ $provider }}" {{ $order->shipping_provider === $provider ? 'selected' : '' }}>{{ $provider }}</option>
+                    @empty
+                    <option value="" disabled>— ยังไม่มีบริษัทขนส่ง กรุณาเพิ่มในเมนูตั้งค่า —</option>
+                    @endforelse
                 </select>
                 <input type="text" name="tracking_number" class="form-control" placeholder="เลข Tracking" style="flex:2;" value="{{ $order->tracking_number }}" required>
                 <button type="submit" class="btn btn-primary"><i class="bi bi-send"></i> อัปเดต</button>
             </form>
             @endif
         </div>
+        @endif
 
         {{-- Status Update --}}
         <div class="form-card">
@@ -111,23 +143,32 @@
                 @csrf @method('PUT')
                 <select name="status" class="form-control">
                     @foreach(\App\Models\Order::STATUS_LABELS as $key => $info)
-                    <option value="{{ $key }}" {{ $order->status === $key ? 'selected' : '' }}>{{ $info['label'] }}</option>
+                    <option value="{{ $key }}" {{ $order->status === $key ? 'selected' : '' }}>{{ $order->is_pickup ? (\App\Models\Order::PICKUP_STATUS_LABELS[$key] ?? $info['label']) : $info['label'] }}</option>
                     @endforeach
                 </select>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-floppy"></i> บันทึก</button>
+                <button type="submit" class="btn btn-primary"
+                    data-confirm="เปลี่ยนสถานะออเดอร์นี้?"
+                    data-confirm-text="ลูกค้าจะเห็นสถานะใหม่ทันที"
+                    data-confirm-icon="question"
+                    data-confirm-yes="เปลี่ยนสถานะ"><i class="bi bi-floppy"></i> บันทึก</button>
             </form>
         </div>
     </div>
 
-    <div>
-        {{-- Shipping Info --}}
+    <div class="col-lg-4">
+        {{-- Shipping / Contact Info --}}
         <div class="form-card">
-            <h3><i class="bi bi-geo-alt"></i> ที่อยู่จัดส่ง</h3>
+            <h3>
+                <i class="bi {{ $order->is_pickup ? 'bi-shop' : 'bi-geo-alt' }}"></i>
+                {{ $order->is_pickup ? 'ผู้รับสินค้า (รับเองที่ร้าน)' : 'ที่อยู่จัดส่ง' }}
+            </h3>
             <div style="font-weight:700;font-size:15px;">{{ $order->ship_name }}</div>
             <div style="margin-top:6px;font-size:14px;line-height:1.8;color:#555;">
+                @unless($order->is_pickup)
                 {{ $order->ship_address }}<br>
                 ต.{{ $order->ship_district }} อ.{{ $order->ship_amphoe }}<br>
                 จ.{{ $order->ship_province }} {{ $order->ship_postcode }}<br>
+                @endunless
                 <i class="bi bi-telephone"></i> {{ $order->ship_phone }}
             </div>
         </div>

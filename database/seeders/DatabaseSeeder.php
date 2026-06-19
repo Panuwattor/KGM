@@ -7,6 +7,7 @@ use App\Models\Career;
 use App\Models\Customer;
 use App\Models\Post;
 use App\Models\PostCategory;
+use App\Models\ShippingProvider;
 use App\Models\ShippingRate;
 use App\Models\ShippingSetting;
 use App\Models\Showroom;
@@ -44,6 +45,14 @@ class DatabaseSeeder extends Seeder
             ['provider_name' => 'Kerry Express'],
             ['flat_rate' => 50, 'free_shipping_threshold' => 1000, 'is_active' => true, 'sort_order' => 1]
         );
+
+        // ── Shipping Providers (บริษัทขนส่ง) ───────────────────────────────────
+        // มีข้อมูลอยู่แล้วก็ข้าม (กันทับค่าที่แอดมินแก้เอง)
+        if (ShippingProvider::count() === 0) {
+            foreach (['ไปรษณีย์ไทย', 'Kerry Express', 'Flash Express', 'J&T Express', 'DHL'] as $i => $name) {
+                ShippingProvider::create(['name' => $name, 'sort_order' => $i, 'is_active' => true]);
+            }
+        }
 
         // ── Shipping Rates ─────────────────────────────────────────────────────
         $this->call(ShippingRateSeeder::class);

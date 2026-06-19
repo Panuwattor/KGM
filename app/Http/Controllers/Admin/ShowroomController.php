@@ -18,7 +18,7 @@ class ShowroomController extends Controller
 
     public function store(Request $request)
     {
-        $data = $this->validate($request, $this->rules());
+        $data = $request->validate($this->rules());
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('showrooms', 'public');
         }
@@ -30,7 +30,7 @@ class ShowroomController extends Controller
 
     public function update(Request $request, Showroom $showroom)
     {
-        $data = $this->validate($request, $this->rules());
+        $data = $request->validate($this->rules());
         if ($request->hasFile('image')) {
             \Storage::disk('public')->delete($showroom->image);
             $data['image'] = $request->file('image')->store('showrooms', 'public');

@@ -12,14 +12,15 @@ class Order extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'order_number', 'customer_id', 'status', 'subtotal', 'shipping_fee',
+        'order_number', 'customer_id', 'status', 'delivery_method', 'pickup_showroom_id',
+        'picked_up_at', 'subtotal', 'shipping_fee',
         'discount_amount', 'vat_amount', 'total', 'needs_tax_invoice',
         'tax_id', 'tax_branch', 'tax_company_name', 'tax_address',
         'coupon_code', 'coupon_id', 'ship_name', 'ship_phone',
         'ship_address', 'ship_district', 'ship_amphoe', 'ship_province', 'ship_postcode',
         'shipping_provider', 'tracking_number', 'shipped_at', 'delivered_at',
         'payment_slip', 'payment_uploaded_at', 'payment_verified_at', 'verified_by',
-        'admin_note', 'customer_note',
+        'admin_note', 'rejection_reason', 'customer_note',
     ];
 
     protected $casts = [
@@ -31,6 +32,7 @@ class Order extends Model
         'total' => 'decimal:2',
         'shipped_at' => 'datetime',
         'delivered_at' => 'datetime',
+        'picked_up_at' => 'datetime',
         'payment_uploaded_at' => 'datetime',
         'payment_verified_at' => 'datetime',
     ];
@@ -46,9 +48,20 @@ class Order extends Model
         'refunded'          => ['label' => 'คืนเงินแล้ว', 'color' => 'gray'],
     ];
 
+    // ป้ายสถานะที่ปรับข้อความให้เหมาะกับ "รับเองที่ร้าน"
+    const PICKUP_STATUS_LABELS = [
+        'shipped'   => 'พร้อมรับที่ร้าน',
+        'delivered' => 'รับสินค้าแล้ว',
+    ];
+
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function pickupShowroom(): BelongsTo
+    {
+        return $this->belongsTo(Showroom::class, 'pickup_showroom_id');
     }
 
     public function items(): HasMany
@@ -56,8 +69,16 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    public function getIsPickupAttribute(): bool
+    {
+        return $this->delivery_method === 'pickup';
+    }
+
     public function getStatusLabelAttribute(): string
     {
+        if ($this->is_pickup && isset(self::PICKUP_STATUS_LABELS[$this->status])) {
+            return self::PICKUP_STATUS_LABELS[$this->status];
+        }
         return self::STATUS_LABELS[$this->status]['label'] ?? $this->status;
     }
 

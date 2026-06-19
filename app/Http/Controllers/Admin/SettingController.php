@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AdminLog;
 use App\Models\ConsentLog;
 use App\Models\DealerApplication;
+use App\Models\ShippingProvider;
 use App\Models\ShippingRate;
 use App\Models\ShippingSetting;
 use App\Models\SiteSetting;
@@ -66,6 +67,30 @@ class SettingController extends Controller
             ]);
         }
         return back()->with('success', 'บันทึกอัตราค่าขนส่งแล้ว');
+    }
+
+    public function shippingProviders()
+    {
+        $providers = ShippingProvider::orderBy('sort_order')->orderBy('name')->get();
+        return view('admin.settings.shipping-providers', compact('providers'));
+    }
+
+    public function updateShippingProviders(Request $request)
+    {
+        $request->validate([
+            'providers'        => 'required|array|min:1',
+            'providers.*.name' => 'required|string|max:100',
+        ]);
+
+        ShippingProvider::truncate();
+        foreach (array_values($request->providers) as $i => $p) {
+            ShippingProvider::create([
+                'name'      => trim($p['name']),
+                'sort_order'=> $i,
+                'is_active' => isset($p['is_active']),
+            ]);
+        }
+        return back()->with('success', 'บันทึกบริษัทขนส่งแล้ว');
     }
 
     public function logs(Request $request)

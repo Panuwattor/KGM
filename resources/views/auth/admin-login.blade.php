@@ -105,8 +105,7 @@
 <body>
     <div class="card">
         <div class="logo-wrap">
-            <div class="logo-icon">K</div>
-            <div class="badge"><i class="bi bi-shield-lock"></i> Admin Access</div>
+            <img src="{{ asset('images/kgm_logo.png') }}" alt="Verified" style="height:50px;">
             <h1>ระบบผู้ดูแล</h1>
             <p class="subtitle">KGM Back Office</p>
         </div>

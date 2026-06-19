@@ -11,6 +11,49 @@
     <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Toast แจ้งเตือนแบบ SweetAlert (ใช้แทน alert ธรรมดา)
+        window.kgmToast = function (icon, title) {
+            if (typeof Swal === 'undefined') return;
+            Swal.fire({ toast: true, position: 'top-end', icon: icon, title: title, showConfirmButton: false, timer: 3200, timerProgressBar: true });
+        };
+        // กล่องยืนยันก่อนทำรายการ: ใส่ data-confirm ที่ปุ่ม (รองรับ data-confirm-input สำหรับกรอกข้อความ)
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('[data-confirm]').forEach(function (el) {
+                el.addEventListener('click', function (e) {
+                    if (el.dataset._ok) return;
+                    e.preventDefault();
+                    var form = el.closest('form');
+                    var inputName = el.dataset.confirmInput;
+                    Swal.fire({
+                        icon: el.dataset.confirmIcon || 'warning',
+                        title: el.dataset.confirm || 'ยืนยันการทำรายการ?',
+                        text: el.dataset.confirmText || '',
+                        input: inputName ? 'textarea' : undefined,
+                        inputPlaceholder: el.dataset.confirmPlaceholder || '',
+                        inputValidator: inputName ? function (v) { if (!v) return 'กรุณากรอกข้อมูล'; } : undefined,
+                        showCancelButton: true,
+                        confirmButtonText: el.dataset.confirmYes || 'ยืนยัน',
+                        cancelButtonText: 'ยกเลิก',
+                        confirmButtonColor: el.dataset.confirmColor || '#2d6a4f',
+                        cancelButtonColor: '#9aa39d',
+                        reverseButtons: true,
+                    }).then(function (r) {
+                        if (!r.isConfirmed) return;
+                        el.dataset._ok = '1';
+                        if (inputName && form) {
+                            var t = form.querySelector('[name="' + inputName + '"]');
+                            if (t) t.value = r.value || '';
+                        }
+                        if (form) form.submit();
+                        else if (el.href) window.location = el.href;
+                    });
+                });
+            });
+        });
+    </script>
     <style>
         :root {
             --g900: #0d2818; --g800: #1a3a2a; --g700: #1e4d35; --g600: #2d6a4f;
@@ -238,6 +281,9 @@
             <a href="{{ route('admin.settings.shipping-rates') }}" class="nav-item {{ request()->routeIs('admin.settings.shipping-rates') ? 'active' : '' }}">
                 <i class="bi bi-truck"></i> อัตราค่าขนส่ง
             </a>
+            <a href="{{ route('admin.settings.shipping-providers') }}" class="nav-item {{ request()->routeIs('admin.settings.shipping-providers') ? 'active' : '' }}">
+                <i class="bi bi-box-seam"></i> บริษัทขนส่ง
+            </a>
         </div>
         <div class="nav-section">
             <div class="nav-section-title">การตลาด</div>
@@ -341,17 +387,21 @@
     {{-- Content --}}
     <main class="admin-content">
         @unless(View::hasSection('suppress_alerts'))
-        @if(session('success'))
-            <div class="alert alert-success"><i class="bi bi-check-circle-fill"></i> {{ session('success') }}</div>
-        @endif
-        @if(session('error'))
-            <div class="alert alert-danger"><i class="bi bi-exclamation-circle-fill"></i> {{ session('error') }}</div>
-        @endif
-        @if($errors->any())
-            <div class="alert alert-danger">
-                <i class="bi bi-exclamation-triangle-fill"></i>
-                <div><strong>กรุณาตรวจสอบข้อมูล:</strong><ul style="margin:4px 0 0 16px;">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul></div>
-            </div>
+        @if(session('success') || session('error') || $errors->any())
+        <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            @if(session('success')) kgmToast('success', @json(session('success'))); @endif
+            @if(session('error')) kgmToast('error', @json(session('error'))); @endif
+            @if($errors->any())
+            Swal.fire({
+                icon: 'error',
+                title: 'กรุณาตรวจสอบข้อมูล',
+                html: @json('<ul style="text-align:left;margin:0;padding-left:18px;">'.collect($errors->all())->map(fn($e) => '<li>'.e($e).'</li>')->implode('').'</ul>'),
+                confirmButtonColor: '#2d6a4f',
+            });
+            @endif
+        });
+        </script>
         @endif
         @endunless
         @yield('content')
@@ -463,11 +513,20 @@ document.addEventListener('DOMContentLoaded', function () {
         function open() {
             build();
             const r = btn.getBoundingClientRect();
-            dd.style.top      = (r.bottom + 5) + 'px';
             dd.style.left     = r.left + 'px';
             dd.style.minWidth = r.width + 'px';
             dd.style.width    = 'auto';
+            // วัดความสูง dropdown แล้วเลือกเปิดขึ้น/ลงตามพื้นที่ที่เหลือ
+            dd.style.visibility = 'hidden';
             dd.classList.add('open');
+            const ddH = dd.offsetHeight;
+            const spaceBelow = window.innerHeight - r.bottom;
+            if (spaceBelow < ddH + 12 && r.top > spaceBelow) {
+                dd.style.top = Math.max(8, r.top - ddH - 5) + 'px';   // เปิดขึ้นบน
+            } else {
+                dd.style.top = (r.bottom + 5) + 'px';                 // เปิดลงล่าง
+            }
+            dd.style.visibility = '';
             btn.classList.add('open');
         }
         function close() { dd.classList.remove('open'); btn.classList.remove('open'); }
