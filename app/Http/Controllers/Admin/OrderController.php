@@ -11,7 +11,7 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Order::with('user')->latest();
+        $query = Order::with('customer')->latest();
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -38,7 +38,7 @@ class OrderController extends Controller
 
     public function show(Order $order)
     {
-        $order->load('items.product', 'user');
+        $order->load('items.product', 'customer');
         return view('admin.orders.show', compact('order'));
     }
 

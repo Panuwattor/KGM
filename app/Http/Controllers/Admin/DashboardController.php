@@ -38,7 +38,7 @@ class DashboardController extends Controller
         ->get();
 
         // Recent orders
-        $recentOrders = Order::with('user')->latest()->take(10)->get();
+        $recentOrders = Order::with('customer')->latest()->take(10)->get();
 
         // Top products
         $topProducts = Product::withSum(['orderItems as total_sold' => fn($q) =>
