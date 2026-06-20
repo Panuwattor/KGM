@@ -31,10 +31,18 @@ class ShowroomController extends Controller
     public function update(Request $request, Showroom $showroom)
     {
         $data = $request->validate($this->rules());
+
         if ($request->hasFile('image')) {
-            \Storage::disk('public')->delete($showroom->image);
+            // ลบรูปเก่าถ้ามี
+            if ($showroom->image) {
+                \Storage::disk('public')->delete($showroom->image);
+            }
             $data['image'] = $request->file('image')->store('showrooms', 'public');
+        } else {
+            // ถ้าไม่มีไฟล์ใหม่ ไม่ต้องอัปเดตฟิลด์ image
+            unset($data['image']);
         }
+
         $showroom->update($data);
         return redirect()->route('admin.showrooms.index')->with('success', 'อัปเดตสาขาแล้ว');
     }

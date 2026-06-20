@@ -19,7 +19,16 @@
         </div>
         <div class="form-group"><label class="form-label">เวลาทำการ</label><textarea name="open_hours" class="form-control" rows="3">{{ old('open_hours',$showroom->open_hours??'') }}</textarea></div>
         <div class="form-group"><label class="form-label">Google Maps Embed Code (iframe)</label><textarea name="map_embed_url" class="form-control" rows="3">{{ old('map_embed_url',$showroom->map_embed_url??'') }}</textarea></div>
-        <div class="form-group"><label class="form-label">รูปภาพสาขา</label><input type="file" name="image" class="form-control" accept="image/*" style="border-radius:12px;"></div>
+        <div class="form-group">
+            <label class="form-label">รูปภาพสาขา</label>
+            @if(isset($showroom) && $showroom->image)
+                <div style="margin-bottom:8px;">
+                    <img src="{{ asset('storage/'.$showroom->image) }}" alt="รูปสาขา" style="max-width:200px;border-radius:8px;border:1px solid #ddd;">
+                    <div style="font-size:12px;color:#666;margin-top:4px;">อัปโหลดไฟล์ใหม่เพื่อเปลี่ยนรูป</div>
+                </div>
+            @endif
+            <input type="file" name="image" class="form-control" accept="image/*" style="border-radius:12px;">
+        </div>
         <div class="form-check"><input type="checkbox" name="is_main" id="is_main" value="1" {{ old('is_main',$showroom->is_main??false)?'checked':'' }}><label for="is_main">สาขาหลัก</label></div>
         <div class="form-check"><input type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active',$showroom->is_active??true)?'checked':'' }}><label for="is_active">เปิดใช้งาน</label></div>
         <button type="submit" class="btn btn-primary" style="margin-top:16px;"><i class="bi bi-floppy"></i> บันทึก</button>
