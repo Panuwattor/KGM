@@ -31,6 +31,7 @@
 .manual-section {
     background: white; border-radius: 20px; box-shadow: 0 2px 12px rgba(0,0,0,.06);
     overflow: hidden;
+    scroll-margin-top: 120px; /* ป้องกัน header ทับเนื้อหา */
 }
 .ms-header {
     padding: 24px 28px 20px;
