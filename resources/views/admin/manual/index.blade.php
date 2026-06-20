@@ -266,9 +266,19 @@
                         <p>Top 5 สินค้าที่มียอดขายสูงสุด พร้อมจำนวนที่ขายได้และยอดเงิน</p>
                     </div>
                 </div>
+
+                <div class="sub-divider"></div>
+                <h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:14px;"><i class="bi bi-check2-square"></i> งานที่ต้องทำทุกวัน</h3>
+                <div class="step-list">
+                    <div class="step-item"><div class="step-num">1</div><span>ตรวจสอบ <b>ออเดอร์ที่รอตรวจสลิป</b> — ดูจากจุดแดงที่เมนู "คำสั่งซื้อ"</span></div>
+                    <div class="step-item"><div class="step-num">2</div><span>ตรวจสอบ <b>รีวิวสินค้า</b> ที่รออนุมัติ (ถ้ามีจุดแดง)</span></div>
+                    <div class="step-item"><div class="step-num">3</div><span>ตรวจสอบ <b>ข้อความติดต่อ</b> และใบเสนอราคาใหม่</span></div>
+                    <div class="step-item"><div class="step-num">4</div><span>อัปเดต Tracking Number ของออเดอร์ที่ส่งแล้ว</span></div>
+                </div>
+
                 <div class="tip-box">
                     <i class="bi bi-lightbulb-fill"></i>
-                    <span>ทุกครั้งที่เข้าสู่ระบบ ให้ตรวจสอบ Dashboard ก่อนเพื่อดูออเดอร์ที่รอตรวจสลิปในทันที</span>
+                    <span>ทุกครั้งที่เข้าสู่ระบบ ให้ตรวจสอบ Dashboard ก่อนเพื่อดูออเดอร์ที่รอตรวจสลิปในทันที จุดแดงที่เมนูแสดงว่ามีงานรอดำเนินการ</span>
                 </div>
             </div>
         </div>
@@ -313,52 +323,150 @@
                 </div>
             </div>
             <div class="ms-body">
+
+                {{-- ระบบราคา --}}
+                <h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:14px;"><i class="bi bi-currency-dollar"></i> ระบบราคาสินค้า</h3>
+                <div style="background:#f8faf8;border-radius:12px;padding:16px;margin-bottom:20px;">
+                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
+                        <div style="background:white;border-radius:8px;padding:12px;border-left:4px solid #3b82f6;">
+                            <b style="color:#1e40af;">ราคาปกติ (price)</b>
+                            <p style="font-size:12px;color:#666;margin:4px 0 0;">ราคาเต็มของสินค้า</p>
+                        </div>
+                        <div style="background:white;border-radius:8px;padding:12px;border-left:4px solid #ef4444;">
+                            <b style="color:#dc2626;">ราคาลด (sale_price)</b>
+                            <p style="font-size:12px;color:#666;margin:4px 0 0;">ราคาโปรโมชัน ถ้ามีจะแสดงแทนราคาปกติ</p>
+                        </div>
+                        <div style="background:white;border-radius:8px;padding:12px;border-left:4px solid #f59e0b;">
+                            <b style="color:#d97706;">ราคาขายส่ง (wholesale_price)</b>
+                            <p style="font-size:12px;color:#666;margin:4px 0 0;">สำหรับอ้างอิง (ไม่แสดงหน้าร้าน)</p>
+                        </div>
+                    </div>
+                    <div style="margin-top:12px;font-size:12px;color:#666;">
+                        <b>ราคาที่แสดง (current_price):</b> ระบบจะใช้ sale_price ถ้ามี มิฉะนั้นใช้ price / ถ้าอยู่ใน Flash Sale จะใช้ราคา Flash Sale
+                    </div>
+                </div>
+
+                <div class="sub-divider"></div>
+
+                {{-- ระบบสต็อก --}}
+                <h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:14px;"><i class="bi bi-box-seam"></i> ระบบจัดการสต็อก</h3>
+                <div class="sub-grid" style="margin-bottom:20px;">
+                    <div class="sub-card">
+                        <div class="sub-card-head">
+                            <div class="sub-card-icon"><i class="bi bi-toggles"></i></div>
+                            <h4>เปิด/ปิดการติดตามสต็อก</h4>
+                        </div>
+                        <p>ตั้งค่า <b>manage_stock = true</b> เพื่อให้ระบบติดตามสต็อก</p>
+                        <div style="background:#f0fdf4;border-radius:8px;padding:10px;margin-top:8px;font-size:12px;">
+                            <b>เมื่อเปิด:</b><br>
+                            • ลูกค้าสั่งซื้อ → สต็อกลดอัตโนมัติ<br>
+                            • ยกเลิก/คืนเงิน → สต็อกคืนอัตโนมัติ<br>
+                            • แจ้งเตือนเมื่อสต็อกต่ำ
+                        </div>
+                    </div>
+                    <div class="sub-card">
+                        <div class="sub-card-head">
+                            <div class="sub-card-icon"><i class="bi bi-exclamation-triangle"></i></div>
+                            <h4>แจ้งเตือนสต็อกต่ำ</h4>
+                        </div>
+                        <p>ตั้งค่า <b>low_stock_threshold</b> เช่น 5</p>
+                        <div style="background:#fef3c7;border-radius:8px;padding:10px;margin-top:8px;font-size:12px;">
+                            เมื่อ stock_quantity ≤ low_stock_threshold<br>
+                            ระบบจะแสดงป้ายเตือน "สต็อกต่ำ" ในหน้ารายการสินค้า
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-divider"></div>
+
+                {{-- ตัวเลือกสินค้า --}}
+                <h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:14px;"><i class="bi bi-collection"></i> ตัวเลือกสินค้า (Variants)</h3>
+                <div style="background:#f8faf8;border-radius:12px;padding:16px;margin-bottom:20px;">
+                    <p style="margin:0 0 10px;font-size:13px;">สินค้าที่มีหลายขนาด/สี สามารถสร้างตัวเลือกแยกได้:</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div style="background:white;border-radius:8px;padding:12px;">
+                            <b style="color:var(--g700);">label</b>
+                            <p style="font-size:12px;color:#666;margin:4px 0 0;">ชื่อตัวเลือก เช่น "ไซซ์ M" หรือ "สีดำ"</p>
+                        </div>
+                        <div style="background:white;border-radius:8px;padding:12px;">
+                            <b style="color:var(--g700);">price_adjustment</b>
+                            <p style="font-size:12px;color:#666;margin:4px 0 0;">ราคาเพิ่ม/ลด จากราคาหลัก เช่น +50 บาท</p>
+                        </div>
+                    </div>
+                    <div style="margin-top:12px;font-size:12px;color:#666;">
+                        <b>ตัวอย่าง:</b> เสื้อราคา 500 บาท + ตัวเลือก "ไซซ์ XL" (price_adjustment = 30) → ราคารวม 530 บาท
+                    </div>
+                </div>
+
+                <div class="sub-divider"></div>
+
+                {{-- สถานะและ Flag --}}
+                <h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:14px;"><i class="bi bi-flag"></i> สถานะและ Flag พิเศษ</h3>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px;">
+                    <div style="background:#dcfce7;border-radius:10px;padding:12px;text-align:center;">
+                        <div style="font-size:20px;margin-bottom:4px;"><i class="bi bi-eye"></i></div>
+                        <b style="color:#166534;">is_active</b>
+                        <p style="font-size:11px;color:#666;margin:4px 0 0;">เปิด/ปิดแสดงหน้าร้าน</p>
+                    </div>
+                    <div style="background:#fef3c7;border-radius:10px;padding:12px;text-align:center;">
+                        <div style="font-size:20px;margin-bottom:4px;"><i class="bi bi-star"></i></div>
+                        <b style="color:#92400e;">is_featured</b>
+                        <p style="font-size:11px;color:#666;margin:4px 0 0;">สินค้าแนะนำ</p>
+                    </div>
+                    <div style="background:#dbeafe;border-radius:10px;padding:12px;text-align:center;">
+                        <div style="font-size:20px;margin-bottom:4px;"><i class="bi bi-lightning"></i></div>
+                        <b style="color:#1e40af;">is_new</b>
+                        <p style="font-size:11px;color:#666;margin:4px 0 0;">สินค้าใหม่</p>
+                    </div>
+                    <div style="background:#fee2e2;border-radius:10px;padding:12px;text-align:center;">
+                        <div style="font-size:20px;margin-bottom:4px;"><i class="bi bi-trophy"></i></div>
+                        <b style="color:#991b1b;">is_bestseller</b>
+                        <p style="font-size:11px;color:#666;margin:4px 0 0;">สินค้าขายดี</p>
+                    </div>
+                </div>
+
+                <div class="sub-divider"></div>
+
+                {{-- วิธีเพิ่มสินค้า --}}
+                <h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:14px;"><i class="bi bi-plus-circle"></i> วิธีเพิ่มสินค้าใหม่</h3>
                 <div class="sub-grid">
                     <div class="sub-card">
                         <div class="sub-card-head">
                             <div class="sub-card-icon"><i class="bi bi-plus-circle"></i></div>
-                            <h4>เพิ่มสินค้าใหม่</h4>
+                            <h4>ขั้นตอนการเพิ่มสินค้า</h4>
                         </div>
-                        <p>กรอกข้อมูลสินค้า ตั้งราคา เลือกหมวดหมู่ ประเภท และเพิ่มรูปภาพ</p>
                         <div class="step-list">
                             <div class="step-item"><div class="step-num">1</div><span>คลิก <b>เพิ่มสินค้า</b> มุมขวาบน</span></div>
-                            <div class="step-item"><div class="step-num">2</div><span>กรอกชื่อ, คำอธิบาย, ราคา, หมวดหมู่</span></div>
-                            <div class="step-item"><div class="step-num">3</div><span>อัปโหลดรูปภาพสินค้า (รองรับหลายรูป)</span></div>
-                            <div class="step-item"><div class="step-num">4</div><span>เพิ่มตัวเลือกสินค้า เช่น ไซซ์ สี</span></div>
-                            <div class="step-item"><div class="step-num">5</div><span>คลิก <b>บันทึก</b></span></div>
+                            <div class="step-item"><div class="step-num">2</div><span>กรอก <b>ชื่อสินค้า</b> และ <b>คำอธิบาย</b></span></div>
+                            <div class="step-item"><div class="step-num">3</div><span>เลือก <b>หมวดหมู่</b> และ <b>ประเภทสินค้า</b></span></div>
+                            <div class="step-item"><div class="step-num">4</div><span>ใส่ <b>ราคา</b> (และราคาลดถ้ามี)</span></div>
+                            <div class="step-item"><div class="step-num">5</div><span>ตั้งค่าสต็อก (ถ้าต้องการติดตาม)</span></div>
+                            <div class="step-item"><div class="step-num">6</div><span>อัปโหลด <b>รูปภาพ</b> (รูปแรกเป็นรูปหลัก)</span></div>
+                            <div class="step-item"><div class="step-num">7</div><span>เพิ่ม <b>ตัวเลือก</b> ถ้ามีหลายไซซ์/สี</span></div>
+                            <div class="step-item"><div class="step-num">8</div><span>คลิก <b>บันทึก</b></span></div>
                         </div>
                     </div>
                     <div class="sub-card">
                         <div class="sub-card-head">
                             <div class="sub-card-icon"><i class="bi bi-images"></i></div>
-                            <h4>จัดการรูปภาพสินค้า</h4>
+                            <h4>จัดการรูปภาพ</h4>
                         </div>
-                        <p>อัปโหลดรูปหลายภาพ กำหนดภาพหลัก (cover) และลบรูปที่ไม่ต้องการ</p>
+                        <p>อัปโหลดได้หลายรูป กำหนดรูปหลักได้</p>
                         <div class="step-list">
-                            <div class="step-item"><div class="step-num">1</div><span>เข้าหน้าแก้ไขสินค้า</span></div>
-                            <div class="step-item"><div class="step-num">2</div><span>ส่วน <b>รูปภาพ</b> — ลากหรือคลิกเพื่ออัปโหลด</span></div>
-                            <div class="step-item"><div class="step-num">3</div><span>คลิกรูปเพื่อตั้งเป็นภาพหลัก</span></div>
-                            <div class="step-item"><div class="step-num">4</div><span>คลิกไอคอนถังขยะเพื่อลบรูป</span></div>
+                            <div class="step-item"><div class="step-num">1</div><span>ลากไฟล์หรือคลิกเพื่ออัปโหลด</span></div>
+                            <div class="step-item"><div class="step-num">2</div><span>คลิกรูปเพื่อตั้งเป็น <b>รูปหลัก</b></span></div>
+                            <div class="step-item"><div class="step-num">3</div><span>คลิก <i class="bi bi-trash"></i> เพื่อลบรูป</span></div>
                         </div>
-                    </div>
-                    <div class="sub-card">
-                        <div class="sub-card-head">
-                            <div class="sub-card-icon"><i class="bi bi-sliders"></i></div>
-                            <h4>ตัวเลือกสินค้า (Variants)</h4>
+                        <div class="tip-box" style="margin-top:10px;">
+                            <i class="bi bi-lightbulb-fill"></i>
+                            <span>รูปหลัก (main_image) จะแสดงในรายการสินค้าและ Thumbnail</span>
                         </div>
-                        <p>กำหนดตัวเลือกสินค้า เช่น ไซซ์ S/M/L/XL หรือสี พร้อมตั้งราคาและสต็อกแยกตามตัวเลือก</p>
-                    </div>
-                    <div class="sub-card">
-                        <div class="sub-card-head">
-                            <div class="sub-card-icon"><i class="bi bi-toggle-on"></i></div>
-                            <h4>สถานะสินค้า</h4>
-                        </div>
-                        <p>เปิด/ปิดการแสดงสินค้าหน้าร้าน กำหนดเป็น "สินค้าแนะนำ" หรือ "สินค้าใหม่" ได้ทันที</p>
                     </div>
                 </div>
+
                 <div class="warn-box">
                     <i class="bi bi-exclamation-triangle-fill"></i>
-                    <span>การลบสินค้าจะลบข้อมูลทั้งหมดรวมถึงรูปภาพและตัวเลือก ควรปิดการแสดงผลแทนการลบหากสินค้าเคยมีออเดอร์</span>
+                    <span>การลบสินค้าจะลบข้อมูลทั้งหมด (รูปภาพ, ตัวเลือก) แต่ระบบใช้ <b>Soft Delete</b> — ข้อมูลยังอยู่ในฐานข้อมูล หากสินค้าเคยมีออเดอร์ ควร <b>ปิดการแสดงผล</b> แทนการลบ</span>
                 </div>
             </div>
         </div>
@@ -443,40 +551,142 @@
             </div>
             <div class="ms-body">
 
-                <h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:14px;"><i class="bi bi-info-circle"></i> สถานะออเดอร์</h3>
-                <div class="pill-row" style="margin-bottom:20px;">
-                    <span class="pill pill-yellow"><i class="bi bi-circle-fill" style="font-size:6px;"></i> รอชำระเงิน</span>
-                    <span class="pill pill-blue"><i class="bi bi-circle-fill" style="font-size:6px;"></i> อัปโหลดสลิปแล้ว</span>
-                    <span class="pill pill-indigo"><i class="bi bi-circle-fill" style="font-size:6px;"></i> ชำระเงินแล้ว</span>
-                    <span class="pill pill-purple"><i class="bi bi-circle-fill" style="font-size:6px;"></i> กำลังจัดส่ง</span>
-                    <span class="pill pill-green"><i class="bi bi-circle-fill" style="font-size:6px;"></i> จัดส่งแล้ว</span>
-                    <span class="pill pill-red"><i class="bi bi-circle-fill" style="font-size:6px;"></i> ยกเลิก</span>
+                {{-- วงจรชีวิตออเดอร์ --}}
+                <h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:14px;"><i class="bi bi-arrow-repeat"></i> วงจรชีวิตออเดอร์ (Order Lifecycle)</h3>
+                <div style="background:#f8faf8;border-radius:12px;padding:16px;margin-bottom:20px;font-size:13px;line-height:1.8;">
+                    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
+                        <span class="pill pill-yellow">รอชำระเงิน</span>
+                        <i class="bi bi-arrow-right" style="color:#999;"></i>
+                        <span class="pill pill-blue">อัปโหลดสลิปแล้ว</span>
+                        <i class="bi bi-arrow-right" style="color:#999;"></i>
+                        <span class="pill pill-green">ชำระเงินแล้ว</span>
+                        <i class="bi bi-arrow-right" style="color:#999;"></i>
+                        <span class="pill pill-indigo">กำลังเตรียมส่ง</span>
+                        <i class="bi bi-arrow-right" style="color:#999;"></i>
+                        <span class="pill pill-purple">จัดส่งแล้ว</span>
+                        <i class="bi bi-arrow-right" style="color:#999;"></i>
+                        <span class="pill" style="background:#d1fae5;color:#065f46;">ส่งถึงแล้ว</span>
+                    </div>
+                    <div style="margin-top:10px;color:#666;">
+                        <b>กรณีปฏิเสธสลิป:</b> อัปโหลดสลิปแล้ว → <span class="pill pill-red" style="padding:2px 8px;">ปฏิเสธ</span> → กลับไป รอชำระเงิน (ลูกค้าอัปโหลดใหม่ได้)
+                    </div>
                 </div>
 
-                <div class="sub-grid">
+                <h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:14px;"><i class="bi bi-info-circle"></i> ความหมายของแต่ละสถานะ</h3>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:20px;">
+                    <div style="background:#fefce8;border:1px solid #fde68a;border-radius:10px;padding:12px;">
+                        <b style="color:#854d0e;">รอชำระเงิน</b>
+                        <p style="margin:4px 0 0;font-size:12px;color:#666;">ลูกค้าสั่งซื้อแล้ว รอโอนเงินและอัปโหลดสลิป</p>
+                    </div>
+                    <div style="background:#dbeafe;border:1px solid #93c5fd;border-radius:10px;padding:12px;">
+                        <b style="color:#1e40af;">อัปโหลดสลิปแล้ว</b>
+                        <p style="margin:4px 0 0;font-size:12px;color:#666;">ลูกค้าอัปโหลดสลิปแล้ว <b>รอ Admin ตรวจสอบ</b></p>
+                    </div>
+                    <div style="background:#dcfce7;border:1px solid #86efac;border-radius:10px;padding:12px;">
+                        <b style="color:#166534;">ชำระเงินแล้ว</b>
+                        <p style="margin:4px 0 0;font-size:12px;color:#666;">Admin ยืนยันสลิปถูกต้อง พร้อมจัดเตรียมสินค้า</p>
+                    </div>
+                    <div style="background:#e0e7ff;border:1px solid #a5b4fc;border-radius:10px;padding:12px;">
+                        <b style="color:#3730a3;">กำลังเตรียมส่ง</b>
+                        <p style="margin:4px 0 0;font-size:12px;color:#666;">กำลังแพ็คสินค้า รอส่งให้ขนส่ง</p>
+                    </div>
+                    <div style="background:#f3e8ff;border:1px solid #c4b5fd;border-radius:10px;padding:12px;">
+                        <b style="color:#6b21a8;">จัดส่งแล้ว / พร้อมรับที่ร้าน</b>
+                        <p style="margin:4px 0 0;font-size:12px;color:#666;">ส่งให้ขนส่งแล้ว หรือพร้อมให้ลูกค้ามารับ</p>
+                    </div>
+                    <div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:10px;padding:12px;">
+                        <b style="color:#065f46;">ส่งถึงแล้ว / รับสินค้าแล้ว</b>
+                        <p style="margin:4px 0 0;font-size:12px;color:#666;">ลูกค้าได้รับสินค้าเรียบร้อยแล้ว</p>
+                    </div>
+                    <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:10px;padding:12px;">
+                        <b style="color:#991b1b;">ยกเลิก</b>
+                        <p style="margin:4px 0 0;font-size:12px;color:#666;">ออเดอร์ถูกยกเลิก <b>สต็อกจะคืนอัตโนมัติ</b></p>
+                    </div>
+                    <div style="background:#f3f4f6;border:1px solid #d1d5db;border-radius:10px;padding:12px;">
+                        <b style="color:#374151;">คืนเงินแล้ว</b>
+                        <p style="margin:4px 0 0;font-size:12px;color:#666;">คืนเงินให้ลูกค้าแล้ว <b>สต็อกจะคืนอัตโนมัติ</b></p>
+                    </div>
+                </div>
+
+                <div class="sub-divider"></div>
+
+                {{-- รูปแบบการจัดส่ง --}}
+                <h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:14px;"><i class="bi bi-truck"></i> รูปแบบการจัดส่ง 2 แบบ</h3>
+                <div class="sub-grid" style="margin-bottom:20px;">
                     <div class="sub-card">
                         <div class="sub-card-head">
-                            <div class="sub-card-icon"><i class="bi bi-credit-card"></i></div>
-                            <h4>ตรวจสอบสลิปชำระเงิน</h4>
+                            <div class="sub-card-icon" style="background:#dbeafe;color:#1e40af;"><i class="bi bi-truck"></i></div>
+                            <h4>จัดส่งถึงบ้าน (Ship)</h4>
                         </div>
-                        <p>ลูกค้าอัปโหลดสลิป ระบบจะแจ้งเตือนด้วยจุดแดงที่เมนูคำสั่งซื้อ</p>
-                        <div class="step-list">
-                            <div class="step-item"><div class="step-num">1</div><span>คลิกเข้าออเดอร์ที่มีสถานะ <b>อัปโหลดสลิปแล้ว</b></span></div>
-                            <div class="step-item"><div class="step-num">2</div><span>ดูรูปสลิปที่ลูกค้าแนบ</span></div>
-                            <div class="step-item"><div class="step-num">3</div><span>คลิก <b>ยืนยันการชำระเงิน</b> หรือ <b>ปฏิเสธ</b></span></div>
+                        <p>ลูกค้ากรอกที่อยู่จัดส่ง → มีค่าขนส่ง (คำนวณตามจำนวนชิ้น)</p>
+                        <div style="background:#f0f8ff;border-radius:8px;padding:10px;margin-top:10px;font-size:12px;">
+                            <b>ข้อมูลที่ต้องมี:</b> ชื่อผู้รับ, เบอร์โทร, ที่อยู่ครบ (ตำบล/อำเภอ/จังหวัด/รหัสไปรษณีย์)
                         </div>
                     </div>
                     <div class="sub-card">
                         <div class="sub-card-head">
-                            <div class="sub-card-icon"><i class="bi bi-truck"></i></div>
-                            <h4>อัปเดตการจัดส่ง</h4>
+                            <div class="sub-card-icon" style="background:#fef3c7;color:#92400e;"><i class="bi bi-shop"></i></div>
+                            <h4>รับเองที่ร้าน (Pickup)</h4>
                         </div>
-                        <p>เมื่อส่งสินค้าแล้ว ให้ใส่เลข Tracking และเลือกบริษัทขนส่ง ลูกค้าจะได้รับแจ้ง</p>
+                        <p>ลูกค้าเลือกสาขาที่จะมารับ → <b>ไม่มีค่าขนส่ง</b></p>
+                        <div style="background:#fffbeb;border-radius:8px;padding:10px;margin-top:10px;font-size:12px;">
+                            <b>ป้ายสถานะจะต่างจากแบบจัดส่ง:</b><br>
+                            • "จัดส่งแล้ว" → แสดงเป็น "พร้อมรับที่ร้าน"<br>
+                            • "ส่งถึงแล้ว" → แสดงเป็น "รับสินค้าแล้ว"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-divider"></div>
+
+                {{-- การดำเนินการหลัก --}}
+                <h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:14px;"><i class="bi bi-gear"></i> การดำเนินการหลัก</h3>
+                <div class="sub-grid">
+                    <div class="sub-card">
+                        <div class="sub-card-head">
+                            <div class="sub-card-icon"><i class="bi bi-credit-card-2-front"></i></div>
+                            <h4>ตรวจสอบสลิปชำระเงิน</h4>
+                        </div>
+                        <p>ลูกค้าอัปโหลดสลิป → ระบบแจ้งเตือน Telegram + จุดแดงที่เมนู</p>
                         <div class="step-list">
-                            <div class="step-item"><div class="step-num">1</div><span>เปิดออเดอร์ที่ชำระเงินแล้ว</span></div>
-                            <div class="step-item"><div class="step-num">2</div><span>คลิก <b>อัปเดตการจัดส่ง</b></span></div>
-                            <div class="step-item"><div class="step-num">3</div><span>ใส่เลข Tracking + เลือกบริษัทขนส่ง</span></div>
-                            <div class="step-item"><div class="step-num">4</div><span>บันทึก — สถานะเปลี่ยนเป็น <b>กำลังจัดส่ง</b></span></div>
+                            <div class="step-item"><div class="step-num">1</div><span>คลิกเข้าออเดอร์ที่มีสถานะ <b>อัปโหลดสลิปแล้ว</b></span></div>
+                            <div class="step-item"><div class="step-num">2</div><span>ดูรูปสลิป ตรวจสอบ: ยอดเงิน, วันที่, เลขบัญชีปลายทาง</span></div>
+                            <div class="step-item"><div class="step-num">3</div><span><b>ถูกต้อง:</b> คลิก "ยืนยันการชำระเงิน" → สถานะเปลี่ยนเป็น "ชำระเงินแล้ว"</span></div>
+                            <div class="step-item"><div class="step-num">4</div><span><b>ไม่ถูกต้อง:</b> คลิก "ปฏิเสธ" + ใส่เหตุผล → สถานะกลับเป็น "รอชำระเงิน"</span></div>
+                        </div>
+                        <div class="warn-box" style="margin-top:12px;">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span>เมื่อปฏิเสธสลิป ระบบจะลบรูปสลิปออก ลูกค้าต้องอัปโหลดใหม่</span>
+                        </div>
+                    </div>
+                    <div class="sub-card">
+                        <div class="sub-card-head">
+                            <div class="sub-card-icon"><i class="bi bi-upc-scan"></i></div>
+                            <h4>อัปเดต Tracking Number</h4>
+                        </div>
+                        <p>เมื่อส่งพัสดุแล้ว ให้บันทึกเลข Tracking เพื่อให้ลูกค้าติดตามได้</p>
+                        <div class="step-list">
+                            <div class="step-item"><div class="step-num">1</div><span>เปิดออเดอร์ที่สถานะ "ชำระเงินแล้ว" หรือ "กำลังเตรียมส่ง"</span></div>
+                            <div class="step-item"><div class="step-num">2</div><span>ใส่ <b>เลข Tracking</b> ในช่องที่กำหนด</span></div>
+                            <div class="step-item"><div class="step-num">3</div><span>เลือก <b>บริษัทขนส่ง</b> (เช่น Kerry, Flash, J&T)</span></div>
+                            <div class="step-item"><div class="step-num">4</div><span>คลิก "บันทึก" → สถานะเปลี่ยนเป็น "จัดส่งแล้ว" อัตโนมัติ</span></div>
+                        </div>
+                        <div class="tip-box" style="margin-top:12px;">
+                            <i class="bi bi-lightbulb-fill"></i>
+                            <span>ระบบจะบันทึกเวลาที่ส่ง (shipped_at) โดยอัตโนมัติ</span>
+                        </div>
+                    </div>
+                    <div class="sub-card">
+                        <div class="sub-card-head">
+                            <div class="sub-card-icon"><i class="bi bi-x-octagon"></i></div>
+                            <h4>ยกเลิก / คืนเงิน</h4>
+                        </div>
+                        <p>เมื่อเปลี่ยนสถานะเป็น "ยกเลิก" หรือ "คืนเงินแล้ว"</p>
+                        <div style="background:#fef2f2;border-radius:8px;padding:12px;margin-top:10px;font-size:13px;color:#991b1b;">
+                            <b>ระบบจะทำอัตโนมัติ:</b><br>
+                            • คืนสต็อกสินค้าทั้งหมดในออเดอร์<br>
+                            • ลดยอดขาย (sale_count) ของสินค้า<br>
+                            • บันทึก Audit Log
                         </div>
                     </div>
                     <div class="sub-card">
@@ -484,13 +694,31 @@
                             <div class="sub-card-icon"><i class="bi bi-funnel"></i></div>
                             <h4>กรองและค้นหา</h4>
                         </div>
-                        <p>กรองออเดอร์ตามสถานะ วันที่ หรือค้นหาด้วยชื่อลูกค้า เบอร์โทร หรือเลขออเดอร์</p>
+                        <p>ค้นหาออเดอร์ได้หลายวิธี</p>
+                        <div style="background:#f8faf8;border-radius:8px;padding:10px;margin-top:10px;font-size:12px;">
+                            <b>ค้นหาด้วย:</b> เลขออเดอร์ (KGM...), ชื่อผู้รับ, เบอร์โทร<br>
+                            <b>กรองตาม:</b> สถานะ, ช่วงวันที่สั่งซื้อ
+                        </div>
                     </div>
                 </div>
-                <div class="warn-box">
-                    <i class="bi bi-exclamation-triangle-fill"></i>
-                    <span>ตรวจสอบสลิปให้ถูกต้องก่อนกด "ยืนยัน" เพราะระบบจะเปลี่ยนสถานะทันทีและแจ้งลูกค้าอัตโนมัติ</span>
+
+                <div class="sub-divider"></div>
+
+                {{-- การคำนวณยอดเงิน --}}
+                <h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:14px;"><i class="bi bi-calculator"></i> การคำนวณยอดเงินออเดอร์</h3>
+                <div style="background:#f8faf8;border-radius:12px;padding:16px;font-size:13px;">
+                    <table style="width:100%;border-collapse:collapse;">
+                        <tr><td style="padding:6px 0;">ราคาสินค้ารวม (Subtotal)</td><td style="text-align:right;font-family:monospace;">xxx.xx บาท</td></tr>
+                        <tr><td style="padding:6px 0;color:#dc2626;">- ส่วนลดคูปอง</td><td style="text-align:right;font-family:monospace;color:#dc2626;">- xx.xx บาท</td></tr>
+                        <tr><td style="padding:6px 0;">+ ค่าจัดส่ง</td><td style="text-align:right;font-family:monospace;">xx.xx บาท</td></tr>
+                        <tr><td style="padding:6px 0;color:#666;">(+ VAT 7% ถ้าต้องการใบกำกับภาษี)</td><td style="text-align:right;font-family:monospace;color:#666;">xx.xx บาท</td></tr>
+                        <tr style="border-top:2px solid #ddd;font-weight:bold;"><td style="padding:10px 0;">ยอดรวมสุทธิ</td><td style="text-align:right;font-family:monospace;">xxx.xx บาท</td></tr>
+                    </table>
+                    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #e5e7eb;color:#666;font-size:12px;">
+                        <b>หมายเหตุ:</b> ค่าจัดส่งคำนวณตามจำนวนชิ้นสินค้า (ดูเมนู "อัตราค่าขนส่ง") / รับเองที่ร้านไม่มีค่าจัดส่ง
+                    </div>
                 </div>
+
             </div>
         </div>
 
@@ -582,31 +810,156 @@
                 </div>
             </div>
             <div class="ms-body">
+
+                {{-- ประเภทคูปอง --}}
+                <h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:14px;"><i class="bi bi-tags"></i> ประเภทคูปอง 3 แบบ</h3>
+                <div class="sub-grid" style="margin-bottom:20px;">
+                    <div class="sub-card">
+                        <div class="sub-card-head">
+                            <div class="sub-card-icon" style="background:#fef3c7;color:#92400e;"><i class="bi bi-percent"></i></div>
+                            <h4>ลดเป็นเปอร์เซ็นต์ (percent)</h4>
+                        </div>
+                        <p>ลดราคาตามเปอร์เซ็นต์ของยอดสินค้า</p>
+                        <div style="background:#fffbeb;border-radius:8px;padding:10px;margin-top:8px;font-size:12px;">
+                            <b>ตัวอย่าง:</b> ลด 10% → ยอด 1,000 บาท = ลด 100 บาท<br>
+                            <b>ตั้งค่าได้:</b> จำกัดส่วนลดสูงสุด (maximum_discount)
+                        </div>
+                    </div>
+                    <div class="sub-card">
+                        <div class="sub-card-head">
+                            <div class="sub-card-icon" style="background:#dbeafe;color:#1e40af;"><i class="bi bi-cash"></i></div>
+                            <h4>ลดเป็นจำนวนเงิน (fixed)</h4>
+                        </div>
+                        <p>ลดราคาเป็นจำนวนเงินคงที่</p>
+                        <div style="background:#eff6ff;border-radius:8px;padding:10px;margin-top:8px;font-size:12px;">
+                            <b>ตัวอย่าง:</b> ลด 100 บาท → ไม่ว่ายอดเท่าไหร่ก็ลด 100 บาท<br>
+                            <b>หมายเหตุ:</b> ส่วนลดจะไม่เกินยอดสินค้าที่ใช้ได้
+                        </div>
+                    </div>
+                    <div class="sub-card">
+                        <div class="sub-card-head">
+                            <div class="sub-card-icon" style="background:#dcfce7;color:#166534;"><i class="bi bi-truck"></i></div>
+                            <h4>ส่งฟรี (free_shipping)</h4>
+                        </div>
+                        <p>ยกเว้นค่าจัดส่งทั้งหมด</p>
+                        <div style="background:#f0fdf4;border-radius:8px;padding:10px;margin-top:8px;font-size:12px;">
+                            <b>ใช้ร่วมกับคูปองลดราคาได้:</b> เพราะเป็นคนละประเภท<br>
+                            <b>ไม่มีผลกับ:</b> ออเดอร์แบบ "รับเองที่ร้าน"
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-divider"></div>
+
+                {{-- เงื่อนไขคูปอง --}}
+                <h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:14px;"><i class="bi bi-sliders"></i> เงื่อนไขที่ตั้งค่าได้</h3>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-bottom:20px;">
+                    <div style="background:#f8faf8;border-radius:10px;padding:14px;">
+                        <div style="font-weight:700;color:var(--g800);margin-bottom:6px;"><i class="bi bi-cart3"></i> ยอดขั้นต่ำ (minimum_order)</div>
+                        <p style="font-size:12px;color:#666;margin:0;">ต้องมียอดสินค้าถึงจำนวนที่กำหนดจึงจะใช้คูปองได้</p>
+                    </div>
+                    <div style="background:#f8faf8;border-radius:10px;padding:14px;">
+                        <div style="font-weight:700;color:var(--g800);margin-bottom:6px;"><i class="bi bi-arrow-down-up"></i> ส่วนลดสูงสุด (maximum_discount)</div>
+                        <p style="font-size:12px;color:#666;margin:0;">จำกัดส่วนลดสูงสุด เช่น ลด 20% แต่ไม่เกิน 500 บาท</p>
+                    </div>
+                    <div style="background:#f8faf8;border-radius:10px;padding:14px;">
+                        <div style="font-weight:700;color:var(--g800);margin-bottom:6px;"><i class="bi bi-123"></i> จำนวนครั้งที่ใช้ได้ (usage_limit)</div>
+                        <p style="font-size:12px;color:#666;margin:0;">จำกัดจำนวนครั้งรวมทั้งหมดที่คูปองถูกใช้</p>
+                    </div>
+                    <div style="background:#f8faf8;border-radius:10px;padding:14px;">
+                        <div style="font-weight:700;color:var(--g800);margin-bottom:6px;"><i class="bi bi-person"></i> ต่อคน (per_user_limit)</div>
+                        <p style="font-size:12px;color:#666;margin:0;">ลูกค้าแต่ละคนใช้ได้กี่ครั้ง เช่น 1 คน ใช้ได้ 1 ครั้ง</p>
+                    </div>
+                    <div style="background:#f8faf8;border-radius:10px;padding:14px;">
+                        <div style="font-weight:700;color:var(--g800);margin-bottom:6px;"><i class="bi bi-calendar-range"></i> ระยะเวลาใช้งาน</div>
+                        <p style="font-size:12px;color:#666;margin:0;">กำหนดวันเริ่มต้น (starts_at) และวันหมดอายุ (expires_at)</p>
+                    </div>
+                    <div style="background:#f8faf8;border-radius:10px;padding:14px;">
+                        <div style="font-weight:700;color:var(--g800);margin-bottom:6px;"><i class="bi bi-eye"></i> แสดงสาธารณะ (is_public)</div>
+                        <p style="font-size:12px;color:#666;margin:0;">ถ้าเปิด จะแสดงในหน้า "คูปอง" ให้ลูกค้าเก็บได้</p>
+                    </div>
+                </div>
+
+                <div class="sub-divider"></div>
+
+                {{-- การจำกัดสินค้า/หมวดหมู่ --}}
+                <h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:14px;"><i class="bi bi-funnel"></i> การจำกัดเฉพาะสินค้า/หมวดหมู่</h3>
+                <div style="background:#f8faf8;border-radius:12px;padding:16px;margin-bottom:20px;font-size:13px;">
+                    <p style="margin:0 0 10px;">คูปองสามารถจำกัดให้ใช้ได้เฉพาะบางสินค้าหรือบางหมวดหมู่:</p>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                        <div style="background:white;border-radius:8px;padding:12px;">
+                            <b style="color:var(--g700);"><i class="bi bi-box-seam"></i> เลือกเฉพาะสินค้า</b>
+                            <p style="font-size:12px;color:#666;margin:6px 0 0;">ส่วนลดจะคำนวณจากยอดสินค้าที่เลือกเท่านั้น</p>
+                        </div>
+                        <div style="background:white;border-radius:8px;padding:12px;">
+                            <b style="color:var(--g700);"><i class="bi bi-tags"></i> เลือกเฉพาะหมวดหมู่</b>
+                            <p style="font-size:12px;color:#666;margin:6px 0 0;">ส่วนลดจะคำนวณจากสินค้าในหมวดหมู่ที่เลือก</p>
+                        </div>
+                    </div>
+                    <div class="warn-box" style="margin-top:12px;">
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <span><b>สำคัญ:</b> ยอดขั้นต่ำ (minimum_order) จะตรวจสอบจาก <u>ยอดรวมทั้งตะกร้า</u> แต่ส่วนลดจะคำนวณจาก <u>เฉพาะสินค้าที่ตรงเงื่อนไข</u></span>
+                    </div>
+                </div>
+
+                <div class="sub-divider"></div>
+
+                {{-- ระบบ Stacking --}}
+                <h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:14px;"><i class="bi bi-stack"></i> การใช้คูปองซ้อนกัน (Stacking)</h3>
+                <div style="background:#eff6ff;border:1.5px solid #93c5fd;border-radius:12px;padding:16px;margin-bottom:20px;">
+                    <p style="margin:0 0 10px;font-size:13px;">ลูกค้าสามารถใช้ <b>2 คูปองพร้อมกัน</b> ได้ หากตั้งค่าถูกต้อง:</p>
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <span class="pill pill-blue">คูปองหลัก (ลดราคา)</span>
+                        <span style="font-size:20px;">+</span>
+                        <span class="pill pill-green">คูปองซ้อน (is_stackable = true)</span>
+                    </div>
+                    <div style="margin-top:12px;font-size:12px;color:#1e40af;">
+                        <b>ตัวอย่าง:</b> ใช้คูปอง "SALE20" (ลด 20%) + "FREESHIP" (ส่งฟรี) พร้อมกันได้<br>
+                        <b>เงื่อนไข:</b> คูปองซ้อนต้องมี is_stackable = true
+                    </div>
+                </div>
+
+                <div class="sub-divider"></div>
+
+                {{-- วิธีสร้างคูปอง --}}
+                <h3 style="font-size:14px;font-weight:700;color:var(--g800);margin-bottom:14px;"><i class="bi bi-plus-circle"></i> วิธีสร้างคูปอง</h3>
                 <div class="sub-grid">
                     <div class="sub-card">
                         <div class="sub-card-head">
                             <div class="sub-card-icon"><i class="bi bi-plus-circle"></i></div>
-                            <h4>สร้างคูปอง</h4>
+                            <h4>ขั้นตอนการสร้าง</h4>
                         </div>
-                        <p>กำหนดโค้ด, ประเภทส่วนลด (บาท/เปอร์เซ็นต์), มูลค่า, จำนวนครั้งที่ใช้ได้ และวันหมดอายุ</p>
                         <div class="step-list">
                             <div class="step-item"><div class="step-num">1</div><span>คลิก <b>สร้างคูปอง</b></span></div>
-                            <div class="step-item"><div class="step-num">2</div><span>กำหนด <b>รหัสคูปอง</b> (เช่น WELCOME20)</span></div>
-                            <div class="step-item"><div class="step-num">3</div><span>เลือกประเภท: ลดเป็น <b>บาท</b> หรือ <b>เปอร์เซ็นต์</b></span></div>
-                            <div class="step-item"><div class="step-num">4</div><span>กำหนดจำนวนครั้งที่ใช้ได้และวันหมดอายุ</span></div>
+                            <div class="step-item"><div class="step-num">2</div><span>กำหนด <b>รหัสคูปอง</b> (เช่น WELCOME20) — ลูกค้าจะพิมพ์รหัสนี้</span></div>
+                            <div class="step-item"><div class="step-num">3</div><span>เลือก <b>ประเภท</b>: percent / fixed / free_shipping</span></div>
+                            <div class="step-item"><div class="step-num">4</div><span>ใส่ <b>มูลค่า</b> (เปอร์เซ็นต์ หรือ จำนวนเงิน)</span></div>
+                            <div class="step-item"><div class="step-num">5</div><span>ตั้งค่าเงื่อนไขตามต้องการ (ยอดขั้นต่ำ, จำกัดครั้ง, วันหมดอายุ)</span></div>
+                            <div class="step-item"><div class="step-num">6</div><span>เลือกสินค้า/หมวดหมู่ (ถ้าต้องการจำกัด)</span></div>
+                            <div class="step-item"><div class="step-num">7</div><span>บันทึก</span></div>
                         </div>
                     </div>
                     <div class="sub-card">
                         <div class="sub-card-head">
-                            <div class="sub-card-icon"><i class="bi bi-bar-chart"></i></div>
-                            <h4>ติดตามการใช้งาน</h4>
+                            <div class="sub-card-icon"><i class="bi bi-check2-circle"></i></div>
+                            <h4>เงื่อนไขคูปองใช้งานได้</h4>
                         </div>
-                        <p>ดูจำนวนครั้งที่คูปองถูกใช้แล้ว เทียบกับจำนวนสูงสุดที่กำหนด และสถานะ เปิด/ปิด</p>
+                        <p>คูปองจะใช้งานได้เมื่อ:</p>
+                        <div style="background:#f0fdf4;border-radius:8px;padding:12px;margin-top:8px;font-size:12px;">
+                            <div style="display:flex;flex-direction:column;gap:4px;">
+                                <span><i class="bi bi-check text-success"></i> สถานะเปิดใช้งาน (is_active = true)</span>
+                                <span><i class="bi bi-check text-success"></i> อยู่ในช่วงเวลาที่กำหนด</span>
+                                <span><i class="bi bi-check text-success"></i> ยังไม่เกินจำนวนครั้งที่ใช้ได้</span>
+                                <span><i class="bi bi-check text-success"></i> ลูกค้ายังไม่เกินลิมิตต่อคน</span>
+                                <span><i class="bi bi-check text-success"></i> ยอดสั่งซื้อถึงขั้นต่ำ</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
                 <div class="tip-box">
                     <i class="bi bi-lightbulb-fill"></i>
-                    <span>ตั้งค่า "ยอดขั้นต่ำ" เพื่อกำหนดให้ใช้คูปองได้เฉพาะเมื่อสั่งซื้อถึงจำนวนที่กำหนด</span>
+                    <span>คูปองที่มี <b>is_public = true</b> จะแสดงในหน้า "คูปอง" ของเว็บไซต์ ลูกค้าสามารถกด "เก็บคูปอง" เพื่อนำไปใช้ได้</span>
                 </div>
             </div>
         </div>
