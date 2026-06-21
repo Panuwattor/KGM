@@ -267,6 +267,9 @@
     transition: background .15s;
 }
 .cq-btn:hover { background: var(--kgm-green-700); color: white; }
+.cq-btn { border: none; cursor: pointer; font-family: inherit; }
+.cq-btn.cq-got { background: var(--kgm-green-100); color: var(--kgm-green-700); cursor: default; }
+.cq-btn.cq-got:hover { background: var(--kgm-green-100); color: var(--kgm-green-700); }
 
 .cq-arrow {
     position: absolute; top: 50%; transform: translateY(calc(-50% - 10px)); z-index: 10;

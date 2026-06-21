@@ -123,30 +123,28 @@
                         </div>
 
                         {{-- ที่อยู่ เฉพาะจัดส่งถึงบ้าน --}}
-                        <template x-if="delivery === 'ship'">
-                            <div class="form-grid col-span-2" style="grid-column:1/-1;">
-                                <div class="form-group col-span-2">
-                                    <label class="form-label">ที่อยู่ *</label>
-                                    <input type="text" name="ship_address" class="form-control" x-model="form.ship_address" placeholder="บ้านเลขที่ ถนน ซอย" :required="delivery === 'ship'">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">แขวง/ตำบล *</label>
-                                    <input type="text" name="ship_district" class="form-control" x-model="form.ship_district" :required="delivery === 'ship'">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">เขต/อำเภอ *</label>
-                                    <input type="text" name="ship_amphoe" class="form-control" x-model="form.ship_amphoe" :required="delivery === 'ship'">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">จังหวัด *</label>
-                                    <input type="text" name="ship_province" class="form-control" x-model="form.ship_province" :required="delivery === 'ship'">
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label">รหัสไปรษณีย์ *</label>
-                                    <input type="text" name="ship_postcode" class="form-control" x-model="form.ship_postcode" maxlength="5" :required="delivery === 'ship'">
-                                </div>
+                        <div class="form-grid col-span-2" style="grid-column:1/-1;" x-show="delivery === 'ship'">
+                            <div class="form-group col-span-2">
+                                <label class="form-label">ที่อยู่ *</label>
+                                <input type="text" name="ship_address" class="form-control" x-model="form.ship_address" placeholder="บ้านเลขที่ ถนน ซอย" :required="delivery === 'ship'">
                             </div>
-                        </template>
+                            <div class="form-group">
+                                <label class="form-label">จังหวัด *</label>
+                                <select name="ship_province" id="ck-province" class="form-control" :required="delivery === 'ship'"></select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">เขต/อำเภอ *</label>
+                                <select name="ship_amphoe" id="ck-amphoe" class="form-control" :required="delivery === 'ship'"></select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">แขวง/ตำบล *</label>
+                                <select name="ship_district" id="ck-district" class="form-control" :required="delivery === 'ship'"></select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">รหัสไปรษณีย์ *</label>
+                                <input type="text" name="ship_postcode" id="ck-postcode" class="form-control" maxlength="5" :required="delivery === 'ship'">
+                            </div>
+                        </div>
                     </div>
 
                     {{-- เลือกสาขารับเองที่ร้าน --}}
@@ -237,7 +235,24 @@
 </div>
 @endsection
 @push('scripts')
+@include('partials.location-assets')
 <script>
+let ckLoc = null;
+document.addEventListener('DOMContentLoaded', function () {
+    KGMLocation({
+        select2:  true,
+        province: document.getElementById('ck-province'),
+        amphoe:   document.getElementById('ck-amphoe'),
+        district: document.getElementById('ck-district'),
+        zip:      document.getElementById('ck-postcode'),
+        initial: {
+            province: '{{ old('ship_province', $defaultAddress?->province ?? '') }}',
+            amphoe:   '{{ old('ship_amphoe', $defaultAddress?->amphoe ?? '') }}',
+            district: '{{ old('ship_district', $defaultAddress?->district ?? '') }}',
+            zip:      '{{ old('ship_postcode', $defaultAddress?->postcode ?? '') }}',
+        },
+    }).then(api => { ckLoc = api; });
+});
 function checkoutForm() {
     return {
         newAddr: false,
@@ -263,7 +278,8 @@ function checkoutForm() {
         },
         fillAddress(id, name, phone, addr, dist, amp, prov, post) {
             this.selectedAddr = id;
-            Object.assign(this.form, { ship_name:name, ship_phone:phone, ship_address:addr, ship_district:dist, ship_amphoe:amp, ship_province:prov, ship_postcode:post });
+            Object.assign(this.form, { ship_name:name, ship_phone:phone, ship_address:addr });
+            if (ckLoc) ckLoc.set({ province: prov, amphoe: amp, district: dist, zip: post });
         }
     };
 }

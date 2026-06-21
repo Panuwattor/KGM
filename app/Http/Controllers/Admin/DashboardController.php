@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\User;
+use App\Models\Customer;
 use App\Models\ContactMessage;
 use App\Models\QuoteRequest;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +19,7 @@ class DashboardController extends Controller
         $todayRevenue = Order::whereDate('created_at', today())
             ->whereNotIn('status', ['cancelled', 'refunded'])->sum('total');
         $pendingOrders = Order::whereIn('status', ['pending_payment', 'payment_uploaded'])->count();
-        $totalCustomers = User::where('role', 'customer')->count();
+        $totalCustomers = Customer::count();
         $lowStockProducts = Product::where('manage_stock', true)
             ->whereColumn('stock_quantity', '<=', 'low_stock_threshold')->count();
         $unreadMessages = ContactMessage::where('is_read', false)->count();

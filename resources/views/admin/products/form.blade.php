@@ -1,6 +1,13 @@
 @extends('layouts.admin')
 @section('title', isset($product) ? 'แก้ไขสินค้า' : 'เพิ่มสินค้า')
 
+@section('breadcrumb')
+    <span class="sep">/</span>
+    <a href="{{ route('admin.products.index') }}">จัดการสินค้า</a>
+    <span class="sep">/</span>
+    <span class="current">{{ isset($product) ? 'แก้ไข' : 'เพิ่มสินค้า' }}</span>
+@endsection
+
 @section('content')
 <div class="page-header">
     <div>

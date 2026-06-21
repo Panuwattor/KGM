@@ -351,8 +351,7 @@
                 </div>
                 <h5>ช่องทางชำระเงิน</h5>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                    <span style="background:rgba(255,255,255,0.1);border-radius:8px;padding:5px 10px;font-size:12px;"><i class="bi bi-bank"></i> โอนเงิน</span>
-                    <span style="background:rgba(255,255,255,0.1);border-radius:8px;padding:5px 10px;font-size:12px;"><i class="bi bi-qr-code"></i> PromptPay</span>
+                    <span style="background:rgba(255,255,255,0.1);border-radius:8px;padding:5px 10px;font-size:12px;"><i class="bi bi-bank"></i> โอนเงิน SCB</span>
                 </div>
             </div>
 

@@ -98,7 +98,7 @@
         </div>
 
         {{-- Info --}}
-        <div>
+        <div style="min-width:0;">
             <div class="product-header-meta">
                 @if($product->category)
                 <a href="{{ route('shop.category', $product->category->slug) }}" class="product-cat-link">{{ $product->category->name }}</a>
@@ -199,12 +199,21 @@
             </div>
 
             <div class="product-meta">
-                <div><i class="bi bi-truck"></i> ส่งฟรีเมื่อซื้อครบ ฿1,000</div>
                 <div><i class="bi bi-shield-check"></i> รับประกันคุณภาพ 30 วัน</div>
                 @if($product->sku)<div><i class="bi bi-upc sku-icon"></i> SKU: {{ $product->sku }}</div>@endif
             </div>
+
         </div>
     </div>
+
+    
+    {{-- คูปองส่วนลดสำหรับสินค้านี้ (slide เก็บได้เลย) --}}
+    @if($coupons->isNotEmpty())
+    <div style="margin-top:18px;min-width:0;max-width:100%;overflow:hidden;">
+        <div style="font-weight:800;color:var(--kgm-green-800);font-size:14px;margin-bottom:2px;"><i class="bi bi-ticket-perforated"></i> คูปองส่วนลดที่ใช้ได้</div>
+        @include('frontend.partials.coupon-carousel', ['coupons' => $coupons, 'collectedIds' => $collectedIds, 'arrows' => false])
+    </div>
+    @endif
 
     {{-- Tabs --}}
     <div class="product-tabs" x-data="{ tab: 'detail' }">

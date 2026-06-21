@@ -33,7 +33,12 @@ use App\Http\Controllers\Admin\VideoController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\LandingPageController;
+use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\ProvinceController;
+use App\Http\Controllers\Admin\DistrictController;
+use App\Http\Controllers\Admin\SubdistrictController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\LocationController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -42,6 +47,11 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// ข้อมูลจังหวัด/อำเภอ/ตำบล (สำหรับ dropdown แบบ cascade)
+Route::get('/locations/provinces', [LocationController::class, 'provinces'])->name('locations.provinces');
+Route::get('/locations/provinces/{province}/districts', [LocationController::class, 'districts'])->name('locations.districts');
+Route::get('/locations/districts/{district}/subdistricts', [LocationController::class, 'subdistricts'])->name('locations.subdistricts');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/services', [PageController::class, 'services'])->name('services');
 Route::get('/order', [PageController::class, 'order'])->name('order');
@@ -154,6 +164,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/reports', [ReportController::class, 'index'])->name('reports');
     Route::get('/manual', fn() => view('admin.manual.index'))->name('manual');
 
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+
     Route::resource('categories', CategoryController::class);
     Route::resource('product-types', ProductTypeController::class);
     Route::resource('products', ProductController::class);
@@ -199,6 +213,20 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::resource('posts', PostController::class);
     Route::resource('videos', VideoController::class);
     Route::resource('showrooms', ShowroomController::class);
+
+    Route::resource('provinces', ProvinceController::class)->except(['show']);
+    // อำเภอ (ภายใต้จังหวัด)
+    Route::get('provinces/{province}/districts', [DistrictController::class, 'index'])->name('provinces.districts.index');
+    Route::get('provinces/{province}/districts/create', [DistrictController::class, 'create'])->name('provinces.districts.create');
+    Route::post('provinces/{province}/districts', [DistrictController::class, 'store'])->name('provinces.districts.store');
+    Route::get('districts/{district}/edit', [DistrictController::class, 'edit'])->name('districts.edit');
+    Route::put('districts/{district}', [DistrictController::class, 'update'])->name('districts.update');
+    // ตำบล (ภายใต้อำเภอ)
+    Route::get('districts/{district}/subdistricts', [SubdistrictController::class, 'index'])->name('districts.subdistricts.index');
+    Route::get('districts/{district}/subdistricts/create', [SubdistrictController::class, 'create'])->name('districts.subdistricts.create');
+    Route::post('districts/{district}/subdistricts', [SubdistrictController::class, 'store'])->name('districts.subdistricts.store');
+    Route::get('subdistricts/{subdistrict}/edit', [SubdistrictController::class, 'edit'])->name('subdistricts.edit');
+    Route::put('subdistricts/{subdistrict}', [SubdistrictController::class, 'update'])->name('subdistricts.update');
 
     Route::get('dealers', [SettingController::class, 'dealers'])->name('dealers.index');
     Route::patch('dealers/{dealer}/status', [SettingController::class, 'dealerStatus'])->name('dealers.status');

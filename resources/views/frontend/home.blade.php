@@ -80,47 +80,22 @@
                             @if($coupon->minimum_order > 0)
                             <div class="cq-cond">ซื้อขั้นต่ำ ฿{{ number_format($coupon->minimum_order,0) }}</div>
                             @endif
-                            <a href="{{ route('coupons.index') }}" class="cq-btn">เก็บคูปอง</a>
+                            @if(in_array($coupon->id, $collectedIds ?? []))
+                            <span class="cq-btn cq-got"><i class="bi bi-check-circle-fill"></i> เก็บแล้ว</span>
+                            @elseif(auth('customer')->check())
+                            <form method="POST" action="{{ route('coupons.collect', $coupon) }}">
+                                @csrf
+                                <button type="submit" class="cq-btn">เก็บคูปอง</button>
+                            </form>
+                            @else
+                            <a href="{{ route('login') }}" class="cq-btn">เข้าสู่ระบบ</a>
+                            @endif
                         </div>
                     </div>
                     @endforeach
                 </div>
             </div>
 
-        </div>
-    </div>
-</section>
-@endif
-{{-- ══ FLASH SALE ══ --}}
-@if(isset($activeFlashSales) && $activeFlashSales->isNotEmpty())
-<section class="flash-sale-section">
-    <div class="container">
-        <div style="text-align:center;margin-bottom:20px;">
-            <div class="section-title" style="color:#e53935;"><i class="bi bi-lightning-charge-fill"></i> Flash Sale</div>
-            <div class="section-divider" style="margin:10px auto 0;background:#e53935;"></div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;">
-            @foreach($activeFlashSales as $fs)
-            <a href="{{ route('flash-sales.show', $fs) }}" class="flash-sale-card" style="text-decoration:none;display:block;border-radius:18px;overflow:hidden;box-shadow:0 4px 20px rgba(229,57,53,0.15);border:2px solid #ffcdd2;background:white;transition:transform .2s,box-shadow .2s;" onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 32px rgba(229,57,53,0.25)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(229,57,53,0.15)'">
-                @if($fs->image)
-                <img src="{{ asset('storage/'.$fs->image) }}" alt="{{ $fs->name }}" style="width:100%;height:160px;object-fit:cover;display:block;">
-                @else
-                <div style="width:100%;height:160px;background:linear-gradient(135deg,#e53935,#ff7043);display:flex;align-items:center;justify-content:center;">
-                    <i class="bi bi-lightning-charge-fill" style="font-size:48px;color:white;opacity:.8;"></i>
-                </div>
-                @endif
-                <div style="padding:16px;">
-                    <div style="font-size:17px;font-weight:800;color:#c62828;margin-bottom:6px;">{{ $fs->name }}</div>
-                    <div style="font-size:12px;color:#e53935;font-weight:600;display:flex;align-items:center;gap:6px;">
-                        <i class="bi bi-clock"></i>
-                        <span>สิ้นสุด {{ $fs->ends_at->format('d/m/Y H:i') }} น.</span>
-                    </div>
-                    <div style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;background:#e53935;color:white;border-radius:20px;padding:6px 16px;font-size:13px;font-weight:700;">
-                        <i class="bi bi-cart-plus"></i> ดูสินค้า Flash Sale
-                    </div>
-                </div>
-            </a>
-            @endforeach
         </div>
     </div>
 </section>
@@ -148,7 +123,157 @@
 </section>
 @endif
 
+{{-- ══ FLASH SALE ══ --}}
+@if(isset($activeFlashSales) && $activeFlashSales->isNotEmpty())
+<section class="flash-sale-section">
+    <div class="container">
+        <div class="fs-banner" id="fsBanner" data-count="{{ $activeFlashSales->count() }}">
+            @foreach($activeFlashSales as $i => $fs)
+            @php
+                $maxPct = 0;
+                foreach($fs->items as $it) {
+                    $op = (float) optional($it->product)->price;
+                    $sp = (float) $it->sale_price;
+                    if ($op > 0) {
+                        $pct = (int) round(($op - $sp) / $op * 100);
+                        if ($pct > $maxPct) $maxPct = $pct;
+                    }
+                }
+            @endphp
+            <a href="{{ route('flash-sales.show', $fs) }}" class="fs-banner-slide {{ $i === 0 ? 'is-active' : '' }}">
+                <div class="fs-banner-img">
+                    @if($fs->image)
+                    <img src="{{ asset('storage/'.$fs->image) }}" alt="{{ $fs->name }}" loading="lazy">
+                    @else
+                    <div class="fs-banner-img-ph"><i class="bi bi-lightning-charge-fill"></i></div>
+                    @endif
+                </div>
+                <div class="fs-banner-body">
+                    <span class="fs-banner-badge"><i class="bi bi-lightning-charge-fill"></i> Flash Sale</span>
+                    <div class="fs-banner-headline">
+                        @if($maxPct > 0)ลด {{ $maxPct }} %@else{{ $fs->name }}@endif
+                    </div>
+                    <div class="fs-banner-timer" data-ends="{{ $fs->ends_at->timestamp }}">
+                        <span class="fs-timer-label">สิ้นสุดใน</span>
+                        <span class="fs-timer-box" data-d>00</span><span class="fs-timer-unit">วัน</span>
+                        <span class="fs-timer-box" data-h>00</span><span class="fs-timer-colon">:</span>
+                        <span class="fs-timer-box" data-m>00</span><span class="fs-timer-colon">:</span>
+                        <span class="fs-timer-box" data-s>00</span>
+                    </div>
+                </div>
+            </a>
+            @endforeach
+        </div>
+    </div>
+</section>
 
+<style>
+.flash-sale-section{padding:40px 0 32px;}
+/* Image bleeds flush on the left (1200x400 / 3:1) + content on red right */
+.fs-banner{position:relative;border-radius:22px;overflow:hidden;background:linear-gradient(120deg,#e53935 0%,#f4453f 60%,#ff6a4d 100%);box-shadow:0 10px 34px rgba(229,57,53,.28);}
+/* Active slide is in-flow so banner height = the 1200x400 image height (no red bleed); others overlay for the fade */
+.fs-banner-slide{position:absolute;inset:0;display:flex;align-items:stretch;text-decoration:none;opacity:0;visibility:hidden;transition:opacity .55s ease;}
+.fs-banner-slide.is-active{position:relative;opacity:1;visibility:visible;}
+.fs-banner-img{flex:0 0 52%;max-width:52%;aspect-ratio:3/1;overflow:hidden;}
+.fs-banner-img img{width:100%;height:100%;object-fit:cover;display:block;}
+.fs-banner-img-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.12);}
+.fs-banner-img-ph i{font-size:52px;color:#fff;opacity:.85;}
+.fs-banner-body{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;color:#fff;min-width:0;padding:0 5%;}
+.fs-banner-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(4px);color:#fff;font-weight:700;font-size:15px;padding:7px 18px;border-radius:30px;}
+.fs-banner-headline{font-size:clamp(28px,3.4vw,44px);font-weight:900;line-height:1.1;margin:16px 0 18px;text-shadow:0 2px 8px rgba(0,0,0,.15);word-break:break-word;}
+.fs-banner-timer{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:15px;font-weight:600;}
+.fs-timer-label{opacity:.95;margin-right:4px;}
+.fs-timer-box{display:inline-flex;align-items:center;justify-content:center;min-width:50px;padding:8px 6px;background:rgba(255,255,255,.18);border-radius:12px;font-size:24px;font-weight:800;line-height:1;}
+.fs-timer-unit{margin:0 4px;font-weight:600;}
+.fs-timer-colon{font-size:22px;font-weight:800;opacity:.85;}
+/* Tablet & below: stack image on top, content below (side-by-side gets too cramped) */
+@media(max-width:1024px){
+    .flash-sale-section{padding:28px 0 22px;}
+    .fs-banner{aspect-ratio:auto;}
+    .fs-banner-slide{position:absolute;flex-direction:column;align-items:stretch;}
+    .fs-banner-slide:not(.is-active){display:none;}
+    .fs-banner-slide.is-active{position:relative;}
+    .fs-banner-img{flex:none;max-width:100%;width:100%;aspect-ratio:3/1;}
+    .fs-banner-body{padding:16px 18px 18px;}
+    .fs-banner-badge{font-size:13px;padding:6px 14px;}
+    .fs-banner-headline{font-size:24px;margin:10px 0 12px;}
+    .fs-banner-timer{font-size:13px;gap:6px;}
+    .fs-timer-box{min-width:36px;font-size:17px;padding:5px 4px;border-radius:10px;}
+    .fs-timer-colon{font-size:17px;}
+}
+</style>
+
+<script>
+(function(){
+    var banner = document.getElementById('fsBanner');
+    if(!banner) return;
+    var slides = banner.querySelectorAll('.fs-banner-slide');
+
+    // Countdown timers
+    function pad(n){ return n < 10 ? '0'+n : ''+n; }
+    function tick(){
+        var now = Date.now()/1000;
+        banner.querySelectorAll('.fs-banner-timer').forEach(function(t){
+            var diff = parseInt(t.dataset.ends,10) - now;
+            if(diff < 0) diff = 0;
+            var d = Math.floor(diff/86400);
+            var h = Math.floor((diff%86400)/3600);
+            var m = Math.floor((diff%3600)/60);
+            var s = Math.floor(diff%60);
+            t.querySelector('[data-d]').textContent = pad(d);
+            t.querySelector('[data-h]').textContent = pad(h);
+            t.querySelector('[data-m]').textContent = pad(m);
+            t.querySelector('[data-s]').textContent = pad(s);
+        });
+    }
+    tick();
+    setInterval(tick, 1000);
+
+    // Auto slideshow (only if more than one)
+    if(slides.length > 1){
+        var idx = 0, timer = null;
+        var DELAY = 6500;
+
+        function go(i){
+            slides[idx].classList.remove('is-active');
+            idx = (i + slides.length) % slides.length;
+            slides[idx].classList.add('is-active');
+        }
+        function start(){ if(!timer) timer = setInterval(function(){ go(idx + 1); }, DELAY); }
+        function stop(){ if(timer){ clearInterval(timer); timer = null; } }
+
+        // Pause when the pointer is over the banner
+        banner.addEventListener('mouseenter', stop);
+        banner.addEventListener('mouseleave', start);
+
+        // Drag / swipe to switch
+        var downX = null, dragged = false;
+        banner.addEventListener('pointerdown', function(e){
+            downX = e.clientX; dragged = false; stop();
+        });
+        banner.addEventListener('pointermove', function(e){
+            if(downX !== null && Math.abs(e.clientX - downX) > 8) dragged = true;
+        });
+        banner.addEventListener('pointerup', function(e){
+            if(downX !== null){
+                var dx = e.clientX - downX;
+                if(Math.abs(dx) > 40) go(dx < 0 ? idx + 1 : idx - 1);
+            }
+            downX = null;
+            start();
+        });
+        banner.addEventListener('pointercancel', function(){ downX = null; start(); });
+        // Block link navigation when the user was dragging
+        banner.addEventListener('click', function(e){
+            if(dragged){ e.preventDefault(); dragged = false; }
+        }, true);
+        banner.addEventListener('dragstart', function(e){ e.preventDefault(); });
+
+        start();
+    }
+})();
+</script>
+@endif
 
 {{-- ══ CATEGORIES ══ --}}
 @if($categories->isNotEmpty())

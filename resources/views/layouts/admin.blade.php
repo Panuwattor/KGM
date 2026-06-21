@@ -65,16 +65,20 @@
         body { font-family: 'Sarabun', sans-serif; background: #f0f4f0; color: #2c3e50; display: flex; min-height: 100vh; }
 
         /* Sidebar */
-        .sidebar { width: var(--sidebar-w); background: linear-gradient(180deg, var(--g900) 0%, var(--g800) 100%); height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; overflow-y: auto; transition: transform 0.3s; }
+        .sidebar { width: var(--sidebar-w); background: linear-gradient(180deg, var(--g900) 0%, var(--g800) 100%); height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; overflow-y: auto; overflow-x: hidden; transition: width 0.32s cubic-bezier(0.4,0,0.2,1), transform 0.3s; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.18) transparent; }
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); border-radius: 999px; }
+        .sidebar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.32); }
         .sidebar-logo { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); }
         .sidebar-logo-inner { display: flex; align-items: center; gap: 10px; }
         .logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, var(--gold), var(--gold-l)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 20px; color: var(--g900); }
-        .logo-text { color: white; font-weight: 700; font-size: 15px; line-height: 1.2; }
+        .logo-text { color: white; font-weight: 700; font-size: 15px; line-height: 1.2; white-space: nowrap; transition: opacity 0.3s cubic-bezier(0.4,0,0.2,1); }
         .logo-text span { color: rgba(255,255,255,0.4); font-size: 11px; font-weight: 400; display: block; }
         .sidebar-nav { padding: 16px 12px; }
         .nav-section { margin-bottom: 24px; }
-        .nav-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.3); padding: 0 10px; margin-bottom: 6px; font-weight: 600; }
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; color: rgba(255,255,255,0.7); font-size: 14px; cursor: pointer; transition: all 0.2s; text-decoration: none; position: relative; }
+        .nav-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.3); padding: 0 10px; margin-bottom: 6px; font-weight: 600; white-space: nowrap; transition: opacity 0.25s cubic-bezier(0.4,0,0.2,1); }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 12px; color: rgba(255,255,255,0.7); font-size: 14px; cursor: pointer; transition: background 0.2s, color 0.2s, padding 0.32s cubic-bezier(0.4,0,0.2,1), gap 0.32s cubic-bezier(0.4,0,0.2,1), font-size 0.32s cubic-bezier(0.4,0,0.2,1); text-decoration: none; position: relative; white-space: nowrap; }
         .nav-item i { font-size: 18px; min-width: 22px; }
         .nav-item:hover { background: rgba(255,255,255,0.08); color: white; }
         .nav-item.active { background: linear-gradient(135deg, var(--g600), var(--g500)); color: white; box-shadow: 0 4px 16px rgba(40,144,108,0.3); }
@@ -82,11 +86,39 @@
         .nav-item .badge-gold { position: absolute; right: 12px; background: var(--gold); color: var(--g900); border-radius: 999px; padding: 1px 6px; font-size: 10px; font-weight: 700; }
 
         /* Main */
-        .main-wrapper { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; display: flex; flex-direction: column; }
+        .main-wrapper { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; display: flex; flex-direction: column; transition: margin-left 0.32s cubic-bezier(0.4,0,0.2,1); }
+
+        /* Collapsed sidebar (icon only) */
+        body.sidebar-collapsed { --sidebar-w: 76px; }
+        body.sidebar-collapsed .logo-text { opacity: 0; width: 0; overflow: hidden; }
+        body.sidebar-collapsed .sidebar-logo { padding: 24px 0; }
+        body.sidebar-collapsed .sidebar-logo-inner { justify-content: center; gap: 0; }
+        body.sidebar-collapsed .nav-section-title { opacity: 0; white-space: nowrap; }
+        body.sidebar-collapsed .nav-item { justify-content: center; font-size: 0; padding: 10px 0; gap: 0; }
+        body.sidebar-collapsed .nav-item i { font-size: 18px; min-width: 0; }
+        body.sidebar-collapsed .nav-item .badge-dot,
+        body.sidebar-collapsed .nav-item .badge-gold { top: 4px; right: 8px; padding: 0 4px; }
+        /* Hover to peek: expand temporarily while collapsed */
+        body.sidebar-collapsed .sidebar:hover { width: 260px; box-shadow: 6px 0 28px rgba(0,0,0,0.28); }
+        body.sidebar-collapsed .sidebar:hover .logo-text { opacity: 1; width: auto; }
+        body.sidebar-collapsed .sidebar:hover .sidebar-logo { padding: 24px 20px; }
+        body.sidebar-collapsed .sidebar:hover .sidebar-logo-inner { justify-content: flex-start; gap: 10px; }
+        body.sidebar-collapsed .sidebar:hover .nav-section-title { opacity: 1; }
+        body.sidebar-collapsed .sidebar:hover .nav-item { justify-content: flex-start; font-size: 14px; padding: 10px 14px; gap: 10px; }
+        body.sidebar-collapsed .sidebar:hover .nav-item i { font-size: 18px; min-width: 22px; }
+        body.sidebar-collapsed .sidebar:hover .nav-item .badge-dot,
+        body.sidebar-collapsed .sidebar:hover .nav-item .badge-gold { top: auto; right: 12px; padding: 1px 6px; }
+        .sidebar-toggle { width: 38px; height: 38px; background: #f5f7f5; border-radius: 999px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: #555; font-size: 18px; transition: all 0.2s; flex-shrink: 0; }
+        .sidebar-toggle:hover { background: var(--g100); color: var(--g600); }
 
         /* Topbar */
         .admin-topbar { background: white; padding: 0 28px; height: 64px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 0 #e8ecef; position: sticky; top: 0; z-index: 50; }
         .topbar-title { font-size: 20px; font-weight: 700; color: var(--g800); }
+        .topbar-crumb { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #94a39a; }
+        .topbar-crumb a { color: #94a39a; text-decoration: none; transition: color 0.2s; }
+        .topbar-crumb a:hover { color: var(--g600); }
+        .topbar-crumb .sep { color: #cdd6cf; font-size: 11px; }
+        .topbar-crumb .current { color: var(--g800); font-weight: 600; }
         .topbar-actions { display: flex; align-items: center; gap: 12px; }
         .topbar-btn { width: 38px; height: 38px; background: #f5f7f5; border-radius: 999px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; color: #555; font-size: 16px; transition: all 0.2s; position: relative; }
         .topbar-btn:hover { background: var(--g100); color: var(--g600); }
@@ -236,7 +268,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     @stack('styles')
 </head>
-<body x-data="{ sidebarOpen: true }">
+<body x-data="{ sidebarOpen: true, collapsed: localStorage.getItem('kgm_sidebar_collapsed') === '1' }"
+      x-init="$watch('collapsed', v => localStorage.setItem('kgm_sidebar_collapsed', v ? '1' : '0'))"
+      :class="{ 'sidebar-collapsed': collapsed }">
 
 {{-- Sidebar --}}
 <aside class="sidebar">
@@ -336,11 +370,11 @@
             <a href="{{ route('admin.showrooms.index') }}" class="nav-item {{ request()->routeIs('admin.showrooms*') ? 'active' : '' }}">
                 <i class="bi bi-geo-alt"></i> สาขา/โชว์รูม
             </a>
+            <a href="{{ route('admin.provinces.index') }}" class="nav-item {{ request()->routeIs('admin.provinces*') ? 'active' : '' }}">
+                <i class="bi bi-map"></i> จัดการจังหวัด
+            </a>
             <a href="{{ route('admin.settings.index') }}" class="nav-item {{ request()->routeIs('admin.settings*') ? 'active' : '' }}">
                 <i class="bi bi-gear"></i> ตั้งค่าระบบ
-            </a>
-            <a href="{{ route('admin.settings.logs') }}" class="nav-item {{ request()->routeIs('admin.settings.logs') ? 'active' : '' }}">
-                <i class="bi bi-journal-text"></i> Audit Log
             </a>
             <a href="{{ route('admin.manual') }}" class="nav-item {{ request()->routeIs('admin.manual') ? 'active' : '' }}">
                 <i class="bi bi-book-half"></i> คู่มือการใช้งาน
@@ -353,16 +387,55 @@
 <div class="main-wrapper">
     {{-- Topbar --}}
     <header class="admin-topbar">
-        <div>
-            <div class="topbar-title">@yield('title', 'Dashboard')</div>
-        </div>
+        <nav class="topbar-crumb">
+            <button type="button" class="sidebar-toggle" @click="collapsed = !collapsed" title="ย่อ/ขยายเมนู">
+                <i class="bi" :class="collapsed ? 'bi-list' : 'bi-text-indent-left'"></i>
+            </button>
+            <a href="{{ route('admin.dashboard') }}">หน้าหลัก</a>
+            @hasSection('breadcrumb')
+                @yield('breadcrumb')
+            @else
+                <span class="sep">/</span>
+                <span class="current">@yield('title', 'Dashboard')</span>
+            @endif
+        </nav>
         <div class="topbar-actions">
             <a href="{{ route('home') }}" class="topbar-btn" target="_blank" title="ดูหน้าเว็บ">
                 <i class="bi bi-box-arrow-up-right"></i>
             </a>
-            <div class="topbar-btn" title="แจ้งเตือน">
-                <i class="bi bi-bell"></i>
-                @if(isset($unread) && $unread > 0)<span class="topbar-notif">{{ $unread }}</span>@endif
+            <div x-data="{ open: false }" style="position:relative;">
+                <button type="button" class="topbar-btn" title="แจ้งเตือน" @click="open=!open">
+                    <i class="bi bi-bell"></i>
+                    @if(($adminNotifTotal ?? 0) > 0)<span class="topbar-notif">{{ $adminNotifTotal > 99 ? '99+' : $adminNotifTotal }}</span>@endif
+                </button>
+                <div x-show="open" @click.away="open=false" x-cloak
+                    style="position:absolute;right:0;top:48px;background:white;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,0.14);width:340px;max-width:90vw;overflow:hidden;z-index:999;">
+                    <div style="padding:14px 16px;border-bottom:1px solid #f0f2f0;display:flex;align-items:center;justify-content:space-between;">
+                        <div style="font-weight:700;font-size:14px;color:var(--g800);">การแจ้งเตือน</div>
+                        @if(($adminNotifTotal ?? 0) > 0)
+                        <span style="background:#fdf0ef;color:#c0392b;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:700;">{{ $adminNotifTotal }} รายการ</span>
+                        @endif
+                    </div>
+                    <div style="max-height:380px;overflow-y:auto;">
+                        @forelse(($adminNotifications ?? []) as $n)
+                        <a href="{{ $n['url'] }}" style="display:flex;align-items:center;gap:12px;padding:12px 16px;text-decoration:none;border-bottom:1px solid #f5f7f5;transition:background .15s;" onmouseover="this.style.background='#fafcfa'" onmouseout="this.style.background='white'">
+                            <span style="flex-shrink:0;width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:18px;background:{{ $n['color'] }}1a;color:{{ $n['color'] }};">
+                                <i class="bi {{ $n['icon'] }}"></i>
+                            </span>
+                            <span style="flex:1;min-width:0;">
+                                <span style="display:block;font-size:13px;font-weight:600;color:#2c3e50;line-height:1.3;">{{ $n['label'] }}</span>
+                                <span style="display:block;font-size:12px;color:#999;margin-top:1px;">{{ $n['count'] }} รายการ</span>
+                            </span>
+                            <span style="flex-shrink:0;background:#fdf0ef;color:#c0392b;border-radius:999px;padding:2px 9px;font-size:12px;font-weight:700;">{{ $n['count'] }}</span>
+                        </a>
+                        @empty
+                        <div style="padding:40px 16px;text-align:center;color:#aaa;">
+                            <i class="bi bi-check2-circle" style="font-size:32px;display:block;margin-bottom:8px;color:var(--g400);"></i>
+                            <div style="font-size:13px;">ไม่มีรายการที่ต้องดำเนินการ</div>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
             </div>
             <div x-data="{ open: false }" style="position:relative;">
                 <div class="admin-avatar" @click="open=!open"><i class="bi bi-person-fill"></i></div>
@@ -372,7 +445,7 @@
                         <div style="font-weight:700;font-size:14px;">{{ auth()->user()->name }}</div>
                         <div style="font-size:12px;color:#888;">{{ auth()->user()->email }}</div>
                     </div>
-                    <a href="{{ route('admin.settings.index') }}" style="display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:13px;color:#555;text-decoration:none;"><i class="bi bi-gear"></i> ตั้งค่า</a>
+                    <a href="{{ route('admin.profile.edit') }}" style="display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:13px;color:#555;text-decoration:none;"><i class="bi bi-person-gear"></i> จัดการข้อมูลส่วนตัว</a>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" style="display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:13px;color:#e74c3c;background:none;border:none;cursor:pointer;width:100%;font-family:inherit;">

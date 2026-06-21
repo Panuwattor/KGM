@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // ออเดอร์ที่จัดส่งเกิน 20 วัน -> ส่งถึงแล้วอัตโนมัติ (รันทุกวัน)
 Schedule::command('orders:auto-deliver')->dailyAt('01:00');
+
+// ออเดอร์ที่รอชำระเงินเกิน 2 วัน -> ยกเลิก + คืนสต๊อก (รันทุกวัน)
+Schedule::command('orders:cancel-unpaid')->dailyAt('02:00');

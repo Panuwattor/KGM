@@ -57,6 +57,9 @@ class DatabaseSeeder extends Seeder
         // ── Shipping Rates ─────────────────────────────────────────────────────
         $this->call(ShippingRateSeeder::class);
 
+        // ── จังหวัด / อำเภอ / ตำบล (seed ครั้งเดียว ถ้ามีแล้วจะข้าม) ───────────
+        $this->call(LocationSeeder::class);
+
         // ── Brands & Categories & Products ────────────────────────────────────
         $this->call([
             BrandCategorySeeder::class,

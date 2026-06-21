@@ -112,16 +112,33 @@
             @if($order->pickupShowroom->phone)<i class="bi bi-telephone"></i> {{ $order->pickupShowroom->phone }}<br>@endif
             @if($order->pickupShowroom->open_hours)<i class="bi bi-clock"></i> {{ $order->pickupShowroom->open_hours }}@endif
         </div>
+        @else
+        <div style="font-size:14px;color:#555;">รับสินค้าที่หน้าร้าน — ทางร้านจะแจ้งเมื่อสินค้าพร้อมรับ</div>
         @endif
+        <div style="margin-top:10px;font-size:14px;color:#555;line-height:1.7;border-top:1px solid rgba(0,0,0,0.06);padding-top:10px;">
+            <strong>ผู้รับสินค้า:</strong> {{ $order->ship_name }} <i class="bi bi-telephone"></i> {{ $order->ship_phone }}
+        </div>
         @if($order->status === 'shipped')
         <div style="margin-top:10px;font-weight:700;color:var(--kgm-green-700);"><i class="bi bi-check-circle"></i> สินค้าพร้อมให้เข้ามารับแล้ว</div>
         @endif
     </div>
-    @elseif($order->tracking_number)
+    @else
     <div style="background:var(--kgm-green-100);border-radius:20px;padding:clamp(16px,4vw,24px);">
-        <h3 style="font-weight:800;margin-bottom:8px;color:var(--kgm-green-800);"><i class="bi bi-truck"></i> ติดตามพัสดุ</h3>
-        <div>บริษัทขนส่ง: <strong>{{ $order->shipping_provider }}</strong></div>
-        <div style="font-size:18px;font-weight:800;color:var(--kgm-green-700);margin-top:4px;">{{ $order->tracking_number }}</div>
+        <h3 style="font-weight:800;margin-bottom:8px;color:var(--kgm-green-800);"><i class="bi bi-geo-alt"></i> ที่อยู่จัดส่ง</h3>
+        <div style="font-weight:700;">{{ $order->ship_name }}</div>
+        <div style="font-size:14px;color:#555;margin-top:4px;line-height:1.7;">
+            {{ $order->ship_address }}<br>
+            ต.{{ $order->ship_district }} อ.{{ $order->ship_amphoe }}<br>
+            จ.{{ $order->ship_province }} {{ $order->ship_postcode }}<br>
+            <i class="bi bi-telephone"></i> {{ $order->ship_phone }}
+        </div>
+        @if($order->tracking_number)
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(0,0,0,0.06);">
+            <div style="font-weight:700;color:var(--kgm-green-800);margin-bottom:4px;"><i class="bi bi-truck"></i> ติดตามพัสดุ</div>
+            <div>บริษัทขนส่ง: <strong>{{ $order->shipping_provider }}</strong></div>
+            <div style="font-size:18px;font-weight:800;color:var(--kgm-green-700);margin-top:2px;">{{ $order->tracking_number }}</div>
+        </div>
+        @endif
     </div>
     @endif
 

@@ -147,16 +147,16 @@
                     <input type="text" name="address_line2" id="addr-address_line2" class="form-control">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">ตำบล/แขวง <span style="color:#e74c3c;">*</span></label>
-                    <input type="text" name="district" id="addr-district" class="form-control" required>
+                    <label class="form-label">จังหวัด <span style="color:#e74c3c;">*</span></label>
+                    <select name="province" id="addr-province" class="form-control" data-kgm-enhanced="1" required></select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">อำเภอ/เขต <span style="color:#e74c3c;">*</span></label>
-                    <input type="text" name="amphoe" id="addr-amphoe" class="form-control" required>
+                    <select name="amphoe" id="addr-amphoe" class="form-control" data-kgm-enhanced="1" required></select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">จังหวัด <span style="color:#e74c3c;">*</span></label>
-                    <input type="text" name="province" id="addr-province" class="form-control" required>
+                    <label class="form-label">ตำบล/แขวง <span style="color:#e74c3c;">*</span></label>
+                    <select name="district" id="addr-district" class="form-control" data-kgm-enhanced="1" required></select>
                 </div>
                 <div class="form-group">
                     <label class="form-label">รหัสไปรษณีย์ <span style="color:#e74c3c;">*</span></label>
@@ -176,14 +176,27 @@
 </div>
 
 @push('scripts')
+@include('partials.location-assets')
 <script>
 const BASE_URL = '{{ url("admin/customers/" . $customer->id . "/addresses") }}';
 const STORE_URL = '{{ route("admin.customers.addresses.store", $customer) }}';
+
+// dropdown จังหวัด/อำเภอ/ตำบล แบบ cascade
+let addrLoc = null;
 
 // ย้าย modal ออกจาก layout ไปที่ body เพื่อหลีกเลี่ยง stacking context ทั้งหมด
 document.addEventListener('DOMContentLoaded', function () {
     const modal = document.getElementById('addr-modal');
     document.body.appendChild(modal);
+
+    KGMLocation({
+        select2:        true,
+        dropdownParent: '#addr-modal',
+        province:       document.getElementById('addr-province'),
+        amphoe:         document.getElementById('addr-amphoe'),
+        district:       document.getElementById('addr-district'),
+        zip:            document.getElementById('addr-postcode'),
+    }).then(api => { addrLoc = api; });
 });
 
 function openAddressModal() {
@@ -200,9 +213,10 @@ function openAddAddress() {
     document.getElementById('addr-modal-title').textContent = 'เพิ่มที่อยู่ใหม่';
     document.getElementById('addr-form').action = STORE_URL;
     document.getElementById('addr-method').value = 'POST';
-    ['label','recipient_name','phone','address_line1','address_line2','district','amphoe','province','postcode'].forEach(f => {
+    ['label','recipient_name','phone','address_line1','address_line2','postcode'].forEach(f => {
         document.getElementById('addr-' + f).value = '';
     });
+    if (addrLoc) addrLoc.set({});
     document.getElementById('addr-is_default').checked = false;
     openAddressModal();
 }
@@ -216,10 +230,8 @@ function openEditAddress(id, label, recipient_name, phone, address_line1, addres
     document.getElementById('addr-phone').value = phone;
     document.getElementById('addr-address_line1').value = address_line1;
     document.getElementById('addr-address_line2').value = address_line2 ?? '';
-    document.getElementById('addr-district').value = district;
-    document.getElementById('addr-amphoe').value = amphoe;
-    document.getElementById('addr-province').value = province;
     document.getElementById('addr-postcode').value = postcode;
+    if (addrLoc) addrLoc.set({ province: province, amphoe: amphoe, district: district, zip: postcode });
     document.getElementById('addr-is_default').checked = is_default;
     openAddressModal();
 }

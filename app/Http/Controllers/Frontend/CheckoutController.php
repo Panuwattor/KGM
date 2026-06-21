@@ -149,17 +149,18 @@ class CheckoutController extends Controller
                 }
             }
 
+            // ใช้คูปองแล้ว: เพิ่มยอดใช้ และลบออกจากกระเป๋าลูกค้า (ต้องเก็บใหม่ถึงจะใช้ได้อีก)
             if ($coupon) {
                 $coupon->increment('used_count');
                 CustomerCoupon::where('customer_id', $customer->id)
                     ->where('coupon_id', $coupon->id)
-                    ->first()?->update(['updated_at' => now()]);
+                    ->delete();
             }
             if ($stackedCoupon) {
                 $stackedCoupon->increment('used_count');
                 CustomerCoupon::where('customer_id', $customer->id)
                     ->where('coupon_id', $stackedCoupon->id)
-                    ->first()?->update(['updated_at' => now()]);
+                    ->delete();
             }
 
             // บันทึกที่อยู่จัดส่งเข้าสมุดที่อยู่ ถ้ายังไม่มี (เฉพาะแบบจัดส่ง)

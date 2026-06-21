@@ -31,7 +31,13 @@
                     style="width:60px;height:60px;object-fit:cover;border-radius:10px;flex-shrink:0;">
                 <div style="flex:1;">
                     <div style="font-weight:700;">{{ $item->product_name }}</div>
-                    @if($item->variant_label)<div style="font-size:12px;color:#888;">{{ $item->variant_label }}</div>@endif
+                    @if($item->variant_label)
+                    <div style="margin-top:4px;">
+                        <span style="display:inline-block;font-size:12px;font-weight:600;color:var(--g700);background:var(--g100);border-radius:6px;padding:2px 8px;">
+                            <i class="bi bi-rulers"></i> ไซส์: {{ $item->variant_label }}
+                        </span>
+                    </div>
+                    @endif
                     <div style="font-size:13px;margin-top:4px;">฿{{ number_format($item->unit_price, 0) }} × {{ $item->quantity }}</div>
                 </div>
                 <div style="font-weight:700;color:var(--g600);">฿{{ number_format($item->subtotal, 0) }}</div>

@@ -36,7 +36,7 @@
                     </div>
                     <div class="form-group"><label class="form-label">ที่อยู่ *</label><textarea name="address" class="form-control" rows="2" required></textarea></div>
                     <div class="row g-3">
-                        <div class="col-12 col-sm-6 form-group"><label class="form-label">จังหวัด *</label><input type="text" name="province" class="form-control" required></div>
+                        <div class="col-12 col-sm-6 form-group"><label class="form-label">จังหวัด *</label><select name="province" id="dealer-province" class="form-control" required></select></div>
                         <div class="col-12 col-sm-6 form-group"><label class="form-label">ประเภทธุรกิจ</label><input type="text" name="business_type" class="form-control" placeholder="ร้านค้า, ออนไลน์, ฯลฯ"></div>
                     </div>
                     <div class="form-group"><label class="form-label">เลขประจำตัวผู้เสียภาษี</label><input type="text" name="tax_id" class="form-control"></div>
@@ -49,3 +49,15 @@
 </div>
 
 @endsection
+@push('scripts')
+@include('partials.location-assets')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    KGMLocation({
+        select2:  true,
+        province: document.getElementById('dealer-province'),
+        initial:  { province: '{{ old('province') }}' },
+    });
+});
+</script>
+@endpush

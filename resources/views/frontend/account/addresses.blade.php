@@ -36,10 +36,10 @@
                         <div class="form-group"><label class="form-label">ชื่อผู้รับ *</label><input type="text" name="recipient_name" class="form-control" required></div>
                         <div class="form-group"><label class="form-label">เบอร์โทร *</label><input type="text" name="phone" class="form-control" required></div>
                         <div class="form-group col-span-2"><label class="form-label">ที่อยู่ *</label><input type="text" name="address_line1" class="form-control" required></div>
-                        <div class="form-group"><label class="form-label">แขวง/ตำบล *</label><input type="text" name="district" class="form-control" required></div>
-                        <div class="form-group"><label class="form-label">เขต/อำเภอ *</label><input type="text" name="amphoe" class="form-control" required></div>
-                        <div class="form-group"><label class="form-label">จังหวัด *</label><input type="text" name="province" class="form-control" required></div>
-                        <div class="form-group"><label class="form-label">รหัสไปรษณีย์ *</label><input type="text" name="postcode" class="form-control" maxlength="5" required></div>
+                        <div class="form-group"><label class="form-label">จังหวัด *</label><select name="province" id="addr-new-province" class="form-control" required></select></div>
+                        <div class="form-group"><label class="form-label">เขต/อำเภอ *</label><select name="amphoe" id="addr-new-amphoe" class="form-control" required></select></div>
+                        <div class="form-group"><label class="form-label">แขวง/ตำบล *</label><select name="district" id="addr-new-district" class="form-control" required></select></div>
+                        <div class="form-group"><label class="form-label">รหัสไปรษณีย์ *</label><input type="text" name="postcode" id="addr-new-postcode" class="form-control" maxlength="5" required></div>
                     </div>
                     <div class="form-check"><input type="checkbox" name="is_default" id="default" value="1"><label for="default">ตั้งเป็นที่อยู่หลัก</label></div>
                     <button type="submit" class="btn btn-primary" style="margin-top:12px;"><i class="bi bi-plus"></i> เพิ่มที่อยู่</button>
@@ -49,3 +49,23 @@
     </div>
 </div>
 @endsection
+@push('scripts')
+@include('partials.location-assets')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    KGMLocation({
+        select2:  true,
+        province: document.getElementById('addr-new-province'),
+        amphoe:   document.getElementById('addr-new-amphoe'),
+        district: document.getElementById('addr-new-district'),
+        zip:      document.getElementById('addr-new-postcode'),
+        initial:  {
+            province: '{{ old('province') }}',
+            amphoe:   '{{ old('amphoe') }}',
+            district: '{{ old('district') }}',
+            zip:      '{{ old('postcode') }}',
+        },
+    });
+});
+</script>
+@endpush

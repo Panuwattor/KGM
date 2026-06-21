@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Coupon;
+use App\Models\CustomerCoupon;
 use App\Models\FlashSaleItem;
 use App\Models\Product;
 use App\Models\ProductType;
@@ -71,7 +73,22 @@ class ShopController extends Controller
             ->with('flashSale')
             ->first();
 
-        return view('frontend.shop.show', compact('product', 'relatedProducts', 'inWishlist', 'flashSaleItem'));
+        // คูปองที่ใช้กับสินค้านี้ได้ (เฉพาะสินค้านี้ / หมวดของสินค้านี้ / ใช้ได้ทั้งร้าน)
+        $coupons = Coupon::publiclyVisible()
+            ->with(['products', 'categories'])
+            ->where(function ($q) use ($product) {
+                $q->whereHas('products', fn($p) => $p->where('products.id', $product->id))
+                  ->orWhereHas('categories', fn($c) => $c->where('categories.id', $product->category_id))
+                  ->orWhere(fn($noScope) => $noScope->whereDoesntHave('products')->whereDoesntHave('categories'));
+            })
+            ->latest()
+            ->get();
+
+        $collectedIds = auth('customer')->check()
+            ? CustomerCoupon::where('customer_id', auth('customer')->id())->pluck('coupon_id')->toArray()
+            : [];
+
+        return view('frontend.shop.show', compact('product', 'relatedProducts', 'inWishlist', 'flashSaleItem', 'coupons', 'collectedIds'));
     }
 
     public function submitReview(Request $request, Product $product)

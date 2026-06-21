@@ -6,7 +6,6 @@
 </div>
 <div style="display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap;">
     <a href="{{ route('admin.settings.index') }}"          class="btn btn-primary"><i class="bi bi-gear"></i> ทั่วไป</a>
-    <a href="{{ route('admin.settings.shipping-rates') }}" class="btn btn-light"><i class="bi bi-truck"></i> อัตราค่าขนส่ง</a>
     <a href="{{ route('admin.settings.logs') }}"           class="btn btn-light"><i class="bi bi-journal-text"></i> Audit Log</a>
     <a href="{{ route('admin.settings.consent-logs') }}"   class="btn btn-light"><i class="bi bi-shield-check"></i> PDPA Log</a>
 </div>

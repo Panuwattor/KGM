@@ -21,7 +21,7 @@ class MarketingController extends Controller
 
     public function create()
     {
-        $products = Product::active()->with(['images', 'variants' => fn($q) => $q->where('is_active', true)->orderBy('size')])->get();
+        $products = Product::active()->with(['images', 'category', 'variants' => fn($q) => $q->where('is_active', true)->orderBy('size')])->get();
         return view('admin.marketing.form', compact('products'));
     }
 
@@ -31,7 +31,9 @@ class MarketingController extends Controller
             'name'      => 'required|string|max:255',
             'starts_at' => 'required|date',
             'ends_at'   => 'required|date|after:starts_at',
-            'image'     => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
+            'image'     => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072|dimensions:width=1200,height=400',
+        ], [
+            'image.dimensions' => 'รูป Banner ต้องมีขนาด 1200×400px เท่านั้น',
         ]);
 
         $data = $request->only('name', 'starts_at', 'ends_at');
@@ -58,7 +60,7 @@ class MarketingController extends Controller
     public function edit(FlashSale $flashSale)
     {
         $flashSale->load('items.product');
-        $products = Product::active()->with('images')->get();
+        $products = Product::active()->with(['images', 'category'])->get();
         return view('admin.marketing.form', compact('flashSale', 'products'));
     }
 
@@ -68,7 +70,9 @@ class MarketingController extends Controller
             'name'      => 'required|string|max:255',
             'starts_at' => 'required|date',
             'ends_at'   => 'required|date|after:starts_at',
-            'image'     => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072',
+            'image'     => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3072|dimensions:width=1200,height=400',
+        ], [
+            'image.dimensions' => 'รูป Banner ต้องมีขนาด 1200×400px เท่านั้น',
         ]);
 
         $data = $request->only('name', 'starts_at', 'ends_at');
