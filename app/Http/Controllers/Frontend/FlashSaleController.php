@@ -13,7 +13,7 @@ class FlashSaleController extends Controller
             abort(404);
         }
 
-        $flashSale->load('items.product.images', 'items.product.category');
+        $flashSale->load('items.product.images', 'items.product.category', 'items.product.variants');
 
         return view('frontend.flash-sales.show', compact('flashSale'));
     }

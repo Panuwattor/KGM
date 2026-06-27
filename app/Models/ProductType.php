@@ -9,12 +9,13 @@ class ProductType extends Model
 {
     protected $fillable = [
         'name', 'slug', 'description', 'image',
-        'show_on_home', 'sort_order', 'is_active',
+        'show_on_home', 'sort_order', 'is_active', 'has_embroidery',
     ];
 
     protected $casts = [
-        'show_on_home' => 'boolean',
-        'is_active'    => 'boolean',
+        'show_on_home'   => 'boolean',
+        'is_active'      => 'boolean',
+        'has_embroidery' => 'boolean',
     ];
 
     public function products(): HasMany

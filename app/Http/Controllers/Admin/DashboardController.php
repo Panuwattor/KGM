@@ -20,8 +20,7 @@ class DashboardController extends Controller
             ->whereNotIn('status', ['cancelled', 'refunded'])->sum('total');
         $pendingOrders = Order::whereIn('status', ['pending_payment', 'payment_uploaded'])->count();
         $totalCustomers = Customer::count();
-        $lowStockProducts = Product::where('manage_stock', true)
-            ->whereColumn('stock_quantity', '<=', 'low_stock_threshold')->count();
+        $lowStockProducts = Product::lowStock()->count();
         $unreadMessages = ContactMessage::where('is_read', false)->count();
         $pendingQuotes = QuoteRequest::where('status', 'pending')->count();
 

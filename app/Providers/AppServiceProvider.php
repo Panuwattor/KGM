@@ -90,8 +90,7 @@ class AppServiceProvider extends ServiceProvider
                     'label' => 'สินค้าใกล้หมด/หมดสต็อก',
                     'icon'  => 'bi-box-seam',
                     'color' => '#e74c3c',
-                    'count' => Product::where('manage_stock', true)
-                        ->whereColumn('stock_quantity', '<=', 'low_stock_threshold')->count(),
+                    'count' => Product::lowStock()->count(),
                     'url'   => Route::has('admin.products.index') ? route('admin.products.index', ['status' => 'low_stock']) : '#',
                 ],
             ])->filter(fn ($i) => $i['count'] > 0)->values();

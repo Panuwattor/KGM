@@ -37,9 +37,38 @@ class CartController extends Controller
 
     public function add(Request $request)
     {
-        $request->validate(['product_id' => 'required|exists:products,id', 'quantity' => 'integer|min:1']);
+        $request->validate([
+            'product_id'      => 'required|exists:products,id',
+            'quantity'        => 'integer|min:1',
+            'embroidery'      => 'boolean',
+            'embroidery_text' => 'nullable|string|max:1000',
+        ]);
         $flashPrice = $request->filled('flash_sale_price') ? (float) $request->flash_sale_price : null;
-        $this->cart->addItem($request->product_id, $request->quantity ?? 1, $request->variant_id, $flashPrice);
+
+        // งานปัก: อนุญาตเฉพาะสินค้าที่ประเภทรองรับการปัก และคิดราคาฝั่งเซิร์ฟเวอร์เสมอ
+        $embroidery      = false;
+        $embroideryText  = null;
+        $embroideryPrice = 0.0;
+        if ($request->boolean('embroidery')) {
+            $product = \App\Models\Product::with('productType')->find($request->product_id);
+            if ($product && $product->productType?->has_embroidery) {
+                $embroidery      = true;
+                $embroideryText  = $request->embroidery_text;
+                $embroideryPrice = $product->free_embroidery
+                    ? 0.0
+                    : (float) \App\Models\SiteSetting::get('embroidery_name_price', 45);
+            }
+        }
+
+        $this->cart->addItem(
+            $request->product_id,
+            $request->quantity ?? 1,
+            $request->variant_id,
+            $flashPrice,
+            $embroidery,
+            $embroideryText,
+            $embroideryPrice,
+        );
 
         if ($request->expectsJson()) {
             return response()->json(['count' => $this->cart->getCount(), 'message' => 'เพิ่มลงตะกร้าแล้ว']);

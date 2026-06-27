@@ -43,6 +43,15 @@
         </div>
     </div>
     <div class="form-card">
+        <h3><i class="bi bi-pen"></i> บริการปัก</h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label">ราคาปักชื่อ (บาท/ตัว)</label>
+                <input type="number" step="0.01" min="0" name="settings[embroidery_name_price]" class="form-control" value="{{ $settings['embroidery_name_price'] ?? 45 }}">
+            </div>
+        </div>
+    </div>
+    <div class="form-card">
         <h3><i class="bi bi-search"></i> SEO ทั่วไป</h3>
         <div class="form-group">
             <label class="form-label">Default Meta Title</label>

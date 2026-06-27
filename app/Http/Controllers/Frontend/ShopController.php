@@ -53,7 +53,7 @@ class ShopController extends Controller
 
     public function show(string $slug)
     {
-        $product = Product::where('slug', $slug)->active()->with(['images', 'variants', 'category', 'reviews.customer'])->firstOrFail();
+        $product = Product::where('slug', $slug)->active()->with(['images', 'variants', 'category', 'productType', 'reviews.customer'])->firstOrFail();
         $product->increment('view_count');
 
         $relatedProducts = Product::active()
@@ -88,7 +88,12 @@ class ShopController extends Controller
             ? CustomerCoupon::where('customer_id', auth('customer')->id())->pluck('coupon_id')->toArray()
             : [];
 
-        return view('frontend.shop.show', compact('product', 'relatedProducts', 'inWishlist', 'flashSaleItem', 'coupons', 'collectedIds'));
+        // ราคาปักต่อชิ้น — ฟรีถ้าสินค้าตั้งค่าปักฟรี, ไม่งั้นใช้ค่าจาก SiteSetting
+        $embroideryPrice = $product->free_embroidery
+            ? 0.0
+            : (float) \App\Models\SiteSetting::get('embroidery_name_price', 45);
+
+        return view('frontend.shop.show', compact('product', 'relatedProducts', 'inWishlist', 'flashSaleItem', 'coupons', 'collectedIds', 'embroideryPrice'));
     }
 
     public function submitReview(Request $request, Product $product)

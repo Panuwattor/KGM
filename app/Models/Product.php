@@ -16,7 +16,7 @@ class Product extends Model
         'category_id', 'product_type_id', 'brand_id', 'name', 'slug', 'short_description', 'description',
         'price', 'sale_price', 'wholesale_price', 'sku', 'stock_quantity',
         'low_stock_threshold', 'manage_stock', 'is_active', 'is_featured',
-        'is_new', 'is_bestseller', 'sort_order',
+        'is_new', 'is_bestseller', 'free_embroidery', 'sort_order',
         'meta_title', 'meta_description', 'og_image',
     ];
 
@@ -29,6 +29,7 @@ class Product extends Model
         'is_featured' => 'boolean',
         'is_new' => 'boolean',
         'is_bestseller' => 'boolean',
+        'free_embroidery' => 'boolean',
     ];
 
     public function category(): BelongsTo
@@ -121,5 +122,23 @@ class Product extends Model
     public function isLowStock(): bool
     {
         return $this->manage_stock && $this->stock_quantity <= $this->low_stock_threshold;
+    }
+
+    /**
+     * สินค้าที่สต๊อกต่ำ:
+     * - ถ้าไม่มี variants → ใช้สต๊อก/เกณฑ์ระดับสินค้า
+     * - ถ้ามี variants → flag เมื่อ "ตัวเลือกใดตัวเลือกหนึ่ง" ที่เปิดใช้งานอยู่ต่ำกว่าเกณฑ์ของตัวมันเอง
+     */
+    public function scopeLowStock($query)
+    {
+        return $query->where('manage_stock', true)->where(function ($q) {
+            $q->where(function ($q2) {
+                $q2->doesntHave('variants')
+                   ->whereColumn('stock_quantity', '<=', 'low_stock_threshold');
+            })->orWhereHas('variants', function ($q2) {
+                $q2->where('is_active', true)
+                   ->whereColumn('stock_quantity', '<=', 'low_stock_threshold');
+            });
+        });
     }
 }

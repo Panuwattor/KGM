@@ -87,6 +87,7 @@
                 </div>
             </div>
 
+            <div x-data="variantManager({{ json_encode($product->variants ?? []) }}, {{ (int) old('stock_quantity', $product->stock_quantity ?? 0) }})">
             {{-- Stock --}}
             <div class="form-card">
                 <h3><i class="bi bi-boxes"></i> สต๊อก</h3>
@@ -96,8 +97,15 @@
                 </div>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label class="form-label">จำนวนสต๊อก</label>
-                        <input type="number" name="stock_quantity" class="form-control" min="0" value="{{ old('stock_quantity', $product->stock_quantity ?? '0') }}">
+                        <label class="form-label">
+                            จำนวนสต๊อก
+                            <span x-show="hasVariants" style="font-size:12px;color:#888;font-weight:400;"><i class="bi bi-lock-fill"></i> คำนวณจากตัวเลือกสินค้า</span>
+                        </label>
+                        <input type="number" name="stock_quantity" class="form-control" min="0"
+                            :value="hasVariants ? totalStock : manualStock"
+                            @input="manualStock = $event.target.value"
+                            :readonly="hasVariants"
+                            :style="hasVariants ? 'background:#f5f7f5;cursor:not-allowed;' : ''">
                     </div>
                     <div class="form-group">
                         <label class="form-label">แจ้งเตือนเมื่อสต๊อกต่ำกว่า</label>
@@ -107,17 +115,13 @@
             </div>
 
             {{-- Variants --}}
-            <div class="form-card" x-data="variantManager({{ json_encode($product->variants ?? []) }})">
+            <div class="form-card">
                 <h3><i class="bi bi-diagram-3"></i> ตัวเลือกสินค้า (Variants)</h3>
                 <template x-for="(v, i) in variants" :key="i">
-                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 80px auto;gap:8px;margin-bottom:10px;align-items:end;">
+                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 80px 80px auto;gap:8px;margin-bottom:10px;align-items:end;">
                         <div>
                             <label class="form-label" x-show="i===0">ไซส์</label>
                             <input type="text" :name="`variants[${i}][size]`" x-model="v.size" class="form-control" placeholder="S, M, L, XL...">
-                        </div>
-                        <div>
-                            <label class="form-label" x-show="i===0">สี</label>
-                            <input type="text" :name="`variants[${i}][color]`" x-model="v.color" class="form-control" placeholder="ดำ, ขาว...">
                         </div>
                         <div>
                             <label class="form-label" x-show="i===0">SKU</label>
@@ -132,21 +136,28 @@
                             <input type="number" :name="`variants[${i}][stock_quantity]`" x-model="v.stock_quantity" class="form-control" min="0">
                         </div>
                         <div>
+                            <label class="form-label" x-show="i===0" title="แจ้งเตือนเมื่อสต๊อกตัวเลือกนี้ต่ำกว่า">แจ้งเตือน</label>
+                            <input type="number" :name="`variants[${i}][low_stock_threshold]`" x-model="v.low_stock_threshold" class="form-control" min="0"
+                                :class="(parseInt(v.stock_quantity)||0) <= (parseInt(v.low_stock_threshold)||0) ? 'is-invalid' : ''"
+                                title="แจ้งเตือนเมื่อสต๊อกตัวเลือกนี้ต่ำกว่าหรือเท่ากับค่านี้">
+                        </div>
+                        <div>
                             <label class="form-label" x-show="i===0" style="visibility:hidden;">ลบ</label>
                             <button type="button" @click="variants.splice(i,1)" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
                         </div>
                     </div>
                 </template>
-                <button type="button" @click="variants.push({size:'',color:'',sku:'',price_adjustment:0,stock_quantity:0})" class="btn btn-sm btn-light">
+                <button type="button" @click="variants.push({size:'',sku:'',price_adjustment:0,stock_quantity:0,low_stock_threshold:5})" class="btn btn-sm btn-light">
                     <i class="bi bi-plus-lg"></i> เพิ่มตัวเลือก
                 </button>
             </div>
+            </div>{{-- /variantManager --}}
 
             {{-- SEO --}}
             <div class="form-card">
                 <h3><i class="bi bi-search"></i> SEO</h3>
                 <div class="form-group">
-                    <label class="form-label">URL Slug <small style="color:#aaa;font-weight:400;">(ปล่อยว่างให้ระบบสร้างอัตโนมัติ)</small></label>
+                    <label class="form-label">URL Slug <small style="color:#aaa;font-weight:400;">(ปล่อยว่างให้ระบบสร้างจากชื่อ • กรอกเองได้ พิมพ์ไทยได้ ระบบจะเก็บตามนั้น)</small></label>
                     <div style="display:flex;align-items:center;gap:0;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;">
                         <span style="background:#f5f7f5;padding:10px 12px;font-size:13px;color:#888;white-space:nowrap;border-right:1px solid #e5e7eb;">/shop/</span>
                         <input type="text" name="slug" class="form-control" style="border:none;border-radius:0;"
@@ -178,6 +189,7 @@
                 <div class="form-check"><input type="checkbox" name="is_featured" id="is_featured" value="1" {{ old('is_featured', $product->is_featured ?? false) ? 'checked' : '' }}><label for="is_featured">สินค้าแนะนำ</label></div>
                 <div class="form-check"><input type="checkbox" name="is_new" id="is_new" value="1" {{ old('is_new', $product->is_new ?? false) ? 'checked' : '' }}><label for="is_new">สินค้าใหม่</label></div>
                 <div class="form-check"><input type="checkbox" name="is_bestseller" id="is_bestseller" value="1" {{ old('is_bestseller', $product->is_bestseller ?? false) ? 'checked' : '' }}><label for="is_bestseller">สินค้าขายดี</label></div>
+                <div class="form-check"><input type="checkbox" name="free_embroidery" id="free_embroidery" value="1" {{ old('free_embroidery', $product->free_embroidery ?? false) ? 'checked' : '' }}><label for="free_embroidery">ปักฟรี</label></div>
                 <div class="form-group" style="margin-top:16px;">
                     <label class="form-label">ลำดับการแสดง</label>
                     <input type="number" name="sort_order" class="form-control" value="{{ old('sort_order', $product->sort_order ?? '0') }}">
@@ -218,8 +230,17 @@
 
 @push('scripts')
 <script>
-function variantManager(initial) {
-    return { variants: initial.length ? initial : [] };
+function variantManager(initial, initialStock) {
+    return {
+        variants: initial.length ? initial : [],
+        manualStock: initialStock,
+        get hasVariants() {
+            return this.variants.length > 0;
+        },
+        get totalStock() {
+            return this.variants.reduce((sum, v) => sum + (parseInt(v.stock_quantity) || 0), 0);
+        },
+    };
 }
 
 function uploadImages(productId, input) {

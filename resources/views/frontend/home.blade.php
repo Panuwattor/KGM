@@ -536,9 +536,9 @@
                 </div>
                 <p style="color:rgba(255,255,255,0.85);font-size:14px;line-height:1.8;margin:0 0 14px;">"{{ $review->body }}"</p>
                 <div style="display:flex;align-items:center;gap:10px;">
-                    <div style="width:34px;height:34px;background:var(--kgm-gold-500);border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--kgm-green-900);font-size:13px;flex-shrink:0;">{{ strtoupper(substr($review->user->name,0,1)) }}</div>
+                    <div style="width:34px;height:34px;background:var(--kgm-gold-500);border-radius:999px;display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--kgm-green-900);font-size:15px;flex-shrink:0;"><i class="bi bi-person-fill"></i></div>
                     <div>
-                        <div style="color:white;font-weight:700;font-size:13px;">{{ $review->user->name }}</div>
+                        <div style="color:white;font-weight:700;font-size:13px;">{{ $review->customer->name }}</div>
                         <div style="color:rgba(255,255,255,0.45);font-size:11px;">{{ $review->product->name }}</div>
                     </div>
                 </div>
@@ -832,6 +832,7 @@ document.addEventListener('keydown', function(e) { if(e.key==='Escape') homeClos
                 ['https://shopee.co.th/kgmuniform',          '/images/online/online_shopping_shopee.jpg',  'Shopee'],
                 ['https://www.lazada.co.th/shop/kgmuniform', '/images/online/online_shopping_Lazada.jpg',  'Lazada'],
                 ['https://www.tiktok.com/@kgmuniform',       '/images/online/online_shopping_tiktok.jpg',  'TikTok Shop'],
+                ['#',       '/images/online/online_shopping_thaimart.jpg',  'TikTok Shop'],
             ] as [$url, $img, $name])
             <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" class="online-channel-card">
                 <img src="{{ $img }}" alt="{{ $name }}" width="515" height="233" loading="lazy">

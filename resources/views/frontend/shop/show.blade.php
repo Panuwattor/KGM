@@ -73,7 +73,7 @@
     @endphp
 
     @php $flashPrice = isset($flashSaleItem) && $flashSaleItem ? (float)$flashSaleItem->sale_price : null; @endphp
-    <div class="product-layout" x-data="productPage({{ $product->id }}, {{ json_encode($product->variants) }}, {{ $flashPrice ?? $product->current_price }}, '{{ $firstImage }}', {{ json_encode($allImages) }}, {{ $flashPrice !== null ? $flashPrice : 'null' }})">
+    <div class="product-layout" x-data="productPage({{ $product->id }}, {{ json_encode($product->variants) }}, {{ $flashPrice ?? $product->current_price }}, '{{ $firstImage }}', {{ json_encode($allImages) }}, {{ $flashPrice !== null ? $flashPrice : 'null' }}, {{ $embroideryPrice }}, {{ (int) $product->stock_quantity }})">
 
         {{-- Gallery --}}
         <div class="product-gallery">
@@ -146,43 +146,78 @@
 
             {{-- Variants --}}
             @if($product->variants->isNotEmpty())
-            @php $sizes = $product->variants->pluck('size')->filter()->unique(); $colors = $product->variants->pluck('color')->filter()->unique(); @endphp
+            @php $sizes = $product->variants->pluck('size')->filter()->unique(); @endphp
             @if($sizes->isNotEmpty())
             <div class="variant-section">
                 <div class="variant-label">ไซส์: <span class="variant-label-value" x-text="selectedSize || 'เลือกไซส์'"></span> <span style="color:#ef4444">*</span></div>
                 <div class="variant-options" :class="{ 'shake': showSizeError }">
                     @foreach($sizes as $size)
-                    <button class="variant-btn" :class="{ 'active': selectedSize === '{{ $size }}', 'error-highlight': showSizeError && !selectedSize }" @click="selectVariant('{{ $size }}', null); showSizeError = false">{{ $size }}</button>
+                    @php $sizeVariant = $product->variants->firstWhere('size', $size); @endphp
+                    <button class="variant-btn"
+                        :class="{ 'active': selectedSize === '{{ $size }}', 'error-highlight': showSizeError && !selectedSize, 'sold-out': {{ (int) ($sizeVariant->stock_quantity ?? 0) }} <= 0 }"
+                        :disabled="{{ (int) ($sizeVariant->stock_quantity ?? 0) <= 0 ? 'true' : 'false' }}"
+                        @click="selectVariant('{{ $size }}'); showSizeError = false">{{ $size }}</button>
                     @endforeach
                 </div>
                 <p x-show="showSizeError" x-cloak style="color:#ef4444;font-size:13px;margin-top:6px;"><i class="bi bi-exclamation-circle"></i> กรุณาเลือกไซส์ก่อน</p>
+                <p x-show="selectedSize" x-cloak style="font-size:13px;margin-top:8px;color:#555;">
+                    คงเหลือไซส์ <strong x-text="selectedSize"></strong>: <strong x-text="maxStock" style="color:var(--kgm-green-700);"></strong> ชิ้น
+                </p>
             </div>
             @endif
-            @if($colors->isNotEmpty())
-            <div class="variant-section-color">
-                <div class="variant-label">สี: <span class="variant-label-value" x-text="selectedColor || 'เลือกสี'"></span></div>
-                <div class="variant-options">
-                    @foreach($colors as $color)
-                    <button class="variant-btn" :class="{ 'active': selectedColor === '{{ $color }}' }" @click="selectVariant(null, '{{ $color }}')">{{ $color }}</button>
-                    @endforeach
+            @endif
+
+            {{-- Embroidery (ปักชื่อ) — แสดงเฉพาะประเภทสินค้าที่รองรับงานปัก --}}
+            @if($product->productType && $product->productType->has_embroidery)
+            <div class="embroidery-section" style="margin:18px 0;padding:16px;border:1.5px solid #e8ecef;border-radius:14px;background:#fafbfa;">
+                <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+                    <input type="checkbox" x-model="embroidery" style="margin-top:3px;width:18px;height:18px;flex-shrink:0;accent-color:var(--kgm-green-600);">
+                    <span>
+                        <span style="font-weight:700;color:var(--kgm-green-800);font-size:15px;">
+                            <i class="bi bi-pen"></i> ปักชื่อ / โลโก้บนเสื้อ
+                        </span>
+                        <span style="display:block;font-size:13px;color:#777;margin-top:2px;">
+                            @if($embroideryPrice > 0)
+                                คิดค่าบริการปักตัวละ <strong style="color:var(--kgm-green-700);">฿{{ number_format($embroideryPrice, 0) }}</strong>
+                            @else
+                                <strong style="color:#16a34a;">ปักฟรี!</strong> ไม่มีค่าใช้จ่ายเพิ่มเติม
+                            @endif
+                        </span>
+                    </span>
+                </label>
+
+                <div x-show="embroidery" x-cloak style="margin-top:14px;">
+                    <label class="variant-label" style="display:block;margin-bottom:6px;">รายละเอียดงานปัก <span style="color:#ef4444">*</span></label>
+                    <textarea x-model="embroideryText" rows="4"
+                        class="form-control"
+                        style="width:100%;border:1.5px solid #e8ecef;border-radius:12px;padding:10px 12px;font-family:inherit;font-size:14px;resize:vertical;"
+                        :class="{ 'is-invalid': showEmbroideryError }"
+                        @input="showEmbroideryError = false"
+                        placeholder="กรุณากรอก ชื่อ-สกุล / ตัวย่อโรงเรียน ที่ต้องการปัก"></textarea>
+                    <p x-show="showEmbroideryError" x-cloak style="color:#ef4444;font-size:13px;margin-top:6px;"><i class="bi bi-exclamation-circle"></i> กรุณากรอกรายละเอียดงานปักก่อน</p>
+                    @if($embroideryPrice > 0)
+                    <p style="font-size:13px;color:#777;margin-top:8px;">
+                        <i class="bi bi-info-circle"></i> ค่าปักรวม: <strong style="color:var(--kgm-green-700);" x-text="'฿' + (embroideryPrice * qty).toLocaleString()"></strong>
+                        <span style="color:#aaa;">(฿{{ number_format($embroideryPrice, 0) }} × <span x-text="qty"></span> ตัว)</span>
+                    </p>
+                    @endif
                 </div>
             </div>
-            @endif
             @endif
 
             {{-- Quantity --}}
             <div class="qty-row">
                 <div class="qty-ctrl">
                     <button class="qty-btn" @click="qty = Math.max(1, qty-1)"><i class="bi bi-dash"></i></button>
-                    <input type="number" class="qty-input" x-model="qty" min="1" max="{{ $product->stock_quantity }}">
-                    <button class="qty-btn" @click="qty = Math.min({{ $product->stock_quantity }}, qty+1)"><i class="bi bi-plus"></i></button>
+                    <input type="number" class="qty-input" x-model.number="qty" min="1" :max="maxStock" @input="clampQty()" @change="clampQty()">
+                    <button class="qty-btn" @click="qty = Math.min(maxStock, qty+1)" :disabled="qty >= maxStock"><i class="bi bi-plus"></i></button>
                 </div>
-                <span class="qty-stock">สินค้าคงเหลือ: <strong>{{ $product->stock_quantity }}</strong> ชิ้น</span>
+                <span class="qty-stock">สินค้าคงเหลือ: <strong x-text="maxStock"></strong> ชิ้น</span>
             </div>
 
             {{-- Actions --}}
             <div class="product-actions">
-                <button @click="addToCartFn()" class="btn btn-primary btn-lg" :disabled="{{ $product->stock_quantity <= 0 ? 'true' : 'false' }}">
+                <button @click="addToCartFn()" class="btn btn-primary btn-lg" :disabled="maxStock <= 0">
                     <i class="bi bi-cart-plus"></i> เพิ่มลงตะกร้า
                 </button>
                 <a href="{{ route('cart') }}" @click.prevent="addToCartFn(true)" class="btn btn-gold btn-lg">
@@ -303,18 +338,35 @@
 
 @push('scripts')
 <script>
-function productPage(productId, variants, basePrice, initialImage, allImages, flashSalePrice = null) {
+function productPage(productId, variants, basePrice, initialImage, allImages, flashSalePrice = null, embroideryPrice = 0, productStock = 0) {
     return {
         productId,
         variants,
         basePrice,
         flashSalePrice,
         currentPrice: basePrice,
+        productStock,
         selectedVariantId: null,
         selectedSize: null,
-        selectedColor: null,
         showSizeError: false,
         hasSizes: variants.some(v => v.size),
+        get maxStock() {
+            if (this.hasSizes && this.selectedVariantId) {
+                const v = this.variants.find(v => v.id === this.selectedVariantId);
+                return v ? parseInt(v.stock_quantity) || 0 : 0;
+            }
+            return this.productStock;
+        },
+        clampQty() {
+            let n = parseInt(this.qty) || 1;
+            if (n < 1) n = 1;
+            if (this.maxStock > 0 && n > this.maxStock) n = this.maxStock;
+            this.qty = n;
+        },
+        embroidery: false,
+        embroideryText: '',
+        embroideryPrice,
+        showEmbroideryError: false,
         qty: 1,
         currentImage: initialImage || '',
         allImages: allImages || [],
@@ -334,18 +386,17 @@ function productPage(productId, variants, basePrice, initialImage, allImages, fl
             this.lightboxIndex = (this.lightboxIndex + 1) % this.allImages.length;
             this.lightboxImage = this.allImages[this.lightboxIndex];
         },
-        selectVariant(size, color) {
-            if (size !== null) this.selectedSize = size;
-            if (color !== null) this.selectedColor = color;
-            const v = variants.find(v =>
-                (size ? v.size === this.selectedSize : true) &&
-                (color ? v.color === this.selectedColor : true)
-            );
+        selectVariant(size) {
+            this.selectedSize = size;
+            const v = variants.find(v => v.size === size);
             if (v) {
                 this.selectedVariantId = v.id;
                 const adj = parseFloat(v.price_adjustment || 0);
                 this.currentPrice = (this.flashSalePrice !== null ? this.flashSalePrice : basePrice) + adj;
+            } else {
+                this.selectedVariantId = null;
             }
+            this.clampQty();
         },
         addToCartFn(redirect = false) {
             if (this.hasSizes && !this.selectedSize) {
@@ -353,7 +404,24 @@ function productPage(productId, variants, basePrice, initialImage, allImages, fl
                 document.querySelector('.variant-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return;
             }
-            addToCart(this.productId, this.selectedVariantId, this.qty, this.flashSalePrice);
+            if (this.maxStock <= 0) {
+                if (window.Swal) Swal.fire({ icon: 'error', title: 'สินค้าหมด', text: 'ไม่สามารถสั่งซื้อได้', confirmButtonColor: 'var(--kgm-green-600)' });
+                return;
+            }
+            if (this.qty > this.maxStock) {
+                this.qty = this.maxStock;
+                if (window.Swal) Swal.fire({ icon: 'warning', title: 'จำนวนเกินสต๊อก', text: 'สั่งซื้อได้สูงสุด ' + this.maxStock + ' ชิ้น', confirmButtonColor: 'var(--kgm-green-600)' });
+                return;
+            }
+            if (this.embroidery && !this.embroideryText.trim()) {
+                this.showEmbroideryError = true;
+                document.querySelector('.embroidery-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            addToCart(this.productId, this.selectedVariantId, this.qty, this.flashSalePrice, {
+                embroidery: this.embroidery,
+                embroidery_text: this.embroidery ? this.embroideryText.trim() : null,
+            });
             if (redirect) setTimeout(() => window.location = '/cart', 500);
         }
     };

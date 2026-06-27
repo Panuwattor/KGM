@@ -76,6 +76,7 @@ img { max-width: 100%; }
 .lazada-link { background: #0f146d; color: #fff; }
 .tiktok-link { background: #010101; color: #fff; }
 .facebook-link { background: #1877f2; color: #fff; }
+.thaimart-link { background: #e02424; color: #fff; }
 @media (max-width: 768px) {
     .navbar-secondary { display: none; }
 }

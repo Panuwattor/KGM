@@ -38,12 +38,28 @@
     .cart-summary {
         position: static;
     }
+    /* มือถือ: รูป+ข้อมูลสินค้าอยู่แถวบนเต็มความกว้าง, ปุ่ม/ราคารวมย้ายลงแถวล่าง */
     .cart-item-row {
         padding: 14px;
         gap: 12px;
+        flex-wrap: wrap;
     }
     .cart-item-img { width: 72px; height: 72px; border-radius: 10px; }
-    .cart-item-actions { gap: 8px; }
+    .cart-item-actions {
+        flex-direction: row;
+        align-items: center;
+        flex-basis: 100%;
+        width: 100%;
+        gap: 12px;
+        margin-top: 6px;
+    }
+    .cart-item-actions .qty-control { order: 1; }
+    .cart-item-actions [id^="item-subtotal-"] {
+        order: 2;
+        margin-left: auto;
+        font-size: 16px;
+    }
+    .cart-item-actions > button { order: 3; font-size: 20px; }
     .qty-btn { width: 32px; height: 32px; font-size: 14px; }
 }
 </style>
@@ -84,8 +100,37 @@
                         @if($item->variant)
                         <div style="font-size:12px;color:#888;margin-top:2px;">{{ $item->variant->label }}</div>
                         @endif
-                        <div style="font-size:15px;font-weight:700;color:var(--kgm-green-600);margin-top:6px;">
-                            ฿{{ number_format($item->product->current_price + ($item->variant?->price_adjustment ?? 0), 0) }}
+                        @if($item->embroidery)
+                        <div style="font-size:12px;color:var(--kgm-green-700);margin-top:4px;font-weight:600;">
+                            <i class="bi bi-pen"></i> ปักชื่อ
+                            @if($item->embroidery_price > 0)
+                                <span style="font-weight:400;color:#888;">(+฿{{ number_format($item->embroidery_price, 0) }}/ตัว)</span>
+                            @else
+                                <span style="font-weight:400;color:#16a34a;">(ฟรี)</span>
+                            @endif
+                        </div>
+                        @if($item->embroidery_text)
+                        <div style="font-size:11px;color:#999;margin-top:2px;white-space:pre-line;background:#f5f7f5;border-radius:8px;padding:6px 8px;">{{ $item->embroidery_text }}</div>
+                        @endif
+                        @endif
+                        @php
+                            $adj          = $item->variant?->price_adjustment ?? 0;
+                            $unitPrice    = ($item->flash_sale_price ?? $item->product->current_price) + $adj;
+                            $originalUnit = $item->product->price + $adj;
+                            if ($item->flash_sale_price !== null) {
+                                $itemDiscount = $item->product->price > 0
+                                    ? (int) round(($item->product->price - $item->flash_sale_price) / $item->product->price * 100)
+                                    : 0;
+                            } else {
+                                $itemDiscount = $item->product->discount_percent ?? 0;
+                            }
+                        @endphp
+                        <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:6px;">
+                            <span style="font-size:15px;font-weight:700;color:var(--kgm-green-600);">฿{{ number_format($unitPrice, 0) }}</span>
+                            @if($itemDiscount > 0)
+                            <span style="font-size:12px;color:#999;text-decoration:line-through;">฿{{ number_format($originalUnit, 0) }}</span>
+                            <span style="font-size:11px;font-weight:700;color:#fff;background:#e53935;border-radius:6px;padding:1px 6px;">-{{ $itemDiscount }}%</span>
+                            @endif
                         </div>
                     </div>
                     <div class="cart-item-actions">
@@ -410,6 +455,23 @@ function cartUpdate(id, qty) {
 }
 
 function cartRemove(id, btn) {
+    Swal.fire({
+        icon: 'warning',
+        title: 'ลบสินค้านี้?',
+        text: 'ต้องการนำสินค้านี้ออกจากตะกร้าใช่หรือไม่',
+        showCancelButton: true,
+        confirmButtonText: 'ลบออก',
+        cancelButtonText: 'ยกเลิก',
+        confirmButtonColor: '#e74c3c',
+        cancelButtonColor: 'var(--kgm-green-600)',
+        reverseButtons: true,
+    }).then((result) => {
+        if (!result.isConfirmed) return;
+        doCartRemove(id, btn);
+    });
+}
+
+function doCartRemove(id, btn) {
     btn.disabled = true;
     fetch(`/cart/remove/${id}`, {
         method: 'DELETE',

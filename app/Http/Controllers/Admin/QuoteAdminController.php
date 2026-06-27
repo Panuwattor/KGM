@@ -8,10 +8,32 @@ use Illuminate\Http\Request;
 
 class QuoteAdminController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $quotes = QuoteRequest::with('user')->latest()->paginate(20);
-        return view('admin.quotes.index', compact('quotes'));
+        $query = QuoteRequest::with('customer')->latest();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('company_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('contact_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('email', 'like', '%' . $request->search . '%')
+                  ->orWhere('phone', 'like', '%' . $request->search . '%');
+            });
+        }
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $quotes = $query->paginate(20)->withQueryString();
+        $statusCounts = QuoteRequest::selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status');
+
+        return view('admin.quotes.index', compact('quotes', 'statusCounts'));
     }
 
     public function show(QuoteRequest $quote)

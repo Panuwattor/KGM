@@ -53,6 +53,12 @@ class OrderController extends Controller
         $old = $order->status;
         $new = $request->status;
 
+        // ออเดอร์ที่ยกเลิก/คืนเงินแล้วถือเป็นสถานะสิ้นสุด — เปลี่ยนสถานะต่อไม่ได้
+        // (สต๊อกถูกคืนไปแล้ว ถ้าเปลี่ยนกลับสต๊อกจะกลับไปกลับมาไม่ตรงความจริง)
+        if (in_array($old, ['cancelled', 'refunded']) && $new !== $old) {
+            return back()->with('error', 'ออเดอร์นี้ถูก' . ($old === 'refunded' ? 'คืนเงิน' : 'ยกเลิก') . 'แล้ว ไม่สามารถเปลี่ยนสถานะได้');
+        }
+
         $data = ['status' => $new];
 
         // ฟอร์มหมายเหตุแอดมินส่ง admin_note มาด้วย -> บันทึกให้ครบ (เดิมตกหล่น)
@@ -89,10 +95,15 @@ class OrderController extends Controller
 
     private function restoreStock(Order $order): void
     {
-        $order->loadMissing('items.product');
+        $order->loadMissing('items.product', 'items.variant');
         foreach ($order->items as $item) {
             if ($item->product && $item->product->manage_stock) {
-                $item->product->increment('stock_quantity', $item->quantity);
+                // คืนสต๊อกตรงกับตอนตัด: มีไซส์คืนที่ไซส์, ไม่มีคืนที่สินค้ารวม
+                if ($item->variant) {
+                    $item->variant->increment('stock_quantity', $item->quantity);
+                } else {
+                    $item->product->increment('stock_quantity', $item->quantity);
+                }
                 $item->product->decrement('sale_count', $item->quantity);
             }
         }

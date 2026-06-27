@@ -17,6 +17,13 @@
                 <div style="font-weight:700;">{{ $item->product_name }}</div>
                 @if($item->variant_label)<div style="font-size:12px;color:#888;">{{ $item->variant_label }}</div>@endif
                 <div style="font-size:13px;color:#888;">฿{{ number_format($item->unit_price,0) }} × {{ $item->quantity }}</div>
+                @if($item->embroidery)
+                <div style="font-size:12px;color:var(--kgm-green-700);font-weight:600;margin-top:2px;">
+                    <i class="bi bi-pen"></i> ปักชื่อ
+                    @if($item->embroidery_price > 0)+฿{{ number_format($item->embroidery_price,0) }} × {{ $item->quantity }}@else(ฟรี)@endif
+                </div>
+                @if($item->embroidery_text)<div style="font-size:11px;color:#999;margin-top:2px;white-space:pre-line;background:#f5f7f5;border-radius:8px;padding:6px 8px;">{{ $item->embroidery_text }}</div>@endif
+                @endif
             </div>
             <div style="font-weight:800;color:var(--kgm-green-700);">฿{{ number_format($item->subtotal,0) }}</div>
         </div>
@@ -99,6 +106,16 @@
                 <button type="submit" class="btn btn-gold" style="flex:1 1 140px;justify-content:center;"><i class="bi bi-cloud-upload"></i> อัปโหลดสลิป</button>
             </div>
         </form>
+
+        @if($order->status === 'pending_payment')
+        <div style="border-top:1px solid #f0f2f0;margin-top:20px;padding-top:16px;">
+            <div style="font-size:13px;color:#888;margin-bottom:10px;">ยังไม่ต้องการสั่งซื้อแล้ว? สามารถยกเลิกออเดอร์นี้ได้ก่อนชำระเงิน</div>
+            <form method="POST" action="{{ route('account.orders.cancel', $order) }}" id="cancel-order-form">
+                @csrf
+                <button type="submit" class="btn btn-outline" style="border-color:#e57373;color:#c0392b;"><i class="bi bi-x-circle"></i> ยกเลิกออเดอร์</button>
+            </form>
+        </div>
+        @endif
     </div>
     @endif
 
@@ -154,4 +171,30 @@
     </div>
     @endif
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const cancelForm = document.getElementById('cancel-order-form');
+    if (cancelForm) {
+        cancelForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            Swal.fire({
+                icon: 'warning',
+                title: 'ยืนยันยกเลิกออเดอร์?',
+                text: 'สินค้าจะถูกคืนเข้าสต๊อก และไม่สามารถกู้คืนได้',
+                showCancelButton: true,
+                confirmButtonText: 'ยกเลิกออเดอร์',
+                cancelButtonText: 'ไม่ใช่ตอนนี้',
+                confirmButtonColor: '#c0392b',
+                cancelButtonColor: '#aaa',
+                reverseButtons: true,
+            }).then(function (result) {
+                if (result.isConfirmed) cancelForm.submit();
+            });
+        });
+    }
+});
+</script>
+@endpush
 @endsection

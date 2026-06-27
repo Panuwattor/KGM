@@ -9,6 +9,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Services\CartService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AccountController extends Controller
 {
@@ -72,6 +73,39 @@ class AccountController extends Controller
             'picked_up_at' => $order->is_pickup ? now() : $order->picked_up_at,
         ]);
         return back()->with('success', 'ขอบคุณที่ยืนยันการรับสินค้า 🎉');
+    }
+
+    public function cancelOrder(Order $order)
+    {
+        if ($order->customer_id !== auth('customer')->id()) abort(403);
+        // ยกเลิกเองได้เฉพาะตอนยังไม่ชำระเงิน (ยังไม่แนบสลิป) เท่านั้น
+        if ($order->status !== 'pending_payment') {
+            return back()->with('error', 'ยกเลิกได้เฉพาะออเดอร์ที่รอชำระเงินเท่านั้น หากต้องการยกเลิกออเดอร์นี้กรุณาติดต่อทีมงาน');
+        }
+        DB::transaction(function () use ($order) {
+            $this->restoreStock($order);
+            $order->update([
+                'status'           => 'cancelled',
+                'rejection_reason' => 'ลูกค้ายกเลิกออเดอร์เอง',
+            ]);
+        });
+        return back()->with('success', 'ยกเลิกออเดอร์เรียบร้อยแล้ว');
+    }
+
+    /** คืนสินค้าเข้าสต๊อก: มีไซส์คืนที่ไซส์, ไม่มีคืนที่สินค้ารวม */
+    private function restoreStock(Order $order): void
+    {
+        $order->loadMissing('items.product', 'items.variant');
+        foreach ($order->items as $item) {
+            if ($item->product && $item->product->manage_stock) {
+                if ($item->variant) {
+                    $item->variant->increment('stock_quantity', $item->quantity);
+                } else {
+                    $item->product->increment('stock_quantity', $item->quantity);
+                }
+                $item->product->decrement('sale_count', $item->quantity);
+            }
+        }
     }
 
     public function addresses()

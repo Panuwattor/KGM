@@ -126,6 +126,7 @@ Route::middleware('auth:customer')->prefix('account')->name('account.')->group(f
     Route::get('/orders/{order}', [AccountController::class, 'orderShow'])->name('orders.show');
     Route::post('/orders/{order}/reorder', [AccountController::class, 'reorder'])->name('orders.reorder');
     Route::post('/orders/{order}/confirm-received', [AccountController::class, 'confirmReceived'])->name('orders.confirm-received');
+    Route::post('/orders/{order}/cancel', [AccountController::class, 'cancelOrder'])->name('orders.cancel');
     Route::get('/addresses', [AccountController::class, 'addresses'])->name('addresses');
     Route::post('/addresses', [AccountController::class, 'storeAddress'])->name('addresses.store');
     Route::put('/addresses/{address}', [AccountController::class, 'updateAddress'])->name('addresses.update');

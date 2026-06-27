@@ -235,6 +235,7 @@
                 $flashPrice = (float) $item->sale_price;
                 $origPrice  = (float) $product->price;
                 $savePercent = $origPrice > 0 ? (int) round(($origPrice - $flashPrice) / $origPrice * 100) : 0;
+                $hasSizes    = $product->variants->pluck('size')->filter()->isNotEmpty();
             @endphp
             <div class="fs-product-card">
                 <div class="fs-product-img-wrap">
@@ -262,10 +263,16 @@
                         @endif
                     </div>
                     @if($product->stock_quantity > 0)
+                    @if($hasSizes)
+                    <a href="{{ route('shop.show', $product->slug) }}" class="fs-add-btn">
+                        <i class="bi bi-rulers"></i> เลือกไซส์
+                    </a>
+                    @else
                     <button type="button" class="fs-add-btn"
                             onclick="addFlashToCart({{ $product->id }}, {{ $flashPrice }}, this)">
                         <i class="bi bi-cart-plus"></i> หยิบใส่ตะกร้า
                     </button>
+                    @endif
                     @else
                     <button disabled class="fs-add-btn">
                         <i class="bi bi-x-circle"></i> สินค้าหมด

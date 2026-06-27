@@ -8,10 +8,16 @@ class OrderItem extends Model
 {
     protected $fillable = [
         'order_id', 'product_id', 'variant_id', 'product_name',
-        'variant_label', 'product_image', 'quantity', 'unit_price', 'subtotal',
+        'variant_label', 'embroidery', 'embroidery_text', 'embroidery_price',
+        'product_image', 'quantity', 'unit_price', 'subtotal',
     ];
 
-    protected $casts = ['unit_price' => 'decimal:2', 'subtotal' => 'decimal:2'];
+    protected $casts = [
+        'unit_price'       => 'decimal:2',
+        'subtotal'         => 'decimal:2',
+        'embroidery'       => 'boolean',
+        'embroidery_price' => 'decimal:2',
+    ];
 
     public function order() { return $this->belongsTo(Order::class); }
     public function product() { return $this->belongsTo(Product::class); }

@@ -210,6 +210,7 @@
                         <div style="flex:1;font-size:13px;">
                             <div style="font-weight:600;">{{ $item->product->name }}</div>
                             @if($item->variant)<div style="color:#888;">{{ $item->variant->label }}</div>@endif
+                            @if($item->embroidery)<div style="color:var(--kgm-green-700);font-weight:600;"><i class="bi bi-pen"></i> ปักชื่อ @if($item->embroidery_price > 0)(+฿{{ number_format($item->embroidery_price, 0) }}/ตัว)@else(ฟรี)@endif</div>@endif
                             <div style="color:#888;">x{{ $item->quantity }}</div>
                         </div>
                         <div style="font-weight:700;font-size:13px;">฿{{ number_format($item->subtotal, 0) }}</div>

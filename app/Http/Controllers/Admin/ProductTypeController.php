@@ -26,6 +26,7 @@ class ProductTypeController extends Controller
     {
         $data = $this->validateType($request);
         $data['slug'] = Str::slug($request->name);
+        $data['has_embroidery'] = $request->boolean('has_embroidery');
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('product-types', 'public');
@@ -44,6 +45,7 @@ class ProductTypeController extends Controller
     public function update(Request $request, ProductType $productType)
     {
         $data = $this->validateType($request);
+        $data['has_embroidery'] = $request->boolean('has_embroidery');
 
         if ($request->hasFile('image')) {
             if ($productType->image) {
@@ -78,9 +80,10 @@ class ProductTypeController extends Controller
             'name'         => 'required|string|max:255',
             'description'  => 'nullable|string',
             'image'        => 'nullable|image|max:2048',
-            'show_on_home' => 'boolean',
-            'sort_order'   => 'integer',
-            'is_active'    => 'boolean',
+            'show_on_home'   => 'boolean',
+            'sort_order'     => 'integer',
+            'is_active'      => 'boolean',
+            'has_embroidery' => 'boolean',
         ]);
     }
 }

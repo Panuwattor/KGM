@@ -38,6 +38,17 @@
                         </span>
                     </div>
                     @endif
+                    @if($item->embroidery)
+                    <div style="margin-top:4px;">
+                        <span style="display:inline-block;font-size:12px;font-weight:600;color:#15803d;background:#dcfce7;border-radius:6px;padding:2px 8px;">
+                            <i class="bi bi-pen"></i> ปักชื่อ
+                            @if($item->embroidery_price > 0)+฿{{ number_format($item->embroidery_price,0) }}/ตัว@else(ฟรี)@endif
+                        </span>
+                    </div>
+                    @if($item->embroidery_text)
+                    <div style="font-size:12px;color:#444;margin-top:4px;white-space:pre-line;background:#f8fafc;border:1px solid #e5e7eb;border-radius:8px;padding:8px 10px;">{{ $item->embroidery_text }}</div>
+                    @endif
+                    @endif
                     <div style="font-size:13px;margin-top:4px;">฿{{ number_format($item->unit_price, 0) }} × {{ $item->quantity }}</div>
                 </div>
                 <div style="font-weight:700;color:var(--g600);">฿{{ number_format($item->subtotal, 0) }}</div>
@@ -70,8 +81,34 @@
         @if($order->payment_slip)
         <div class="form-card">
             <h3><i class="bi bi-credit-card"></i> หลักฐานการชำระเงิน</h3>
-            <img src="{{ asset('storage/'.$order->payment_slip) }}" style="max-width:300px;border-radius:14px;border:2px solid #eee;" alt="สลิปโอนเงิน">
+            @php $slipUrl = asset('storage/'.$order->payment_slip); @endphp
+            <div style="position:relative;display:inline-block;">
+                <img src="{{ $slipUrl }}" onclick="openSlipLightbox()"
+                    style="max-width:300px;border-radius:14px;border:2px solid #eee;cursor:zoom-in;display:block;" alt="สลิปโอนเงิน" title="คลิกเพื่อดูแบบขยาย">
+                <span style="position:absolute;bottom:8px;right:8px;background:rgba(0,0,0,0.55);color:#fff;border-radius:8px;padding:4px 8px;font-size:12px;pointer-events:none;">
+                    <i class="bi bi-zoom-in"></i> ขยาย
+                </span>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
+                <button type="button" class="btn btn-light btn-sm" onclick="copySlipImage(this)" data-url="{{ $slipUrl }}">
+                    <i class="bi bi-clipboard"></i> คัดลอกรูป
+                </button>
+                <a href="{{ $slipUrl }}" download class="btn btn-light btn-sm">
+                    <i class="bi bi-download"></i> ดาวน์โหลด
+                </a>
+            </div>
             <div style="margin-top:12px;font-size:13px;color:#888;">อัปโหลดเมื่อ: {{ $order->payment_uploaded_at?->format('d/m/Y H:i') }}</div>
+
+            {{-- Lightbox ดูสลิปแบบขยาย (ไม่เปิดแท็บใหม่) --}}
+            <div id="slip-lightbox" onclick="closeSlipLightbox()"
+                style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;padding:24px;cursor:zoom-out;">
+                <img src="{{ $slipUrl }}" alt="สลิปโอนเงิน"
+                    style="max-width:92vw;max-height:90vh;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,0.5);">
+                <button type="button" onclick="closeSlipLightbox()"
+                    style="position:absolute;top:18px;right:22px;background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:999px;width:42px;height:42px;font-size:20px;cursor:pointer;">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
             @if($order->status === 'payment_uploaded')
             <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
                 <form method="POST" action="{{ route('admin.orders.verify-payment', $order) }}">
@@ -145,6 +182,11 @@
         {{-- Status Update --}}
         <div class="form-card">
             <h3><i class="bi bi-arrow-repeat"></i> เปลี่ยนสถานะ</h3>
+            @if(in_array($order->status, ['cancelled', 'refunded']))
+            <div style="background:#fdecea;border:1px solid #f5c6cb;border-radius:12px;padding:14px;color:#c0392b;font-size:14px;">
+                <i class="bi bi-lock-fill"></i> ออเดอร์นี้ถูก{{ $order->status === 'refunded' ? 'คืนเงิน' : 'ยกเลิก' }}แล้ว และคืนสินค้าเข้าสต๊อกเรียบร้อย — ถือเป็นสถานะสิ้นสุด ไม่สามารถเปลี่ยนสถานะได้อีก
+            </div>
+            @else
             <form method="POST" action="{{ route('admin.orders.update', $order) }}" style="display:flex;gap:10px;">
                 @csrf @method('PUT')
                 <select name="status" class="form-control">
@@ -158,6 +200,7 @@
                     data-confirm-icon="question"
                     data-confirm-yes="เปลี่ยนสถานะ"><i class="bi bi-floppy"></i> บันทึก</button>
             </form>
+            @endif
         </div>
     </div>
 
@@ -213,3 +256,56 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+function openSlipLightbox() {
+    const lb = document.getElementById('slip-lightbox');
+    if (lb) { lb.style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+}
+function closeSlipLightbox() {
+    const lb = document.getElementById('slip-lightbox');
+    if (lb) { lb.style.display = 'none'; document.body.style.overflow = ''; }
+}
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSlipLightbox(); });
+
+async function copySlipImage(btn) {
+    const url = btn.dataset.url;
+    const original = btn.innerHTML;
+    btn.disabled = true;
+    try {
+        const res = await fetch(url);
+        const blob = await res.blob();
+
+        // คลิปบอร์ดส่วนใหญ่รองรับเฉพาะ image/png → แปลงผ่าน canvas ให้ชัวร์
+        const pngBlob = await new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = function () {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                canvas.getContext('2d').drawImage(img, 0, 0);
+                canvas.toBlob(b => b ? resolve(b) : reject(new Error('toBlob failed')), 'image/png');
+            };
+            img.onerror = reject;
+            img.src = URL.createObjectURL(blob);
+        });
+
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': pngBlob })]);
+        if (window.kgmToast) kgmToast('success', 'คัดลอกรูปหลักฐานแล้ว');
+        btn.innerHTML = '<i class="bi bi-clipboard-check"></i> คัดลอกแล้ว';
+        setTimeout(() => { btn.innerHTML = original; }, 1800);
+    } catch (e) {
+        // เบราว์เซอร์ไม่รองรับการคัดลอกรูป → คัดลอกลิงก์แทน
+        try {
+            await navigator.clipboard.writeText(url);
+            if (window.kgmToast) kgmToast('info', 'เบราว์เซอร์ไม่รองรับการคัดลอกรูป — คัดลอกลิงก์แทนแล้ว');
+        } catch (_) {
+            if (window.kgmToast) kgmToast('error', 'ไม่สามารถคัดลอกได้');
+        }
+    } finally {
+        btn.disabled = false;
+    }
+}
+</script>
+@endpush

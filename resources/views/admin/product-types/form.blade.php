@@ -87,6 +87,11 @@
                 {{ old('is_active', $productType->is_active ?? true) ? 'checked' : '' }}>
             <label for="is_active">เปิดใช้งาน</label>
         </div>
+        <div class="form-check">
+            <input type="checkbox" name="has_embroidery" id="has_embroidery" value="1"
+                {{ old('has_embroidery', $productType->has_embroidery ?? false) ? 'checked' : '' }}>
+            <label for="has_embroidery">มีบริการปัก</label>
+        </div>
 
         <div style="margin-top:20px;">
             <button type="submit" class="btn btn-primary"><i class="bi bi-floppy"></i> บันทึก</button>

@@ -133,18 +133,26 @@ class CheckoutController extends Controller
 
             foreach ($cartItems as $item) {
                 OrderItem::create([
-                    'order_id'      => $order->id,
-                    'product_id'    => $item->product_id,
-                    'variant_id'    => $item->variant_id,
-                    'product_name'  => $item->product->name,
-                    'variant_label' => $item->variant?->label,
-                    'product_image' => $item->product->main_image,
-                    'quantity'      => $item->quantity,
-                    'unit_price'    => $item->product->current_price + ($item->variant?->price_adjustment ?? 0),
-                    'subtotal'      => $item->subtotal,
+                    'order_id'        => $order->id,
+                    'product_id'      => $item->product_id,
+                    'variant_id'      => $item->variant_id,
+                    'product_name'    => $item->product->name,
+                    'variant_label'   => $item->variant?->label,
+                    'embroidery'      => $item->embroidery,
+                    'embroidery_text' => $item->embroidery_text,
+                    'embroidery_price'=> $item->embroidery ? $item->embroidery_price : 0,
+                    'product_image'   => $item->product->main_image,
+                    'quantity'        => $item->quantity,
+                    'unit_price'      => $item->product->current_price + ($item->variant?->price_adjustment ?? 0),
+                    'subtotal'        => $item->subtotal,
                 ]);
                 if ($item->product->manage_stock) {
-                    $item->product->decrement('stock_quantity', $item->quantity);
+                    // มีไซส์ (variant) → ตัดสต๊อกที่ไซส์, ไม่มี → ตัดสต๊อกสินค้ารวม
+                    if ($item->variant) {
+                        $item->variant->decrement('stock_quantity', $item->quantity);
+                    } else {
+                        $item->product->decrement('stock_quantity', $item->quantity);
+                    }
                     $item->product->increment('sale_count', $item->quantity);
                 }
             }

@@ -177,6 +177,10 @@
                     <i class="bi bi-facebook"></i>
                     Facebook
                 </a>
+                <a href="#" class="navbar-secondary-marketplace thaimart-link">
+                    <img src="{{ asset('images/online/thaimart.png') }}" alt="Thaimart" width="16" height="16">
+                    Thaimart
+                </a>
             </div>
         </div>
     </div>
@@ -275,7 +279,9 @@
         <a href="https://www.facebook.com/KGMuniform" target="_blank" rel="noopener" class="mobile-nav-link" @click="open=false" style="gap:10px;">
             <img src="{{ asset('images/online/facebook.png') }}" alt="Facebook" width="18" height="18" style="border-radius:4px;"> Facebook
         </a>
-
+        <a href="#" target="_blank" rel="noopener" class="mobile-nav-link" @click="open=false" style="gap:10px;">
+            <img src="{{ asset('images/online/thaimart.png') }}" alt="Facebook" width="18" height="18" style="border-radius:4px;"> Thaimart
+        </a>
         <div class="mobile-drawer-footer">
             <a href="{{ route('quote') }}" class="btn btn-gold w-full" style="border-radius:14px;" @click="open=false">
                 <i class="bi bi-file-earmark-text"></i> ขอใบเสนอราคา
@@ -580,9 +586,13 @@ document.addEventListener('DOMContentLoaded', function () {
         .catch(() => {});
 });
 
-function addToCart(productId, variantId, qty = 1, flashSalePrice = null) {
+function addToCart(productId, variantId, qty = 1, flashSalePrice = null, options = {}) {
     const payload = { product_id: productId, variant_id: variantId, quantity: qty };
     if (flashSalePrice !== null) payload.flash_sale_price = flashSalePrice;
+    if (options.embroidery) {
+        payload.embroidery = true;
+        payload.embroidery_text = options.embroidery_text;
+    }
     fetch('/cart/add', {
         method: 'POST',
         headers: {

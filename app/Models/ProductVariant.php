@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ProductVariant extends Model
 {
     protected $fillable = [
-        'product_id', 'size', 'color', 'sku', 'price_adjustment', 'stock_quantity', 'is_active',
+        'product_id', 'size', 'sku', 'price_adjustment', 'stock_quantity', 'low_stock_threshold', 'is_active',
     ];
 
     protected $casts = ['is_active' => 'boolean', 'price_adjustment' => 'decimal:2'];
@@ -19,6 +19,11 @@ class ProductVariant extends Model
 
     public function getLabelAttribute(): string
     {
-        return collect([$this->size, $this->color])->filter()->implode(' / ');
+        return (string) $this->size;
+    }
+
+    public function isLowStock(): bool
+    {
+        return $this->is_active && $this->stock_quantity <= $this->low_stock_threshold;
     }
 }

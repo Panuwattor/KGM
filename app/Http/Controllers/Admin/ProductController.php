@@ -34,7 +34,7 @@ class ProductController extends Controller
                 'active'    => $query->where('is_active', true)->whereNull('deleted_at'),
                 'inactive'  => $query->where('is_active', false)->whereNull('deleted_at'),
                 'deleted'   => $query->onlyTrashed(),
-                'low_stock' => $query->whereColumn('stock_quantity', '<=', 'low_stock_threshold'),
+                'low_stock' => $query->lowStock(),
                 default     => null,
             };
         }
@@ -62,9 +62,10 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $data = $this->validateProduct($request);
-        $data['slug'] = $this->generateSlug(
-            $request->filled('slug') ? $request->slug : $request->name
-        );
+        $data['free_embroidery'] = $request->boolean('free_embroidery');
+        $data['slug'] = $request->filled('slug')
+            ? $this->manualSlug($request->slug)          // แอดมินกรอกเอง → เก็บตามนั้น (รวมไทย)
+            : $this->generateSlug($request->name);       // เว้นว่าง → สร้างจากชื่อ (แปลงเป็นอังกฤษ)
 
         $product = Product::create($data);
 
@@ -91,10 +92,11 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $data = $this->validateProduct($request, $product->id);
+        $data['free_embroidery'] = $request->boolean('free_embroidery');
 
-        // Only update slug if admin explicitly changed it
+        // Only update slug if admin explicitly changed it (เก็บตามที่กรอก รวมไทย)
         if ($request->filled('slug') && $request->slug !== $product->slug) {
-            $data['slug'] = $this->generateSlug($request->slug, $product->id);
+            $data['slug'] = $this->manualSlug($request->slug, $product->id);
         }
 
         $old = $product->toArray();
@@ -143,10 +145,35 @@ class ProductController extends Controller
         return response()->json(['success' => true]);
     }
 
+    /** สร้าง slug จากชื่อสินค้าอัตโนมัติ (แปลงไทย→อังกฤษ RTGS) */
     private function generateSlug(string $name, ?int $ignoreId = null): string
     {
-        $base = ThaiSlug::make($name);
+        return $this->uniqueSlug(ThaiSlug::make($name), $ignoreId);
+    }
 
+    /**
+     * slug ที่แอดมินกรอกเอง — เก็บตามที่พิมพ์ รองรับภาษาไทย
+     * normalize เบาๆ: ตัวพิมพ์เล็ก, เว้นวรรค→'-', ตัดอักขระที่ไม่ปลอดภัยใน URL ทิ้ง
+     */
+    private function manualSlug(string $input, ?int $ignoreId = null): string
+    {
+        $slug = mb_strtolower(trim($input));
+        $slug = preg_replace('/\s+/u', '-', $slug);                 // เว้นวรรค → -
+        $slug = preg_replace('/[^\p{L}\p{N}\p{M}_-]+/u', '', $slug); // เก็บตัวอักษร(รวมไทย)/ตัวเลข/สระวรรณยุกต์/-/_
+        $slug = preg_replace('/-+/u', '-', $slug);                  // ยุบ - ซ้ำ
+        $slug = trim($slug, '-_');
+
+        // ถ้าพิมพ์มามีแต่อักขระพิเศษจนเหลือว่าง → ใช้ค่า fallback
+        if ($slug === '') {
+            $slug = 'product';
+        }
+
+        return $this->uniqueSlug($slug, $ignoreId);
+    }
+
+    /** ต่อท้ายเลขลำดับถ้า slug ซ้ำกับสินค้าตัวอื่น */
+    private function uniqueSlug(string $base, ?int $ignoreId = null): string
+    {
         $slug = $base;
         $counter = 2;
         while (Product::where('slug', $slug)->when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))->exists()) {
@@ -175,6 +202,7 @@ class ProductController extends Controller
             'is_featured'        => 'boolean',
             'is_new'             => 'boolean',
             'is_bestseller'      => 'boolean',
+            'free_embroidery'    => 'boolean',
             'sort_order'         => 'integer',
             'meta_title'         => 'nullable|string|max:255',
             'meta_description'   => 'nullable|string|max:500',
@@ -190,19 +218,31 @@ class ProductController extends Controller
 
     private function saveVariants(Product $product, Request $request): void
     {
-        if (!$request->filled('variants')) return;
+        if (!$request->filled('variants')) {
+            $product->variants()->delete();
+            return;
+        }
 
         $product->variants()->delete();
+        $totalStock = 0;
+        $hasVariant = false;
         foreach ($request->variants as $variant) {
-            if (empty($variant['size']) && empty($variant['color'])) continue;
+            if (empty($variant['size'])) continue;
             ProductVariant::create([
                 'product_id'       => $product->id,
                 'size'             => $variant['size'] ?? null,
-                'color'            => $variant['color'] ?? null,
                 'sku'              => $variant['sku'] ?? null,
-                'price_adjustment' => $variant['price_adjustment'] ?? 0,
-                'stock_quantity'   => $variant['stock_quantity'] ?? 0,
+                'price_adjustment'    => $variant['price_adjustment'] ?? 0,
+                'stock_quantity'      => $variant['stock_quantity'] ?? 0,
+                'low_stock_threshold' => $variant['low_stock_threshold'] ?? 5,
             ]);
+            $totalStock += (int) ($variant['stock_quantity'] ?? 0);
+            $hasVariant = true;
+        }
+
+        // เมื่อมี variants สต๊อกรวมของสินค้า = ผลรวมสต๊อกของทุก variant
+        if ($hasVariant) {
+            $product->update(['stock_quantity' => $totalStock]);
         }
     }
 }
