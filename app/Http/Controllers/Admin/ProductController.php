@@ -185,7 +185,7 @@ class ProductController extends Controller
 
     private function validateProduct(Request $request, ?int $ignoreId = null): array
     {
-        return $request->validate([
+        $validated = $request->validate([
             'name'               => 'required|string|max:255',
             'category_id'        => 'nullable|exists:categories,id',
             'product_type_id'    => 'nullable|exists:product_types,id',
@@ -206,7 +206,17 @@ class ProductController extends Controller
             'sort_order'         => 'integer',
             'meta_title'         => 'nullable|string|max:255',
             'meta_description'   => 'nullable|string|max:500',
+            // ตัวเลือกสินค้า (Variants): ถ้ามีแถว ต้องกรอกไซส์ทุกแถวเสมอ
+            'variants'           => 'nullable|array',
+            'variants.*.size'    => 'required|string|max:100',
+        ], [
+            'variants.*.size.required' => 'กรุณากรอกไซส์ของตัวเลือกสินค้าให้ครบทุกแถวก่อนบันทึก',
         ]);
+
+        // variants จัดการแยกใน saveVariants() ไม่ต้องส่งเข้า Product::create/update
+        unset($validated['variants']);
+
+        return $validated;
     }
 
     private function clearProductCache(): void
