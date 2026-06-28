@@ -8,12 +8,12 @@
 <meta property="og:url" content="{{ url()->current() }}">
 <meta property="og:title" content="{{ $product->meta_title ?? $product->name }}">
 <meta property="og:description" content="{{ $product->meta_description ?? $product->short_description }}">
-<meta property="og:image" content="{{ $product->main_image ? asset('storage/'.$product->main_image) : '' }}">
+<meta property="og:image" content="{{ $product->main_image ? media_url($product->main_image) : '' }}">
 <meta property="og:site_name" content="กิจเจริญการ์เมนท์">
 @php
-    $jsonImages = $product->images->map(fn($img) => asset('storage/'.$img->image_path))->values()->all();
+    $jsonImages = $product->images->map(fn($img) => media_url($img->image_path))->values()->all();
     if (empty($jsonImages) && $product->main_image) {
-        $jsonImages = [asset('storage/'.$product->main_image)];
+        $jsonImages = [media_url($product->main_image)];
     }
     $jsonLd = [
         '@context'    => 'https://schema.org',
@@ -67,8 +67,8 @@
     </div>
 
     @php
-        $allImages = $product->images->map(fn($img) => asset('storage/'.$img->image_path))->values()->toArray();
-        if (empty($allImages) && $product->main_image) $allImages = [asset('storage/'.$product->main_image)];
+        $allImages = $product->images->map(fn($img) => media_url($img->image_path))->values()->toArray();
+        if (empty($allImages) && $product->main_image) $allImages = [media_url($product->main_image)];
         $firstImage = $allImages[0] ?? '';
     @endphp
 
@@ -82,8 +82,8 @@
             </div>
             <div class="thumb-list">
                 @foreach($product->images as $i => $img)
-                <div class="thumb {{ $i===0?'active':'' }}" onclick="setImage('{{ asset('storage/'.$img->image_path) }}', this)">
-                    <img src="{{ asset('storage/'.$img->image_path) }}" alt="">
+                <div class="thumb {{ $i===0?'active':'' }}" onclick="setImage('{{ media_url($img->image_path) }}', this)">
+                    <img src="{{ media_url($img->image_path) }}" alt="">
                 </div>
                 @endforeach
             </div>

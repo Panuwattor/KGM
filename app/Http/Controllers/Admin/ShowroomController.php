@@ -20,7 +20,7 @@ class ShowroomController extends Controller
     {
         $data = $request->validate($this->rules());
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('showrooms', 'public');
+            $data['image'] = $request->file('image')->store('showrooms', config('filesystems.media'));
         }
         Showroom::create($data);
         return redirect()->route('admin.showrooms.index')->with('success', 'เพิ่มสาขาแล้ว');
@@ -35,9 +35,9 @@ class ShowroomController extends Controller
         if ($request->hasFile('image')) {
             // ลบรูปเก่าถ้ามี
             if ($showroom->image) {
-                \Storage::disk('public')->delete($showroom->image);
+                \Storage::disk(config('filesystems.media'))->delete($showroom->image);
             }
-            $data['image'] = $request->file('image')->store('showrooms', 'public');
+            $data['image'] = $request->file('image')->store('showrooms', config('filesystems.media'));
         } else {
             // ถ้าไม่มีไฟล์ใหม่ ไม่ต้องอัปเดตฟิลด์ image
             unset($data['image']);

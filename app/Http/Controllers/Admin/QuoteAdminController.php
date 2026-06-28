@@ -57,7 +57,7 @@ class QuoteAdminController extends Controller
         ];
 
         if ($request->hasFile('quote_pdf')) {
-            $data['quote_pdf'] = $request->file('quote_pdf')->store('quotes', 'public');
+            $data['quote_pdf'] = $request->file('quote_pdf')->store('quotes', config('filesystems.media'));
         }
 
         $quote->update($data);

@@ -27,7 +27,7 @@
             <h3><i class="bi bi-cart3"></i> รายการสินค้า</h3>
             @foreach($order->items as $item)
             <div style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid #f5f7f5;">
-                <img src="{{ $item->product_image ? asset('storage/'.$item->product_image) : asset('images/no-product.png') }}"
+                <img src="{{ $item->product_image ? media_url($item->product_image) : asset('images/no-product.png') }}"
                     style="width:60px;height:60px;object-fit:cover;border-radius:10px;flex-shrink:0;">
                 <div style="flex:1;">
                     <div style="font-weight:700;">{{ $item->product_name }}</div>
@@ -81,7 +81,7 @@
         @if($order->payment_slip)
         <div class="form-card">
             <h3><i class="bi bi-credit-card"></i> หลักฐานการชำระเงิน</h3>
-            @php $slipUrl = asset('storage/'.$order->payment_slip); @endphp
+            @php $slipUrl = media_url($order->payment_slip); @endphp
             <div style="position:relative;display:inline-block;">
                 <img src="{{ $slipUrl }}" onclick="openSlipLightbox()"
                     style="max-width:300px;border-radius:14px;border:2px solid #eee;cursor:zoom-in;display:block;" alt="สลิปโอนเงิน" title="คลิกเพื่อดูแบบขยาย">

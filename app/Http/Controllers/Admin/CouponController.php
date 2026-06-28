@@ -35,7 +35,7 @@ class CouponController extends Controller
         $data['is_stackable'] = $request->boolean('is_stackable');
         if ($data['type'] === 'free_shipping') $data['value'] = 0;
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('coupons', 'public');
+            $data['image'] = $request->file('image')->store('coupons', config('filesystems.media'));
         }
         $coupon = Coupon::create($data);
         $coupon->products()->sync($request->input('product_ids', []));
@@ -61,8 +61,8 @@ class CouponController extends Controller
         if ($data['type'] === 'free_shipping') $data['value'] = 0;
         unset($data['image']);
         if ($request->hasFile('image')) {
-            if ($coupon->image) Storage::disk('public')->delete($coupon->image);
-            $data['image'] = $request->file('image')->store('coupons', 'public');
+            if ($coupon->image) Storage::disk(config('filesystems.media'))->delete($coupon->image);
+            $data['image'] = $request->file('image')->store('coupons', config('filesystems.media'));
         }
         $coupon->update($data);
         $coupon->products()->sync($request->input('product_ids', []));
@@ -73,7 +73,7 @@ class CouponController extends Controller
 
     public function destroy(Coupon $coupon)
     {
-        if ($coupon->image) Storage::disk('public')->delete($coupon->image);
+        if ($coupon->image) Storage::disk(config('filesystems.media'))->delete($coupon->image);
         $coupon->delete();
         Cache::forget('home.coupons');
         return redirect()->route('admin.coupons.index')->with('success', 'ลบคูปองแล้ว');

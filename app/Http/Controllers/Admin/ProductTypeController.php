@@ -29,7 +29,7 @@ class ProductTypeController extends Controller
         $data['has_embroidery'] = $request->boolean('has_embroidery');
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('product-types', 'public');
+            $data['image'] = $request->file('image')->store('product-types', config('filesystems.media'));
         }
 
         ProductType::create($data);
@@ -49,13 +49,13 @@ class ProductTypeController extends Controller
 
         if ($request->hasFile('image')) {
             if ($productType->image) {
-                Storage::disk('public')->delete($productType->image);
+                Storage::disk(config('filesystems.media'))->delete($productType->image);
             }
-            $data['image'] = $request->file('image')->store('product-types', 'public');
+            $data['image'] = $request->file('image')->store('product-types', config('filesystems.media'));
         }
 
         if ($request->boolean('remove_image') && $productType->image) {
-            Storage::disk('public')->delete($productType->image);
+            Storage::disk(config('filesystems.media'))->delete($productType->image);
             $data['image'] = null;
         }
 
@@ -67,7 +67,7 @@ class ProductTypeController extends Controller
     public function destroy(ProductType $productType)
     {
         if ($productType->image) {
-            Storage::disk('public')->delete($productType->image);
+            Storage::disk(config('filesystems.media'))->delete($productType->image);
         }
         $productType->delete();
         Cache::forget('home.product_types');

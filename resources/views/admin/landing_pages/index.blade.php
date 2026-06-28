@@ -50,7 +50,7 @@
             </div>
             @endif
 
-            <img src="{{ asset('storage/'.$page->image_path) }}"
+            <img src="{{ media_url($page->image_path) }}"
                  alt="Landing Page"
                  style="width:100%;height:200px;object-fit:cover;display:block;"
                  onerror="this.src='/images/logo.png'">

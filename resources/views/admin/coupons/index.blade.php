@@ -26,7 +26,7 @@
         <tr>
             <td>
                 @if($c->image)
-                <img src="{{ asset('storage/'.$c->image) }}" alt="{{ $c->name }}"
+                <img src="{{ media_url($c->image) }}" alt="{{ $c->name }}"
                      style="width:52px;height:52px;object-fit:cover;border-radius:10px;border:1px solid #e8ecef;">
                 @else
                 <div style="width:52px;height:52px;border-radius:10px;background:linear-gradient(135deg,var(--g700),var(--g500));display:flex;align-items:center;justify-content:center;">

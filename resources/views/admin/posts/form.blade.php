@@ -54,7 +54,7 @@
                     <input type="file" name="featured_image" id="featured_image_input" class="form-control" accept="image/*" style="border-radius:12px;" onchange="previewCover(this)">
                     <div id="cover-preview-wrap">
                         @if(isset($post) && $post->featured_image)
-                            <img id="cover-preview-img" src="{{ asset('storage/'.$post->featured_image) }}" class="cover-preview">
+                            <img id="cover-preview-img" src="{{ media_url($post->featured_image) }}" class="cover-preview">
                         @else
                             <div class="cover-placeholder" onclick="document.getElementById('featured_image_input').click()">
                                 <i class="bi bi-image-alt"></i>

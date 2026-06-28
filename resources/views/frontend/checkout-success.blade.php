@@ -31,7 +31,7 @@
 
             @if($order->payment_slip)
             <div style="display:flex;align-items:center;gap:12px;background:var(--kgm-green-100);border-radius:12px;padding:12px 14px;margin-bottom:14px;">
-                <img src="{{ asset('storage/'.$order->payment_slip) }}" style="width:54px;height:54px;object-fit:cover;border-radius:10px;border:1px solid #fff;" alt="สลิป">
+                <img src="{{ media_url($order->payment_slip) }}" style="width:54px;height:54px;object-fit:cover;border-radius:10px;border:1px solid #fff;" alt="สลิป">
                 <div style="font-size:13px;color:var(--kgm-green-800);font-weight:600;line-height:1.5;">
                     <i class="bi bi-check-circle-fill"></i> อัปโหลดสลิปแล้ว<br>
                     <span style="font-weight:400;color:#777;">รอทีมงานตรวจสอบการชำระเงิน</span>

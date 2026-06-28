@@ -44,7 +44,7 @@
             <a href="{{ route('news.show', $featured->slug) }}" class="featured-card">
                 <div class="featured-card-img">
                     @if($featured->featured_image)
-                        <img src="{{ asset('storage/'.$featured->featured_image) }}" alt="{{ $featured->title }}" loading="lazy" onerror="this.src='/images/logo.png'">
+                        <img src="{{ media_url($featured->featured_image) }}" alt="{{ $featured->title }}" loading="lazy" onerror="this.src='/images/logo.png'">
                     @else
                         <div style="width:100%;height:100%;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);display:flex;align-items:center;justify-content:center;">
                             <i class="bi bi-newspaper" style="font-size:56px;color:#a5d6a7;"></i>
@@ -79,7 +79,7 @@
                 <a href="{{ route('news.show', $post->slug) }}" class="post-card">
                     <div class="post-card-img">
                         @if($post->featured_image)
-                            <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ $post->title }}" loading="lazy" onerror="this.src='/images/logo.png'">
+                            <img src="{{ media_url($post->featured_image) }}" alt="{{ $post->title }}" loading="lazy" onerror="this.src='/images/logo.png'">
                         @else
                             <div style="width:100%;height:100%;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);display:flex;align-items:center;justify-content:center;">
                                 <i class="bi bi-newspaper" style="font-size:36px;color:#a5d6a7;"></i>

@@ -23,7 +23,7 @@
             @if($quote->notes)<div style="background:#fef9ec;border-radius:12px;padding:14px;"><strong>หมายเหตุ:</strong> {{ $quote->notes }}</div>@endif
             @if($quote->attachment)
             <div style="margin-top:12px;">
-                <a href="{{ asset('storage/'.$quote->attachment) }}" class="btn btn-sm btn-light" target="_blank"><i class="bi bi-paperclip"></i> ดาวน์โหลดไฟล์แนบ</a>
+                <a href="{{ media_url($quote->attachment) }}" class="btn btn-sm btn-light" target="_blank"><i class="bi bi-paperclip"></i> ดาวน์โหลดไฟล์แนบ</a>
             </div>
             @endif
         </div>
@@ -56,7 +56,7 @@
             </form>
             @if($quote->quote_pdf)
             <div style="margin-top:16px;">
-                <a href="{{ asset('storage/'.$quote->quote_pdf) }}" class="btn btn-sm btn-gold" target="_blank"><i class="bi bi-file-pdf"></i> ดู PDF ใบเสนอราคา</a>
+                <a href="{{ media_url($quote->quote_pdf) }}" class="btn btn-sm btn-gold" target="_blank"><i class="bi bi-file-pdf"></i> ดู PDF ใบเสนอราคา</a>
             </div>
             @endif
         </div>

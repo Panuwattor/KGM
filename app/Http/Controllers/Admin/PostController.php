@@ -31,7 +31,7 @@ class PostController extends Controller
         $data['author_id'] = auth()->user()?->id;
         $data['is_top'] = $request->boolean('is_top');
         if ($request->hasFile('featured_image')) {
-            $data['featured_image'] = $request->file('featured_image')->store('posts', 'public');
+            $data['featured_image'] = $request->file('featured_image')->store('posts', config('filesystems.media'));
         }
         if ($data['status'] === 'published' && empty($data['published_at'])) {
             $data['published_at'] = now();
@@ -56,9 +56,9 @@ class PostController extends Controller
         $data['is_top'] = $request->boolean('is_top');
         if ($request->hasFile('featured_image')) {
             if ($post->featured_image) {
-                Storage::disk('public')->delete($post->featured_image);
+                Storage::disk(config('filesystems.media'))->delete($post->featured_image);
             }
-            $data['featured_image'] = $request->file('featured_image')->store('posts', 'public');
+            $data['featured_image'] = $request->file('featured_image')->store('posts', config('filesystems.media'));
         }
         if ($data['status'] === 'published' && !$post->published_at) {
             $data['published_at'] = now();

@@ -206,7 +206,7 @@
                     <h3 style="font-size:17px;font-weight:800;color:var(--kgm-green-800);margin-bottom:16px;"><i class="bi bi-receipt"></i> สรุปออเดอร์</h3>
                     @foreach($cartItems as $item)
                     <div style="display:flex;gap:10px;margin-bottom:10px;">
-                        <img src="{{ $item->product->main_image ? asset('storage/'.$item->product->main_image) : '' }}" style="width:48px;height:48px;object-fit:cover;border-radius:10px;">
+                        <img src="{{ $item->product->main_image ? media_url($item->product->main_image) : '' }}" style="width:48px;height:48px;object-fit:cover;border-radius:10px;">
                         <div style="flex:1;font-size:13px;">
                             <div style="font-weight:600;">{{ $item->product->name }}</div>
                             @if($item->variant)<div style="color:#888;">{{ $item->variant->label }}</div>@endif

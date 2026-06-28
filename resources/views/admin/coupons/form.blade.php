@@ -30,7 +30,7 @@
                 <label class="form-label">รูปภาพคูปอง <span style="color:#aaa;font-weight:400;">(.jpg/.png ไม่เกิน 2MB)</span></label>
                 <div style="margin-bottom:10px;">
                     <img id="coupon-img-preview"
-                         src="{{ $coupon?->image ? asset('storage/'.$coupon->image) : '' }}"
+                         src="{{ $coupon?->image ? media_url($coupon->image) : '' }}"
                          alt="preview"
                          style="{{ $coupon?->image ? '' : 'display:none;' }}height:80px;border-radius:10px;object-fit:cover;border:1px solid #e8ecef;">
                 </div>

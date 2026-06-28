@@ -22,7 +22,7 @@
             <label class="form-label">รูปภาพ {{ isset($banner) ? '' : '*' }} <small style="color:#888;">(1400 × 609 px, ไม่เกิน 2 MB)</small></label>
             <input type="file" id="bannerImage" name="image" class="form-control" accept="image/*" style="border-radius:12px;" {{ isset($banner) ? '' : 'required' }}>
             <div id="imageError" style="color:#e74c3c;font-size:13px;margin-top:6px;display:none;"></div>
-            @if(isset($banner))<img src="{{ asset('storage/'.$banner->image_path) }}" style="max-width:300px;border-radius:12px;margin-top:8px;" onerror="this.style.display='none'">@endif
+            @if(isset($banner))<img src="{{ media_url($banner->image_path) }}" style="max-width:300px;border-radius:12px;margin-top:8px;" onerror="this.style.display='none'">@endif
         </div>
         <div class="form-check">
             <input type="checkbox" name="is_active" id="is_active" value="1" {{ old('is_active', $banner->is_active ?? true) ? 'checked' : '' }}>

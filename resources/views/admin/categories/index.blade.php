@@ -13,7 +13,7 @@
         <tr>
             <td>
                 @if($cat->image)
-                    <img src="{{ asset('storage/'.$cat->image) }}" style="width:48px;height:48px;object-fit:cover;border-radius:10px;">
+                    <img src="{{ media_url($cat->image) }}" style="width:48px;height:48px;object-fit:cover;border-radius:10px;">
                 @else
                     <div style="width:48px;height:48px;background:#f0f4f0;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#ccc;">
                         <i class="bi bi-tag"></i>

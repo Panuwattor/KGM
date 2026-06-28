@@ -39,7 +39,7 @@ class MarketingController extends Controller
         $data = $request->only('name', 'starts_at', 'ends_at');
         $data['is_active'] = $request->boolean('is_active');
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('flash-sales', 'public');
+            $data['image'] = $request->file('image')->store('flash-sales', config('filesystems.media'));
         }
 
         $flashSale = FlashSale::create($data);
@@ -79,9 +79,9 @@ class MarketingController extends Controller
         $data['is_active'] = $request->boolean('is_active');
         if ($request->hasFile('image')) {
             if ($flashSale->image) {
-                Storage::disk('public')->delete($flashSale->image);
+                Storage::disk(config('filesystems.media'))->delete($flashSale->image);
             }
-            $data['image'] = $request->file('image')->store('flash-sales', 'public');
+            $data['image'] = $request->file('image')->store('flash-sales', config('filesystems.media'));
         }
 
         $flashSale->update($data);
@@ -103,7 +103,7 @@ class MarketingController extends Controller
     public function destroy(FlashSale $flashSale)
     {
         if ($flashSale->image) {
-            Storage::disk('public')->delete($flashSale->image);
+            Storage::disk(config('filesystems.media'))->delete($flashSale->image);
         }
         $flashSale->delete();
         return redirect()->route('admin.marketing.index')->with('success', 'ลบ Flash Sale แล้ว');

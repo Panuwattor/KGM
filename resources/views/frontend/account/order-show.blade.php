@@ -12,7 +12,7 @@
         </div>
         @foreach($order->items as $item)
         <div style="display:flex;gap:14px;padding:14px 0;border-bottom:1px solid #f5f7f5;">
-            <img src="{{ $item->product_image ? asset('storage/'.$item->product_image) : '' }}" style="width:70px;height:70px;object-fit:cover;border-radius:12px;flex-shrink:0;" alt="">
+            <img src="{{ $item->product_image ? media_url($item->product_image) : '' }}" style="width:70px;height:70px;object-fit:cover;border-radius:12px;flex-shrink:0;" alt="">
             <div style="flex:1;">
                 <div style="font-weight:700;">{{ $item->product_name }}</div>
                 @if($item->variant_label)<div style="font-size:12px;color:#888;">{{ $item->variant_label }}</div>@endif
@@ -96,7 +96,7 @@
         </div>
         <h3 style="font-weight:800;margin-bottom:16px;border-top:1px solid #f0f2f0;padding-top:20px;"><i class="bi bi-cloud-upload"></i> อัปโหลดสลิปการชำระเงิน</h3>
         @if($order->payment_slip)
-        <div style="margin-bottom:16px;"><img src="{{ asset('storage/'.$order->payment_slip) }}" style="max-width:200px;border-radius:12px;border:2px solid #eee;" alt="สลิป">
+        <div style="margin-bottom:16px;"><img src="{{ media_url($order->payment_slip) }}" style="max-width:200px;border-radius:12px;border:2px solid #eee;" alt="สลิป">
         <div style="font-size:12px;color:#888;margin-top:6px;">อัปโหลดแล้ว รอการตรวจสอบ</div></div>
         @endif
         <form method="POST" action="{{ route('orders.upload-slip', $order) }}" enctype="multipart/form-data">

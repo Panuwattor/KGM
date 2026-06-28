@@ -12,7 +12,7 @@
         @foreach($showrooms as $showroom)
         <div style="background:white;border-radius:24px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
             @if($showroom->image)
-            <div style="height:200px;overflow:hidden;"><img src="{{ asset('storage/'.$showroom->image) }}" style="width:100%;height:100%;object-fit:cover;" alt="{{ $showroom->name }}"></div>
+            <div style="height:200px;overflow:hidden;"><img src="{{ media_url($showroom->image) }}" style="width:100%;height:100%;object-fit:cover;" alt="{{ $showroom->name }}"></div>
             @else
             <div style="height:160px;background:linear-gradient(135deg,var(--kgm-green-700),var(--kgm-green-500));display:flex;align-items:center;justify-content:center;"><i class="bi bi-shop" style="font-size:48px;color:rgba(255,255,255,0.5);"></i></div>
             @endif

@@ -31,7 +31,7 @@
                     <div style="flex:0 0 38%;border-radius:18px 0 0 18px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;min-height:120px;">
                         @if($coupon->image)
                         <div style="position:absolute;inset:0;background:linear-gradient(135deg,#ffffff,#ffffff);"></div>
-                        <img src="{{ asset('storage/'.$coupon->image) }}" alt="{{ $coupon->name }}"
+                        <img src="{{ media_url($coupon->image) }}" alt="{{ $coupon->name }}"
                              style="width:100%;height:100%;object-fit:contain;padding:14px;position:relative;z-index:1;">
                         @else
                         <div style="background:linear-gradient(135deg,var(--kgm-green-700),var(--kgm-green-500));position:absolute;inset:0;border-radius:18px 0 0 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:white;text-align:center;">

@@ -15,7 +15,7 @@
                 <label class="form-label"><i class="bi bi-image"></i> รูป Banner Flash Sale <span style="color:#aaa;font-size:12px;">(บังคับขนาด 1200×400px เท่านั้น, ไม่เกิน 3MB)</span></label>
                 @if(($flashSale ?? null)?->image)
                 <div style="margin-bottom:10px;">
-                    <img src="{{ asset('storage/'.$flashSale->image) }}" alt="Banner" style="max-width:360px;border-radius:10px;border:1px solid #e0e0e0;">
+                    <img src="{{ media_url($flashSale->image) }}" alt="Banner" style="max-width:360px;border-radius:10px;border:1px solid #e0e0e0;">
                     <div style="font-size:12px;color:#888;margin-top:4px;">อัปโหลดรูปใหม่เพื่อเปลี่ยน</div>
                 </div>
                 @endif
@@ -40,7 +40,7 @@
                 'name'        => $p->name,
                 'price'       => (float) $p->price,
                 'category'    => $p->category?->name ?? 'ไม่มีหมวดหมู่',
-                'image'       => $p->images->first() ? asset('storage/' . $p->images->first()->image_path) : null,
+                'image'       => $p->images->first() ? media_url($p->images->first()->image_path) : null,
                 'selected'    => $old ? !empty($old['selected']) : (bool) $item,
                 'sale_price'  => $old['price'] ?? ($item?->sale_price ?? ''),
                 'stock_limit' => $old['stock_limit'] ?? ($item?->stock_limit ?? ''),

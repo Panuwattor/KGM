@@ -206,7 +206,7 @@
                 <div id="image-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;">
                     @foreach($product->images as $img)
                     <div style="position:relative;border-radius:12px;overflow:hidden;aspect-ratio:1;">
-                        <img src="{{ asset('storage/'.$img->image_path) }}" style="width:100%;height:100%;object-fit:cover;">
+                        <img src="{{ media_url($img->image_path) }}" style="width:100%;height:100%;object-fit:cover;">
                         <button type="button" onclick="deleteImage({{ $product->id }}, {{ $img->id }}, this)"
                             style="position:absolute;top:4px;right:4px;background:rgba(231,76,60,0.9);color:white;border:none;border-radius:999px;width:24px;height:24px;cursor:pointer;font-size:12px;">
                             <i class="bi bi-x"></i>

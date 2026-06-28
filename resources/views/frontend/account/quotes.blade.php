@@ -22,7 +22,7 @@
                 <div style="font-size:18px;font-weight:800;color:var(--kgm-green-700);">ราคาที่เสนอ: ฿{{ number_format($q->quoted_price, 2) }}</div>
                 @endif
                 @if($q->quote_pdf)
-                <a href="{{ asset('storage/'.$q->quote_pdf) }}" class="btn btn-sm btn-gold" target="_blank" style="margin-top:8px;"><i class="bi bi-file-pdf"></i> ดาวน์โหลดใบเสนอราคา</a>
+                <a href="{{ media_url($q->quote_pdf) }}" class="btn btn-sm btn-gold" target="_blank" style="margin-top:8px;"><i class="bi bi-file-pdf"></i> ดาวน์โหลดใบเสนอราคา</a>
                 @endif
             </div>
             @empty

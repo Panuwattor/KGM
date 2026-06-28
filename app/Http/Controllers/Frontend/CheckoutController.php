@@ -221,7 +221,7 @@ class CheckoutController extends Controller
 
         $request->validate(['slip' => 'required|image|max:5120']);
 
-        $path = $request->file('slip')->store('slips', 'public');
+        $path = $request->file('slip')->store('slips', config('filesystems.media'));
         $order->update([
             'payment_slip'        => $path,
             'status'              => 'payment_uploaded',

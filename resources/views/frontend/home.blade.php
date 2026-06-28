@@ -17,10 +17,10 @@
                 <div class="hero-item">
                     @if($banner->link_url)
                     <a href="{{ $banner->link_url }}">
-                        <img src="{{ asset('storage/'.$banner->image_path) }}" alt="Banner {{ $i+1 }}" width="1200" height="600" loading="{{ $i === 0 ? 'eager' : 'lazy' }}" {{ $i === 0 ? 'fetchpriority="high"' : '' }} onerror="this.onerror=null;this.src='/images/logo.png'">
+                        <img src="{{ media_url($banner->image_path) }}" alt="Banner {{ $i+1 }}" width="1200" height="600" loading="{{ $i === 0 ? 'eager' : 'lazy' }}" {{ $i === 0 ? 'fetchpriority="high"' : '' }} onerror="this.onerror=null;this.src='/images/logo.png'">
                     </a>
                     @else
-                    <img src="{{ asset('storage/'.$banner->image_path) }}" alt="Banner {{ $i+1 }}" width="1200" height="600" loading="{{ $i === 0 ? 'eager' : 'lazy' }}" {{ $i === 0 ? 'fetchpriority="high"' : '' }} onerror="this.onerror=null;this.src='/images/logo.png'">
+                    <img src="{{ media_url($banner->image_path) }}" alt="Banner {{ $i+1 }}" width="1200" height="600" loading="{{ $i === 0 ? 'eager' : 'lazy' }}" {{ $i === 0 ? 'fetchpriority="high"' : '' }} onerror="this.onerror=null;this.src='/images/logo.png'">
                     @endif
                 </div>
                 @endforeach
@@ -55,7 +55,7 @@
                     <div class="cq-ticket">
                         {{-- LEFT: image bg or gradient --}}
                         <div class="cq-left"
-                             @if($coupon->image) style="background-image:url('{{ asset('storage/'.$coupon->image) }}');" @endif>
+                             @if($coupon->image) style="background-image:url('{{ media_url($coupon->image) }}');" @endif>
                             @if(!$coupon->image)
                             <div class="cq-left-inner">
                                 @if($coupon->type === 'free_shipping')
@@ -110,7 +110,7 @@
             <a href="{{ route('shop') }}?type={{ $pt->slug }}" class="type-card">
                 <div class="type-img-wrap">
                     @if($pt->image)
-                        <img src="{{ asset('storage/'.$pt->image) }}" alt="{{ $pt->name }}" width="110" height="110" loading="lazy">
+                        <img src="{{ media_url($pt->image) }}" alt="{{ $pt->name }}" width="110" height="110" loading="lazy">
                     @else
                         <div class="type-img-placeholder"><i class="bi bi-grid-3x3-gap"></i></div>
                     @endif
@@ -143,7 +143,7 @@
             <a href="{{ route('flash-sales.show', $fs) }}" class="fs-banner-slide {{ $i === 0 ? 'is-active' : '' }}">
                 <div class="fs-banner-img">
                     @if($fs->image)
-                    <img src="{{ asset('storage/'.$fs->image) }}" alt="{{ $fs->name }}" loading="lazy">
+                    <img src="{{ media_url($fs->image) }}" alt="{{ $fs->name }}" loading="lazy">
                     @else
                     <div class="fs-banner-img-ph"><i class="bi bi-lightning-charge-fill"></i></div>
                     @endif
@@ -287,7 +287,7 @@
             @foreach($categories as $cat)
             <a href="{{ route('shop.category', $cat->slug) }}" class="cat-card">
                 <div class="cat-img-wrap">
-                    <img src="{{ asset('storage/'.$cat->image) }}" alt="{{ $cat->name }}" width="150" height="150" loading="lazy">
+                    <img src="{{ media_url($cat->image) }}" alt="{{ $cat->name }}" width="150" height="150" loading="lazy">
                 </div>
                 <div class="cat-name">{{ $cat->name }}</div>
             </a>
@@ -724,7 +724,7 @@ document.addEventListener('keydown', function(e) { if(e.key==='Escape') homeClos
                 <div class="card">
                     @if($post->featured_image)
                     <div style="height:165px;overflow:hidden;">
-                        <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ $post->title }}" width="600" height="165" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.src='/images/logo.png'">
+                        <img src="{{ media_url($post->featured_image) }}" alt="{{ $post->title }}" width="600" height="165" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.src='/images/logo.png'">
                     </div>
                     @endif
                     <div class="card-body">
@@ -747,7 +747,7 @@ document.addEventListener('keydown', function(e) { if(e.key==='Escape') homeClos
                         <div class="card" style="border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.08);">
                             @if($post->featured_image)
                             <div style="height:200px;overflow:hidden;">
-                                <img src="{{ asset('storage/'.$post->featured_image) }}" alt="{{ $post->title }}" width="600" height="200" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.src='/images/logo.png'">
+                                <img src="{{ media_url($post->featured_image) }}" alt="{{ $post->title }}" width="600" height="200" loading="lazy" style="width:100%;height:100%;object-fit:cover;" onerror="this.onerror=null;this.src='/images/logo.png'">
                             </div>
                             @endif
                             <div class="card-body">

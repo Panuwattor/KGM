@@ -705,7 +705,7 @@ document.addEventListener('DOMContentLoaded', function () {
     <div onclick="event.stopPropagation();"
          style="animation:lpFadeIn .35s ease;display:inline-flex;flex-direction:column;align-items:center;gap:16px;cursor:default;">
         <div style="display:inline-block;border-radius:20px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,0.55);line-height:0;font-size:0;">
-            <img src="{{ asset('storage/'.$activeLandingPage->image_path) }}"
+            <img src="{{ media_url($activeLandingPage->image_path) }}"
                  alt="ยินดีต้อนรับ"
                  style="display:block;max-width:min(680px,92vw);max-height:75vh;width:auto;height:auto;">
         </div>

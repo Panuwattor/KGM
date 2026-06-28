@@ -23,7 +23,7 @@
             <label class="form-label">รูปภาพสาขา</label>
             @if(isset($showroom) && $showroom->image)
                 <div style="margin-bottom:8px;">
-                    <img src="{{ asset('storage/'.$showroom->image) }}" alt="รูปสาขา" style="max-width:200px;border-radius:8px;border:1px solid #ddd;">
+                    <img src="{{ media_url($showroom->image) }}" alt="รูปสาขา" style="max-width:200px;border-radius:8px;border:1px solid #ddd;">
                     <div style="font-size:12px;color:#666;margin-top:4px;">อัปโหลดไฟล์ใหม่เพื่อเปลี่ยนรูป</div>
                 </div>
             @endif

@@ -92,7 +92,7 @@
                 @foreach($cartItems as $item)
                 <div class="cart-item-row" id="cart-item-{{ $item->id }}">
                     <a href="{{ route('shop.show', $item->product->slug) }}" style="flex-shrink:0;">
-                        <img src="{{ $item->product->main_image ? asset('storage/'.$item->product->main_image) : asset('images/no-product.png') }}"
+                        <img src="{{ $item->product->main_image ? media_url($item->product->main_image) : asset('images/no-product.png') }}"
                             class="cart-item-img" alt="{{ $item->product->name }}">
                     </a>
                     <div class="cart-item-info">
@@ -269,7 +269,7 @@
                     {{-- Single-row header --}}
                     <div style="padding:12px 14px;display:flex;align-items:center;gap:10px;">
                         @if($c->image)
-                            <img src="{{ asset('storage/'.$c->image) }}" style="width:36px;height:36px;object-fit:cover;border-radius:8px;flex-shrink:0;{{ $canUse ? '' : 'opacity:.5' }}">
+                            <img src="{{ media_url($c->image) }}" style="width:36px;height:36px;object-fit:cover;border-radius:8px;flex-shrink:0;{{ $canUse ? '' : 'opacity:.5' }}">
                         @else
                             <div style="width:36px;height:36px;background:{{ $canUse ? 'var(--kgm-green-100)' : '#eee' }};border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                                 <i class="bi bi-ticket-perforated" style="color:{{ $canUse ? 'var(--kgm-green-600)' : '#bbb' }};font-size:16px;"></i>

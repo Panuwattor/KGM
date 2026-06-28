@@ -24,7 +24,7 @@
 
         {{-- Image Upload --}}
         <div class="form-group" x-data="{
-            preview: '{{ isset($productType) && $productType->image ? asset('storage/'.$productType->image) : '' }}',
+            preview: '{{ isset($productType) && $productType->image ? media_url($productType->image) : '' }}',
             hasImage: {{ isset($productType) && $productType->image ? 'true' : 'false' }},
             removed: false,
             pick(e) {

@@ -31,7 +31,7 @@
 
         {{-- Image Upload --}}
         <div class="form-group" x-data="{
-            preview: '{{ isset($category) && $category->image ? asset('storage/'.$category->image) : '' }}',
+            preview: '{{ isset($category) && $category->image ? media_url($category->image) : '' }}',
             hasImage: {{ isset($category) && $category->image ? 'true' : 'false' }},
             removed: false,
             pick(e) {

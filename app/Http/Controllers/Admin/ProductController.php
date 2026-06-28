@@ -121,7 +121,7 @@ class ProductController extends Controller
         $isPrimary = $product->images()->count() === 0;
 
         foreach ($request->file('images') as $file) {
-            $path = $file->store('products', 'public');
+            $path = $file->store('products', config('filesystems.media'));
             ProductImage::create([
                 'product_id' => $product->id,
                 'image_path' => $path,
@@ -137,7 +137,7 @@ class ProductController extends Controller
     public function deleteImage(Product $product, ProductImage $image)
     {
         if ($image->product_id !== $product->id) abort(403);
-        Storage::disk('public')->delete($image->image_path);
+        Storage::disk(config('filesystems.media'))->delete($image->image_path);
         $image->delete();
         if ($image->is_primary) {
             $product->images()->first()?->update(['is_primary' => true]);

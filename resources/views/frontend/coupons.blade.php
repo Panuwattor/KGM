@@ -143,7 +143,7 @@
                 <div class="cp-left">
                     @if($coupon->image)
                         <div class="cp-left-bg"></div>
-                        <img class="cp-left-img" src="{{ asset('storage/'.$coupon->image) }}" alt="{{ $coupon->name }}">
+                        <img class="cp-left-img" src="{{ media_url($coupon->image) }}" alt="{{ $coupon->name }}">
                     @else
                     <div class="cp-left-inner" style="background:linear-gradient(135deg,var(--kgm-green-700),var(--kgm-green-500));position:absolute;inset:0;border-radius:18px 0 0 18px;justify-content:center;">
                         @if($coupon->type === 'free_shipping')

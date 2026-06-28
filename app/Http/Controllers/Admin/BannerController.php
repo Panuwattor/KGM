@@ -27,7 +27,7 @@ class BannerController extends Controller
         ]);
 
         Banner::create([
-            'image_path' => $request->file('image')->store('banners', 'public'),
+            'image_path' => $request->file('image')->store('banners', config('filesystems.media')),
             'link_url'   => $request->link_url,
             'sort_order' => $request->sort_order ?? 0,
             'is_active'  => $request->boolean('is_active', true),
@@ -55,8 +55,8 @@ class BannerController extends Controller
         ];
 
         if ($request->hasFile('image')) {
-            \Storage::disk('public')->delete($banner->image_path);
-            $data['image_path'] = $request->file('image')->store('banners', 'public');
+            \Storage::disk(config('filesystems.media'))->delete($banner->image_path);
+            $data['image_path'] = $request->file('image')->store('banners', config('filesystems.media'));
         }
 
         $banner->update($data);
@@ -66,7 +66,7 @@ class BannerController extends Controller
 
     public function destroy(Banner $banner)
     {
-        \Storage::disk('public')->delete($banner->image_path);
+        \Storage::disk(config('filesystems.media'))->delete($banner->image_path);
         $banner->delete();
         Cache::forget('home.banners');
         return redirect()->route('admin.banners.index')->with('success', 'ลบ Banner แล้ว');

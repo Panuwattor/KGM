@@ -22,7 +22,7 @@
             @if($post->author)<span><i class="bi bi-person"></i> {{ $post->author->name }}</span>@endif
         </div>
         @if($post->featured_image)
-        <img src="{{ asset('storage/'.$post->featured_image) }}" style="width:100%;border-radius:14px;margin-bottom:28px;" alt="{{ $post->title }}">
+        <img src="{{ media_url($post->featured_image) }}" style="width:100%;border-radius:14px;margin-bottom:28px;" alt="{{ $post->title }}">
         @endif
         <div style="font-size:15px;line-height:1.9;color:#444;">{!! $post->body !!}</div>
     </article>
@@ -34,7 +34,7 @@
             <div class="card">
                 @if($r->featured_image)
                 <div style="height:160px;overflow:hidden;border-radius:14px 14px 0 0;">
-                    <img src="{{ asset('storage/'.$r->featured_image) }}" style="width:100%;height:100%;object-fit:cover;" alt="{{ $r->title }}">
+                    <img src="{{ media_url($r->featured_image) }}" style="width:100%;height:100%;object-fit:cover;" alt="{{ $r->title }}">
                 </div>
                 @endif
                 <div class="card-body">

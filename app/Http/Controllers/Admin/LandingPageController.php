@@ -21,7 +21,7 @@ class LandingPageController extends Controller
             'image' => 'required|image|mimes:jpg,jpeg,png,webp,gif|max:4096',
         ]);
 
-        $path = $request->file('image')->store('landing_pages', 'public');
+        $path = $request->file('image')->store('landing_pages', config('filesystems.media'));
 
         LandingPage::create([
             'image_path' => $path,
@@ -46,7 +46,7 @@ class LandingPageController extends Controller
 
     public function destroy(LandingPage $landingPage)
     {
-        Storage::disk('public')->delete($landingPage->image_path);
+        Storage::disk(config('filesystems.media'))->delete($landingPage->image_path);
         $landingPage->delete();
         return redirect()->route('admin.landing-pages.index')->with('success', 'ลบรูป Landing Page แล้ว');
     }

@@ -29,7 +29,7 @@ class CategoryController extends Controller
         $data['slug'] = Str::slug($request->name);
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store('categories', 'public');
+            $data['image'] = $request->file('image')->store('categories', config('filesystems.media'));
         }
 
         Category::create($data);
@@ -49,13 +49,13 @@ class CategoryController extends Controller
 
         if ($request->hasFile('image')) {
             if ($category->image) {
-                Storage::disk('public')->delete($category->image);
+                Storage::disk(config('filesystems.media'))->delete($category->image);
             }
-            $data['image'] = $request->file('image')->store('categories', 'public');
+            $data['image'] = $request->file('image')->store('categories', config('filesystems.media'));
         }
 
         if ($request->boolean('remove_image') && $category->image) {
-            Storage::disk('public')->delete($category->image);
+            Storage::disk(config('filesystems.media'))->delete($category->image);
             $data['image'] = null;
         }
 
@@ -67,7 +67,7 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         if ($category->image) {
-            Storage::disk('public')->delete($category->image);
+            Storage::disk(config('filesystems.media'))->delete($category->image);
         }
         $category->delete();
         Cache::forget('home.categories');

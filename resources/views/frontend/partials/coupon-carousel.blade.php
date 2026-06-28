@@ -76,7 +76,7 @@ window.KGMCouponCarousel = function (trackId) {
             @foreach($coupons as $coupon)
             @php $isCollected = in_array($coupon->id, $collectedIds ?? []); @endphp
             <div class="cq-ticket">
-                <div class="cq-left" @if($coupon->image) style="background-image:url('{{ asset('storage/'.$coupon->image) }}');" @endif>
+                <div class="cq-left" @if($coupon->image) style="background-image:url('{{ media_url($coupon->image) }}');" @endif>
                     @if(!$coupon->image)
                     <div class="cq-left-inner">
                         @if($coupon->type === 'free_shipping')

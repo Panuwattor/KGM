@@ -11,7 +11,7 @@
         <tbody>
         @forelse($banners as $b)
         <tr>
-            <td><img src="{{ asset('storage/'.$b->image_path) }}" style="width:100px;height:50px;object-fit:cover;border-radius:10px;" onerror="this.style.display='none'"></td>
+            <td><img src="{{ media_url($b->image_path) }}" style="width:100px;height:50px;object-fit:cover;border-radius:10px;" onerror="this.style.display='none'"></td>
             <td>{{ $b->link_url ?? '-' }}</td>
             <td>{{ $b->sort_order }}</td>
             <td><span class="status-badge {{ $b->is_active ? 'status-green' : 'status-red' }}">{{ $b->is_active ? 'เปิด' : 'ปิด' }}</span></td>

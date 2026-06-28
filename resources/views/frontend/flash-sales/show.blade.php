@@ -189,7 +189,7 @@
     <div class="fs-hero-inner">
         @if($flashSale->image)
         <div class="fs-hero-img">
-            <img src="{{ asset('storage/'.$flashSale->image) }}" alt="{{ $flashSale->name }}">
+            <img src="{{ media_url($flashSale->image) }}" alt="{{ $flashSale->name }}">
         </div>
         @else
         <div class="fs-hero-placeholder">
@@ -240,7 +240,7 @@
             <div class="fs-product-card">
                 <div class="fs-product-img-wrap">
                     <a href="{{ route('shop.show', $product->slug) }}">
-                        <img src="{{ $product->main_image ? asset('storage/'.$product->main_image) : asset('images/logo.png') }}"
+                        <img src="{{ $product->main_image ? media_url($product->main_image) : asset('images/logo.png') }}"
                              alt="{{ $product->name }}"
                              onerror="this.onerror=null;this.src='/images/logo.png'">
                     </a>
