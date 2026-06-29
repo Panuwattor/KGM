@@ -21,7 +21,7 @@
         {{-- ช่องทางชำระเงิน --}}
         <div style="background:white;border:2px solid var(--kgm-gold-300);border-radius:16px;padding:clamp(16px,4vw,20px);margin-bottom:20px;text-align:left;">
             <h3 style="font-weight:800;color:var(--kgm-gold-700);margin-bottom:14px;font-size:16px;"><i class="bi bi-credit-card"></i> ช่องทางการชำระเงิน</h3>
-            @include('frontend._payment-info', ['payAmount' => $order->total])
+            @include('frontend._payment-info', ['payAmount' => $order->total, 'payRef' => $order->order_number])
         </div>
 
         {{-- อัปโหลดสลิปได้เลยจากหน้านี้ --}}

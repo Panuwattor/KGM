@@ -92,7 +92,7 @@
     <div style="background:white;border-radius:20px;padding:clamp(16px,4vw,24px);box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-bottom:20px;">
         <h3 style="font-weight:800;margin-bottom:16px;"><i class="bi bi-bank"></i> ช่องทางการชำระเงิน</h3>
         <div style="margin-bottom:20px;">
-            @include('frontend._payment-info', ['payAmount' => $order->total])
+            @include('frontend._payment-info', ['payAmount' => $order->total, 'payRef' => $order->order_number])
         </div>
         <h3 style="font-weight:800;margin-bottom:16px;border-top:1px solid #f0f2f0;padding-top:20px;"><i class="bi bi-cloud-upload"></i> อัปโหลดสลิปการชำระเงิน</h3>
         @if($order->payment_slip)
@@ -109,10 +109,10 @@
 
         @if($order->status === 'pending_payment')
         <div style="border-top:1px solid #f0f2f0;margin-top:20px;padding-top:16px;">
-            <div style="font-size:13px;color:#888;margin-bottom:10px;">ยังไม่ต้องการสั่งซื้อแล้ว? สามารถยกเลิกออเดอร์นี้ได้ก่อนชำระเงิน</div>
-            <form method="POST" action="{{ route('account.orders.cancel', $order) }}" id="cancel-order-form">
+            <form method="POST" action="{{ route('account.orders.cancel', $order) }}" id="cancel-order-form" style="text-align:center;">
                 @csrf
-                <button type="submit" class="btn btn-outline" style="border-color:#e57373;color:#c0392b;"><i class="bi bi-x-circle"></i> ยกเลิกออเดอร์</button>
+            <div style="font-size:13px;color:#888;margin-bottom:10px;">ยังไม่ต้องการสั่งซื้อแล้ว? สามารถยกเลิกออเดอร์นี้ได้ก่อนชำระเงิน</div>
+                <button type="submit" class="btn btn-outline" style="background:#fff;border-color:#ddd;color:#555;"><i class="bi bi-x-circle"></i> ยกเลิกออเดอร์</button>
             </form>
         </div>
         @endif
