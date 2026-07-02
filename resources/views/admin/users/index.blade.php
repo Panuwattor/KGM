@@ -6,9 +6,11 @@
         <div class="page-title">จัดการพนักงาน</div>
         <div class="page-subtitle">แอดมินและพนักงานที่มีสิทธิ์เข้าหลังบ้าน</div>
     </div>
+    @can('user_manage')
     <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
         <i class="bi bi-person-plus"></i> เพิ่มผู้ใช้งาน
     </a>
+    @endcan
 </div>
 <form method="GET" class="filter-bar">
     <div class="filter-item" style="flex:2;">
@@ -42,11 +44,18 @@
             <td style="color:#555;">{{ $user->email }}</td>
             <td>
                 @forelse($user->roles as $role)
-                    <span class="status-badge {{ $role->name === 'admin' ? 'status-purple' : 'status-indigo' }}">{{ $role->name }}</span>
-                @empty
-                    <span class="status-badge {{ $user->role === 'admin' ? 'status-purple' : 'status-indigo' }}">
-                        {{ $user->role === 'admin' ? 'แอดมิน' : 'พนักงาน' }}
+                    <span class="status-badge {{ $role->name === 'executive' ? 'status-purple' : 'status-indigo' }}">
+                        @switch($role->name)
+                            @case('executive') ผู้บริหาร @break
+                            @case('sales') ฝ่ายขาย @break
+                            @case('accounting') บัญชี @break
+                            @case('marketing') การตลาด @break
+                            @case('staff') พนักงาน @break
+                            @default {{ $role->name }}
+                        @endswitch
                     </span>
+                @empty
+                    <span class="status-badge status-gray">ไม่มีตำแหน่ง</span>
                 @endforelse
             </td>
             <td>
@@ -56,16 +65,18 @@
             </td>
             <td style="font-size:12px;color:#888;">{{ $user->created_at->format('d/m/Y') }}</td>
             <td style="display:flex;gap:6px;">
+                @can('user_manage')
                 <a href="{{ route('admin.users.edit', $user) }}" class="btn btn-sm btn-light">
                     <i class="bi bi-pencil"></i>
                 </a>
-                @if($user->id !== auth()->id())
+                @if($user->id !== auth()->id() && $user->id !== 1)
                 <form method="POST" action="{{ route('admin.users.destroy', $user) }}"
-                    onsubmit="return confirm('ลบผู้ใช้งาน {{ $user->name }}?')">
+                    onsubmit="return confirm('ระงับบัญชี {{ $user->name }}?\n\nบัญชีจะไม่สามารถเข้าสู่ระบบได้ แต่ข้อมูลยังคงอยู่และสามารถกู้คืนได้')">
                     @csrf @method('DELETE')
-                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>
+                    <button class="btn btn-sm btn-danger" title="ระงับบัญชี"><i class="bi bi-ban"></i></button>
                 </form>
                 @endif
+                @endcan
             </td>
         </tr>
         @empty

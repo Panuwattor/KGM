@@ -17,10 +17,19 @@
             </div>
             <div class="form-group">
                 <label class="form-label">ตำแหน่ง</label>
-                @php $currentRole = $user->roles->first()?->name ?? $user->role; @endphp
+                @php $currentRole = $user->roles->first()?->name; @endphp
                 <select name="role" class="form-control">
                     @foreach($roles as $r)
-                        <option value="{{ $r->name }}" {{ $currentRole === $r->name ? 'selected' : '' }}>{{ $r->name }}</option>
+                        <option value="{{ $r->name }}" {{ $currentRole === $r->name ? 'selected' : '' }}>
+                            @switch($r->name)
+                                @case('executive') ผู้บริหาร @break
+                                @case('sales') ฝ่ายขาย @break
+                                @case('accounting') บัญชี @break
+                                @case('marketing') การตลาด @break
+                                @case('staff') พนักงาน @break
+                                @default {{ $r->name }}
+                            @endswitch
+                        </option>
                     @endforeach
                 </select>
             </div>

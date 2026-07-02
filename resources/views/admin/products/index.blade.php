@@ -7,7 +7,9 @@
         <div class="page-title">จัดการสินค้า</div>
         <div class="page-subtitle">สินค้าทั้งหมด {{ $products->total() }} รายการ</div>
     </div>
+    @can('product_manage')
     <a href="{{ route('admin.products.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> เพิ่มสินค้าใหม่</a>
+    @endcan
 </div>
 
 <form method="GET" class="filter-bar">
@@ -108,12 +110,14 @@
             </td>
             <td>
                 <div style="display:flex;gap:6px;">
-                    <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-light" title="แก้ไข"><i class="bi bi-pencil"></i></a>
                     <a href="{{ route('shop.show', $product->slug) }}" class="btn btn-sm btn-light" target="_blank" title="ดูหน้าเว็บ"><i class="bi bi-eye"></i></a>
+                    @can('product_manage')
+                    <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-sm btn-light" title="แก้ไข"><i class="bi bi-pencil"></i></a>
                     <form method="POST" action="{{ route('admin.products.destroy', $product) }}" onsubmit="return confirm('ลบสินค้านี้?')">
                         @csrf @method('DELETE')
                         <button type="submit" class="btn btn-sm btn-danger" title="ลบ"><i class="bi bi-trash"></i></button>
                     </form>
+                    @endcan
                 </div>
             </td>
         </tr>

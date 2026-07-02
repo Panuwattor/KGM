@@ -31,17 +31,17 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return in_array($this->role, ['admin', 'staff']);
+        return $this->hasAnyRole(['executive', 'sales', 'accounting', 'marketing', 'staff']);
     }
 
     public function isCustomer(): bool
     {
-        return $this->role === 'customer';
+        return $this->hasRole('customer');
     }
 
     public function isSuperAdmin(): bool
     {
-        return $this->role === 'admin';
+        return $this->hasRole('executive');
     }
 
     public function addresses()

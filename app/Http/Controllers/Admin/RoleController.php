@@ -62,7 +62,7 @@ class RoleController extends Controller
 
     public function destroy(Role $role)
     {
-        if (in_array($role->name, ['admin', 'staff', 'customer'])) {
+        if (in_array($role->name, ['executive', 'sales', 'accounting', 'marketing', 'staff', 'customer'])) {
             return back()->with('error', 'ไม่สามารถลบตำแหน่งหลักของระบบได้');
         }
         if ($role->users()->count() > 0) {

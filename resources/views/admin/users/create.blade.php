@@ -36,7 +36,16 @@
                 <label class="form-label">ตำแหน่ง <span style="color:#e74c3c;">*</span></label>
                 <select name="role" class="form-control @error('role') is-invalid @enderror">
                     @foreach($roles as $r)
-                        <option value="{{ $r->name }}" {{ old('role') === $r->name ? 'selected' : '' }}>{{ $r->name }}</option>
+                        <option value="{{ $r->name }}" {{ old('role') === $r->name ? 'selected' : '' }}>
+                            @switch($r->name)
+                                @case('executive') ผู้บริหาร @break
+                                @case('sales') ฝ่ายขาย @break
+                                @case('accounting') บัญชี @break
+                                @case('marketing') การตลาด @break
+                                @case('staff') พนักงาน @break
+                                @default {{ $r->name }}
+                            @endswitch
+                        </option>
                     @endforeach
                 </select>
                 @error('role')<div class="invalid-feedback">{{ $message }}</div>@enderror

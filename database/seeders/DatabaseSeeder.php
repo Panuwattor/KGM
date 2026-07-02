@@ -54,6 +54,12 @@ class DatabaseSeeder extends Seeder
             }
         }
 
+        // ── Roles & Permissions (ต้องรันก่อน เพื่อให้ User ID 1 มี role) ───────
+        $this->call(RolePermissionSeeder::class);
+
+        // ── News Tickers ───────────────────────────────────────────────────────
+        $this->call(NewsTickerSeeder::class);
+
         // ── Shipping Rates ─────────────────────────────────────────────────────
         $this->call(ShippingRateSeeder::class);
 

@@ -12,13 +12,15 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::whereIn('role', ['admin', 'staff']);
+        $query = User::with('roles');
+
         if ($request->filled('search')) {
             $query->where(fn($q) => $q
                 ->where('name', 'like', '%' . $request->search . '%')
                 ->orWhere('email', 'like', '%' . $request->search . '%'));
         }
-        $users = $query->with('roles')->latest()->paginate(20)->withQueryString();
+
+        $users = $query->latest()->paginate(20)->withQueryString();
         return view('admin.users.index', compact('users'));
     }
 
@@ -37,13 +39,10 @@ class UserController extends Controller
             'role'                  => 'required|exists:roles,name',
         ]);
 
-        $isAdminRole = $request->role === 'admin';
-
         $user = User::create([
             'name'      => $request->name,
             'email'     => $request->email,
             'password'  => Hash::make($request->password),
-            'role'      => $isAdminRole ? 'admin' : 'staff',
             'is_active' => true,
         ]);
 
@@ -69,12 +68,11 @@ class UserController extends Controller
             'role' => 'required|exists:roles,name',
         ]);
 
-        if ($user->id === auth()->id() && $request->role !== 'admin') {
-            return back()->with('error', 'ไม่สามารถเปลี่ยนตำแหน่งของตัวเองออกจากแอดมินได้');
+        if ($user->id === auth()->id() && $request->role !== 'executive') {
+            return back()->with('error', 'ไม่สามารถเปลี่ยนตำแหน่งของตัวเองออกจากผู้บริหารได้');
         }
 
         $user->update([
-            'role'      => $request->role === 'admin' ? 'admin' : 'staff',
             'is_active' => $request->boolean('is_active'),
         ]);
 
@@ -86,9 +84,15 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         if ($user->id === auth()->id()) {
-            return back()->with('error', 'ไม่สามารถลบบัญชีของตัวเองได้');
+            return back()->with('error', 'ไม่สามารถระงับบัญชีของตัวเองได้');
         }
+        if ($user->id === 1) {
+            return back()->with('error', 'ไม่สามารถระงับบัญชีผู้ดูแลระบบหลักได้');
+        }
+
+        // Soft delete - ไม่ลบจริง แค่ทำเครื่องหมายว่าถูกลบ
         $user->delete();
-        return redirect()->route('admin.users.index')->with('success', 'ลบผู้ใช้งานแล้ว');
+
+        return redirect()->route('admin.users.index')->with('success', 'ระงับบัญชีผู้ใช้งานแล้ว (สามารถกู้คืนได้)');
     }
 }

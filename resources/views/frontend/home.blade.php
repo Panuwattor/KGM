@@ -7,6 +7,53 @@
 
 @section('content')
 
+
+{{-- ══ PRODUCT TYPES ══ --}}
+@if($productTypes->isNotEmpty())
+<section class="type-section">
+    <div class="container">
+        <div class="type-grid">
+            @foreach($productTypes as $pt)
+            <a href="{{ route('shop') }}?type={{ $pt->slug }}" class="type-card">
+                <div class="type-img-wrap">
+                    @if($pt->image)
+                        <img src="{{ media_url($pt->image) }}" alt="{{ $pt->name }}" width="110" height="110" loading="lazy">
+                    @else
+                        <div class="type-img-placeholder"><i class="bi bi-grid-3x3-gap"></i></div>
+                    @endif
+                </div>
+                <div class="type-name">{{ $pt->name }}</div>
+            </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+
+{{-- ══ NEWS TICKER ══ --}}
+<div class="news-ticker-wrapper">
+    <div class="news-ticker-container">
+        <div class="news-ticker-label">
+            <span>ข่าวสำคัญ</span>
+            <i class="bi bi-megaphone-fill"></i>
+        </div>
+        <div class="news-ticker-content">
+            <div class="news-ticker-track">
+                <span class="news-ticker-item">
+                    @foreach($newsTickers as $ticker)
+                        @if($ticker->plain_text){{ $ticker->plain_text }}@endif
+                        @if($ticker->link_text && $ticker->link_url)
+                            <a href="{{ $ticker->link_url }}" class="ticker-link">{{ $ticker->link_text }}</a>
+                        @endif
+                        @if(!$loop->last) | @endif
+                    @endforeach
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
 {{-- ══ HERO ══ --}}
 @if($banners->isNotEmpty())
 <div class="hero-section" id="hero-slider">
@@ -41,9 +88,10 @@
 </div>
 @endif
 
+
 {{-- ══ COUPON CAROUSEL ══ --}}
 @if($homeCoupons->isNotEmpty())
-<section class="cq-sec">
+<section class="cq-sec mt-2">
     <div class="container">
         <div class="cq-wrap">
             <button class="cq-arrow cq-prev" onclick="cqSlide(-1)" aria-label="ก่อนหน้า"><i class="bi bi-chevron-left"></i></button>
@@ -96,28 +144,6 @@
                 </div>
             </div>
 
-        </div>
-    </div>
-</section>
-@endif
-
-{{-- ══ PRODUCT TYPES ══ --}}
-@if($productTypes->isNotEmpty())
-<section class="type-section">
-    <div class="container">
-        <div class="type-grid">
-            @foreach($productTypes as $pt)
-            <a href="{{ route('shop') }}?type={{ $pt->slug }}" class="type-card">
-                <div class="type-img-wrap">
-                    @if($pt->image)
-                        <img src="{{ media_url($pt->image) }}" alt="{{ $pt->name }}" width="110" height="110" loading="lazy">
-                    @else
-                        <div class="type-img-placeholder"><i class="bi bi-grid-3x3-gap"></i></div>
-                    @endif
-                </div>
-                <div class="type-name">{{ $pt->name }}</div>
-            </a>
-            @endforeach
         </div>
     </div>
 </section>

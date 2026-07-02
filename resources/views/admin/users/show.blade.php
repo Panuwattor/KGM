@@ -5,9 +5,18 @@
     <div>
         <div class="page-title">{{ $user->name }}</div>
         <div class="page-subtitle">
-            <span class="status-badge {{ $user->role === 'admin' ? 'status-purple' : 'status-indigo' }}">
-                {{ $user->role === 'admin' ? 'แอดมิน' : 'พนักงาน' }}
-            </span>
+            @foreach($user->roles as $role)
+                <span class="status-badge {{ $role->name === 'executive' ? 'status-purple' : 'status-indigo' }}">
+                    @switch($role->name)
+                        @case('executive') ผู้บริหาร @break
+                        @case('sales') ฝ่ายขาย @break
+                        @case('accounting') บัญชี @break
+                        @case('marketing') การตลาด @break
+                        @case('staff') พนักงาน @break
+                        @default {{ $role->name }}
+                    @endswitch
+                </span>
+            @endforeach
         </div>
     </div>
     <div style="display:flex;gap:8px;">
@@ -22,9 +31,18 @@
             <div><strong>ชื่อ:</strong> {{ $user->name }}</div>
             <div><strong>อีเมล:</strong> {{ $user->email }}</div>
             <div><strong>บทบาท:</strong>
-                <span class="status-badge {{ $user->role === 'admin' ? 'status-purple' : 'status-indigo' }}">
-                    {{ $user->role === 'admin' ? 'แอดมิน' : 'พนักงาน' }}
-                </span>
+                @foreach($user->roles as $role)
+                    <span class="status-badge {{ $role->name === 'executive' ? 'status-purple' : 'status-indigo' }}">
+                        @switch($role->name)
+                            @case('executive') ผู้บริหาร @break
+                            @case('sales') ฝ่ายขาย @break
+                            @case('accounting') บัญชี @break
+                            @case('marketing') การตลาด @break
+                            @case('staff') พนักงาน @break
+                            @default {{ $role->name }}
+                        @endswitch
+                    </span>
+                @endforeach
             </div>
             <div><strong>สถานะ:</strong>
                 <span class="status-badge {{ $user->is_active ? 'status-green' : 'status-red' }}">

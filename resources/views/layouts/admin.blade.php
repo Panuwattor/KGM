@@ -281,114 +281,185 @@
         </div>
     </div>
     <nav class="sidebar-nav">
+        @can('dashboard_view')
         <div class="nav-section">
             <div class="nav-section-title">ภาพรวม</div>
             <a href="{{ route('admin.dashboard') }}" class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
+            @can('report_view')
             <a href="{{ route('admin.reports') }}" class="nav-item {{ request()->routeIs('admin.reports') ? 'active' : '' }}">
                 <i class="bi bi-bar-chart-line"></i> รายงาน
             </a>
+            @endcan
         </div>
+        @endcan
+
+        @if(auth()->user()->can('product_view') || auth()->user()->can('category_view') || auth()->user()->can('product_type_view'))
         <div class="nav-section">
             <div class="nav-section-title">สินค้า</div>
+            @can('product_view')
             <a href="{{ route('admin.products.index') }}" class="nav-item {{ request()->routeIs('admin.products*') ? 'active' : '' }}">
                 <i class="bi bi-box-seam"></i> จัดการสินค้า
             </a>
+            @endcan
+            @can('category_view')
             <a href="{{ route('admin.categories.index') }}" class="nav-item {{ request()->routeIs('admin.categories*') ? 'active' : '' }}">
                 <i class="bi bi-tags"></i> หมวดหมู่
             </a>
+            @endcan
+            @can('product_type_view')
             <a href="{{ route('admin.product-types.index') }}" class="nav-item {{ request()->routeIs('admin.product-types*') ? 'active' : '' }}">
                 <i class="bi bi-grid-3x3-gap"></i> ประเภทสินค้า
             </a>
+            @endcan
         </div>
+        @endif
+
+        @if(auth()->user()->can('order_view') || auth()->user()->can('quote_view'))
         <div class="nav-section">
             <div class="nav-section-title">ออเดอร์</div>
+            @can('order_view')
             <a href="{{ route('admin.orders.index') }}" class="nav-item {{ request()->routeIs('admin.orders*') ? 'active' : '' }}">
                 <i class="bi bi-receipt"></i> คำสั่งซื้อ
                 @php $pendingCount = \App\Models\Order::where('status','payment_uploaded')->count(); @endphp
                 @if($pendingCount > 0)<span class="badge-dot">{{ $pendingCount }}</span>@endif
             </a>
+            @endcan
+            @can('quote_view')
             <a href="{{ route('admin.quotes.index') }}" class="nav-item {{ request()->routeIs('admin.quotes*') ? 'active' : '' }}">
                 <i class="bi bi-file-earmark-text"></i> ใบเสนอราคา
             </a>
+            @endcan
+            @can('setting_view')
             <a href="{{ route('admin.settings.shipping-rates') }}" class="nav-item {{ request()->routeIs('admin.settings.shipping-rates') ? 'active' : '' }}">
                 <i class="bi bi-truck"></i> อัตราค่าขนส่ง
             </a>
             <a href="{{ route('admin.settings.shipping-providers') }}" class="nav-item {{ request()->routeIs('admin.settings.shipping-providers') ? 'active' : '' }}">
                 <i class="bi bi-box-seam"></i> บริษัทขนส่ง
             </a>
+            @endcan
         </div>
+        @endif
+
+        @if(auth()->user()->can('coupon_view') || auth()->user()->can('flash_sale_view') || auth()->user()->can('banner_view') || auth()->user()->can('news_ticker_view') || auth()->user()->can('landing_page_view') || auth()->user()->can('post_view') || auth()->user()->can('video_view'))
         <div class="nav-section">
             <div class="nav-section-title">การตลาด</div>
+            @can('coupon_view')
             <a href="{{ route('admin.coupons.index') }}" class="nav-item {{ request()->routeIs('admin.coupons*') ? 'active' : '' }}">
                 <i class="bi bi-ticket-perforated"></i> คูปองส่วนลด
             </a>
+            @endcan
+            @can('flash_sale_view')
             <a href="{{ route('admin.marketing.index') }}" class="nav-item {{ request()->routeIs('admin.marketing*') || request()->routeIs('admin.flash-sales*') ? 'active' : '' }}">
                 <i class="bi bi-lightning-charge"></i> Flash Sale
             </a>
+            @endcan
+            @can('banner_view')
             <a href="{{ route('admin.banners.index') }}" class="nav-item {{ request()->routeIs('admin.banners*') ? 'active' : '' }}">
                 <i class="bi bi-image"></i> จัดการ Banner
             </a>
+            @endcan
+            @can('news_ticker_view')
+            <a href="{{ route('admin.news-tickers.index') }}" class="nav-item {{ request()->routeIs('admin.news-tickers*') ? 'active' : '' }}">
+                <i class="bi bi-megaphone"></i> ข่าวสำคัญ
+            </a>
+            @endcan
+            @can('landing_page_view')
             <a href="{{ route('admin.landing-pages.index') }}" class="nav-item {{ request()->routeIs('admin.landing-pages*') ? 'active' : '' }}">
                 <i class="bi bi-easel2"></i> Landing Page
             </a>
+            @endcan
+            @can('post_view')
             <a href="{{ route('admin.posts.index') }}" class="nav-item {{ request()->routeIs('admin.posts*') ? 'active' : '' }}">
                 <i class="bi bi-newspaper"></i> บทความ/ข่าวสาร
             </a>
+            @endcan
+            @can('video_view')
             <a href="{{ route('admin.videos.index') }}" class="nav-item {{ request()->routeIs('admin.videos*') ? 'active' : '' }}">
                 <i class="bi bi-play-circle"></i> เรื่องราวที่น่าสนใจ
             </a>
+            @endcan
         </div>
+        @endif
+
+        @if(auth()->user()->can('customer_view') || auth()->user()->can('review_view') || auth()->user()->can('contact_view') || auth()->user()->can('career_view') || auth()->user()->can('dealer_view'))
         <div class="nav-section">
             <div class="nav-section-title">ผู้ใช้งาน</div>
+            @can('customer_view')
             <a href="{{ route('admin.customers.index') }}" class="nav-item {{ request()->routeIs('admin.customers*') ? 'active' : '' }}">
                 <i class="bi bi-people"></i> ลูกค้า
             </a>
+            @endcan
+            @can('review_view')
             <a href="{{ route('admin.reviews.index') }}" class="nav-item {{ request()->routeIs('admin.reviews*') ? 'active' : '' }}">
                 <i class="bi bi-star-half"></i> รีวิวสินค้า
                 @php $pendingReviews = \App\Models\Review::where('is_approved', false)->count(); @endphp
                 @if($pendingReviews > 0)<span class="badge-dot">{{ $pendingReviews }}</span>@endif
             </a>
+            @endcan
+            @can('contact_view')
             <a href="{{ route('admin.contacts.index') }}" class="nav-item {{ request()->routeIs('admin.contacts*') ? 'active' : '' }}">
                 <i class="bi bi-chat-left-text"></i> ข้อความติดต่อ
                 @php $unread = \App\Models\ContactMessage::where('is_read',false)->count(); @endphp
                 @if($unread > 0)<span class="badge-dot">{{ $unread }}</span>@endif
             </a>
+            @endcan
+            @can('career_view')
             <a href="{{ route('admin.careers.index') }}" class="nav-item {{ request()->routeIs('admin.careers*') ? 'active' : '' }}">
                 <i class="bi bi-briefcase"></i> ใบสมัครงาน
             </a>
+            @endcan
+            @can('dealer_view')
             <a href="{{ route('admin.dealers.index') }}" class="nav-item {{ request()->routeIs('admin.dealers*') ? 'active' : '' }}">
                 <i class="bi bi-shop"></i> ตัวแทนจำหน่าย
             </a>
+            @endcan
         </div>
+        @endif
+
+        @if(auth()->user()->can('user_view') || auth()->user()->can('role_view'))
         <div class="nav-section">
             <div class="nav-section-title">จัดการแอดมิน</div>
+            @can('user_view')
             <a href="{{ route('admin.users.index') }}" class="nav-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
                 <i class="bi bi-person-badge"></i> จัดการพนักงาน
             </a>
+            @endcan
+            @can('role_view')
             <a href="{{ route('admin.roles.index') }}" class="nav-item {{ request()->routeIs('admin.roles*') ? 'active' : '' }}">
                 <i class="bi bi-diagram-3"></i> จัดการตำแหน่ง
             </a>
             <a href="{{ route('admin.permissions.index') }}" class="nav-item {{ request()->routeIs('admin.permissions*') ? 'active' : '' }}">
                 <i class="bi bi-shield-lock"></i> จัดการสิทธิ์
             </a>
+            @endcan
         </div>
+        @endif
+
+        @if(auth()->user()->can('showroom_view') || auth()->user()->can('location_view') || auth()->user()->can('setting_view'))
         <div class="nav-section">
             <div class="nav-section-title">ระบบ</div>
+            @can('showroom_view')
             <a href="{{ route('admin.showrooms.index') }}" class="nav-item {{ request()->routeIs('admin.showrooms*') ? 'active' : '' }}">
                 <i class="bi bi-geo-alt"></i> สาขา/โชว์รูม
             </a>
+            @endcan
+            @can('location_view')
             <a href="{{ route('admin.provinces.index') }}" class="nav-item {{ request()->routeIs('admin.provinces*') ? 'active' : '' }}">
                 <i class="bi bi-map"></i> จัดการจังหวัด
             </a>
+            @endcan
+            @can('setting_view')
             <a href="{{ route('admin.settings.index') }}" class="nav-item {{ request()->routeIs('admin.settings*') ? 'active' : '' }}">
                 <i class="bi bi-gear"></i> ตั้งค่าระบบ
             </a>
+            @endcan
             <a href="{{ route('admin.manual') }}" class="nav-item {{ request()->routeIs('admin.manual') ? 'active' : '' }}">
                 <i class="bi bi-book-half"></i> คู่มือการใช้งาน
             </a>
         </div>
+        @endif
     </nav>
 </aside>
 
@@ -455,7 +526,7 @@
                         <div style="font-size:12px;color:#888;">{{ auth()->user()->email }}</div>
                     </div>
                     <a href="{{ route('admin.profile.edit') }}" style="display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:13px;color:#555;text-decoration:none;"><i class="bi bi-person-gear"></i> จัดการข้อมูลส่วนตัว</a>
-                    <form method="POST" action="{{ route('logout') }}">
+                    <form method="POST" action="{{ route('admin.logout') }}">
                         @csrf
                         <button type="submit" style="display:flex;align-items:center;gap:8px;padding:10px 16px;font-size:13px;color:#e74c3c;background:none;border:none;cursor:pointer;width:100%;font-family:inherit;">
                             <i class="bi bi-box-arrow-right"></i> ออกจากระบบ

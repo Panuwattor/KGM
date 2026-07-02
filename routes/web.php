@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\PermissionController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\NewsTickerController;
 use App\Http\Controllers\Admin\CareerController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\QuoteAdminController;
@@ -163,94 +164,299 @@ Route::prefix('admin')->name('admin.')->group(function () {
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
-    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports');
+    // Dashboard & Profile (ทุกคนเข้าได้)
+    Route::middleware(['check.permission:dashboard_view'])->group(function () {
+        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    });
+
+    Route::middleware(['check.permission:report_view'])->group(function () {
+        Route::get('/reports', [ReportController::class, 'index'])->name('reports');
+    });
+
     Route::get('/manual', fn() => view('admin.manual.index'))->name('manual');
 
+    // Profile - ทุกคนแก้ไขได้
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 
-    Route::resource('categories', CategoryController::class);
-    Route::resource('product-types', ProductTypeController::class);
-    Route::resource('products', ProductController::class);
-    Route::post('products/{product}/images', [ProductController::class, 'uploadImages'])->name('products.images.upload');
-    Route::delete('products/{product}/images/{image}', [ProductController::class, 'deleteImage'])->name('products.images.delete');
+    // Products
+    Route::middleware(['check.permission:product_manage'])->group(function () {
+        Route::get('products/create', [ProductController::class, 'create'])->name('products.create');
+        Route::post('products', [ProductController::class, 'store'])->name('products.store');
+        Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+        Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
+        Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
+        Route::post('products/{product}/images', [ProductController::class, 'uploadImages'])->name('products.images.upload');
+        Route::delete('products/{product}/images/{image}', [ProductController::class, 'deleteImage'])->name('products.images.delete');
+    });
+    Route::middleware(['check.permission:product_view'])->group(function () {
+        Route::get('products', [ProductController::class, 'index'])->name('products.index');
+        Route::get('products/{product}', [ProductController::class, 'show'])->name('products.show');
+    });
 
-    Route::resource('orders', OrderController::class)->only(['index', 'show', 'update']);
-    Route::post('orders/{order}/verify-payment', [OrderController::class, 'verifyPayment'])->name('orders.verify-payment');
-    Route::post('orders/{order}/reject-payment', [OrderController::class, 'rejectPayment'])->name('orders.reject-payment');
-    Route::post('orders/{order}/tracking', [OrderController::class, 'updateTracking'])->name('orders.tracking');
+    // Categories
+    Route::middleware(['check.permission:category_view'])->group(function () {
+        Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
+    });
+    Route::middleware(['check.permission:category_manage'])->group(function () {
+        Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create');
+        Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
+        Route::get('categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+        Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+        Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+    });
 
-    Route::resource('banners', BannerController::class);
-    Route::resource('users', UserController::class);
-    Route::resource('roles', RoleController::class)->except(['show']);
-    Route::resource('permissions', PermissionController::class)->only(['index', 'store', 'destroy']);
-    Route::resource('customers', CustomerController::class)->only(['index', 'show', 'edit', 'update', 'destroy']);
-    Route::post('customers/{customer}/addresses', [CustomerController::class, 'storeAddress'])->name('customers.addresses.store');
-    Route::put('customers/{customer}/addresses/{address}', [CustomerController::class, 'updateAddress'])->name('customers.addresses.update');
-    Route::delete('customers/{customer}/addresses/{address}', [CustomerController::class, 'destroyAddress'])->name('customers.addresses.destroy');
-    Route::resource('careers', CareerController::class);
-    Route::get('careers/{career}/applications', [CareerController::class, 'applications'])->name('careers.applications');
-    Route::patch('career-applications/{application}/status', [CareerController::class, 'updateApplicationStatus'])->name('career-applications.status');
-    Route::get('career-applications/{application}/resume', [CareerController::class, 'downloadResume'])->name('career-applications.resume');
+    // Product Types
+    Route::middleware(['check.permission:product_type_view'])->group(function () {
+        Route::get('product-types', [ProductTypeController::class, 'index'])->name('product-types.index');
+    });
+    Route::middleware(['check.permission:product_type_manage'])->group(function () {
+        Route::get('product-types/create', [ProductTypeController::class, 'create'])->name('product-types.create');
+        Route::post('product-types', [ProductTypeController::class, 'store'])->name('product-types.store');
+        Route::get('product-types/{productType}/edit', [ProductTypeController::class, 'edit'])->name('product-types.edit');
+        Route::put('product-types/{productType}', [ProductTypeController::class, 'update'])->name('product-types.update');
+        Route::delete('product-types/{productType}', [ProductTypeController::class, 'destroy'])->name('product-types.destroy');
+    });
 
-    Route::get('contacts', [ContactController::class, 'index'])->name('contacts.index');
-    Route::get('contacts/{message}', [ContactController::class, 'show'])->name('contacts.show');
-    Route::post('contacts/{message}/reply', [ContactController::class, 'reply'])->name('contacts.reply');
-    Route::delete('contacts/{message}', [ContactController::class, 'destroy'])->name('contacts.destroy');
+    // Orders
+    Route::middleware(['check.permission:order_view'])->group(function () {
+        Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    });
+    Route::middleware(['check.permission:order_manage'])->group(function () {
+        Route::put('orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+        Route::post('orders/{order}/verify-payment', [OrderController::class, 'verifyPayment'])->name('orders.verify-payment');
+        Route::post('orders/{order}/reject-payment', [OrderController::class, 'rejectPayment'])->name('orders.reject-payment');
+        Route::post('orders/{order}/tracking', [OrderController::class, 'updateTracking'])->name('orders.tracking');
+    });
 
-    Route::get('quotes', [QuoteAdminController::class, 'index'])->name('quotes.index');
-    Route::get('quotes/{quote}', [QuoteAdminController::class, 'show'])->name('quotes.show');
-    Route::post('quotes/{quote}/respond', [QuoteAdminController::class, 'respond'])->name('quotes.respond');
-    Route::patch('quotes/{quote}/status', [QuoteAdminController::class, 'updateStatus'])->name('quotes.status');
+    // Customers
+    Route::middleware(['check.permission:customer_view'])->group(function () {
+        Route::get('customers', [CustomerController::class, 'index'])->name('customers.index');
+        Route::get('customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
+    });
+    Route::middleware(['check.permission:customer_manage'])->group(function () {
+        Route::get('customers/{customer}/edit', [CustomerController::class, 'edit'])->name('customers.edit');
+        Route::put('customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');
+        Route::delete('customers/{customer}', [CustomerController::class, 'destroy'])->name('customers.destroy');
+        Route::post('customers/{customer}/addresses', [CustomerController::class, 'storeAddress'])->name('customers.addresses.store');
+        Route::put('customers/{customer}/addresses/{address}', [CustomerController::class, 'updateAddress'])->name('customers.addresses.update');
+        Route::delete('customers/{customer}/addresses/{address}', [CustomerController::class, 'destroyAddress'])->name('customers.addresses.destroy');
+    });
 
-    Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
-    Route::put('reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
-    Route::post('reviews/{review}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
-    Route::post('reviews/{review}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
-    Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+    // Users
+    Route::middleware(['check.permission:user_manage'])->group(function () {
+        Route::get('users/create', [UserController::class, 'create'])->name('users.create');
+        Route::post('users', [UserController::class, 'store'])->name('users.store');
+        Route::get('users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('users/{user}', [UserController::class, 'update'])->name('users.update');
+        Route::delete('users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    });
+    Route::middleware(['check.permission:user_view'])->group(function () {
+        Route::get('users', [UserController::class, 'index'])->name('users.index');
+        Route::get('users/{user}', [UserController::class, 'show'])->name('users.show');
+    });
 
-    Route::resource('coupons', CouponController::class);
-    Route::get('marketing', [MarketingController::class, 'index'])->name('marketing.index');
-    Route::resource('flash-sales', MarketingController::class)->except(['index'])->names('flash-sales');
+    // Roles & Permissions
+    Route::middleware(['check.permission:role_manage'])->group(function () {
+        Route::get('roles/create', [RoleController::class, 'create'])->name('roles.create');
+        Route::post('roles', [RoleController::class, 'store'])->name('roles.store');
+        Route::get('roles/{role}/edit', [RoleController::class, 'edit'])->name('roles.edit');
+        Route::put('roles/{role}', [RoleController::class, 'update'])->name('roles.update');
+        Route::delete('roles/{role}', [RoleController::class, 'destroy'])->name('roles.destroy');
+    });
+    Route::middleware(['check.permission:role_view'])->group(function () {
+        Route::get('roles', [RoleController::class, 'index'])->name('roles.index');
+        Route::get('permissions', [PermissionController::class, 'index'])->name('permissions.index');
+    });
 
-    Route::resource('posts', PostController::class);
-    Route::resource('videos', VideoController::class);
-    Route::resource('showrooms', ShowroomController::class);
+    // Banners
+    Route::middleware(['check.permission:banner_view'])->group(function () {
+        Route::get('banners', [BannerController::class, 'index'])->name('banners.index');
+    });
+    Route::middleware(['check.permission:banner_manage'])->group(function () {
+        Route::get('banners/create', [BannerController::class, 'create'])->name('banners.create');
+        Route::post('banners', [BannerController::class, 'store'])->name('banners.store');
+        Route::get('banners/{banner}/edit', [BannerController::class, 'edit'])->name('banners.edit');
+        Route::put('banners/{banner}', [BannerController::class, 'update'])->name('banners.update');
+        Route::delete('banners/{banner}', [BannerController::class, 'destroy'])->name('banners.destroy');
+    });
 
-    Route::resource('provinces', ProvinceController::class)->except(['show']);
-    // อำเภอ (ภายใต้จังหวัด)
-    Route::get('provinces/{province}/districts', [DistrictController::class, 'index'])->name('provinces.districts.index');
-    Route::get('provinces/{province}/districts/create', [DistrictController::class, 'create'])->name('provinces.districts.create');
-    Route::post('provinces/{province}/districts', [DistrictController::class, 'store'])->name('provinces.districts.store');
-    Route::get('districts/{district}/edit', [DistrictController::class, 'edit'])->name('districts.edit');
-    Route::put('districts/{district}', [DistrictController::class, 'update'])->name('districts.update');
-    // ตำบล (ภายใต้อำเภอ)
-    Route::get('districts/{district}/subdistricts', [SubdistrictController::class, 'index'])->name('districts.subdistricts.index');
-    Route::get('districts/{district}/subdistricts/create', [SubdistrictController::class, 'create'])->name('districts.subdistricts.create');
-    Route::post('districts/{district}/subdistricts', [SubdistrictController::class, 'store'])->name('districts.subdistricts.store');
-    Route::get('subdistricts/{subdistrict}/edit', [SubdistrictController::class, 'edit'])->name('subdistricts.edit');
-    Route::put('subdistricts/{subdistrict}', [SubdistrictController::class, 'update'])->name('subdistricts.update');
+    // News Tickers
+    Route::middleware(['check.permission:news_ticker_view'])->group(function () {
+        Route::get('news-tickers', [NewsTickerController::class, 'index'])->name('news-tickers.index');
+    });
+    Route::middleware(['check.permission:news_ticker_manage'])->group(function () {
+        Route::get('news-tickers/create', [NewsTickerController::class, 'create'])->name('news-tickers.create');
+        Route::post('news-tickers', [NewsTickerController::class, 'store'])->name('news-tickers.store');
+        Route::get('news-tickers/{newsTicker}/edit', [NewsTickerController::class, 'edit'])->name('news-tickers.edit');
+        Route::put('news-tickers/{newsTicker}', [NewsTickerController::class, 'update'])->name('news-tickers.update');
+        Route::delete('news-tickers/{newsTicker}', [NewsTickerController::class, 'destroy'])->name('news-tickers.destroy');
+    });
 
-    Route::get('dealers', [SettingController::class, 'dealers'])->name('dealers.index');
-    Route::patch('dealers/{dealer}/status', [SettingController::class, 'dealerStatus'])->name('dealers.status');
+    // Posts
+    Route::middleware(['check.permission:post_view'])->group(function () {
+        Route::get('posts', [PostController::class, 'index'])->name('posts.index');
+    });
+    Route::middleware(['check.permission:post_manage'])->group(function () {
+        Route::get('posts/create', [PostController::class, 'create'])->name('posts.create');
+        Route::post('posts', [PostController::class, 'store'])->name('posts.store');
+        Route::get('posts/{post}/edit', [PostController::class, 'edit'])->name('posts.edit');
+        Route::put('posts/{post}', [PostController::class, 'update'])->name('posts.update');
+        Route::delete('posts/{post}', [PostController::class, 'destroy'])->name('posts.destroy');
+    });
 
-    Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
-    Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
-    Route::get('settings/shipping', [SettingController::class, 'shipping'])->name('settings.shipping');
-    Route::post('settings/shipping', [SettingController::class, 'updateShipping'])->name('settings.shipping.update');
-    Route::get('settings/shipping-rates', [SettingController::class, 'shippingRates'])->name('settings.shipping-rates');
-    Route::post('settings/shipping-rates', [SettingController::class, 'updateShippingRates'])->name('settings.shipping-rates.update');
-    Route::get('settings/shipping-providers', [SettingController::class, 'shippingProviders'])->name('settings.shipping-providers');
-    Route::post('settings/shipping-providers', [SettingController::class, 'updateShippingProviders'])->name('settings.shipping-providers.update');
-    Route::get('settings/logs', [SettingController::class, 'logs'])->name('settings.logs');
-    Route::get('settings/consent-logs', [SettingController::class, 'consentLogs'])->name('settings.consent-logs');
+    // Videos
+    Route::middleware(['check.permission:video_view'])->group(function () {
+        Route::get('videos', [VideoController::class, 'index'])->name('videos.index');
+    });
+    Route::middleware(['check.permission:video_manage'])->group(function () {
+        Route::get('videos/create', [VideoController::class, 'create'])->name('videos.create');
+        Route::post('videos', [VideoController::class, 'store'])->name('videos.store');
+        Route::get('videos/{video}/edit', [VideoController::class, 'edit'])->name('videos.edit');
+        Route::put('videos/{video}', [VideoController::class, 'update'])->name('videos.update');
+        Route::delete('videos/{video}', [VideoController::class, 'destroy'])->name('videos.destroy');
+    });
 
-    Route::get('landing-pages', [LandingPageController::class, 'index'])->name('landing-pages.index');
-    Route::post('landing-pages', [LandingPageController::class, 'store'])->name('landing-pages.store');
-    Route::post('landing-pages/{landingPage}/toggle', [LandingPageController::class, 'toggle'])->name('landing-pages.toggle');
-    Route::delete('landing-pages/{landingPage}', [LandingPageController::class, 'destroy'])->name('landing-pages.destroy');
+    // Showrooms
+    Route::middleware(['check.permission:showroom_view'])->group(function () {
+        Route::get('showrooms', [ShowroomController::class, 'index'])->name('showrooms.index');
+    });
+    Route::middleware(['check.permission:showroom_manage'])->group(function () {
+        Route::get('showrooms/create', [ShowroomController::class, 'create'])->name('showrooms.create');
+        Route::post('showrooms', [ShowroomController::class, 'store'])->name('showrooms.store');
+        Route::get('showrooms/{showroom}/edit', [ShowroomController::class, 'edit'])->name('showrooms.edit');
+        Route::put('showrooms/{showroom}', [ShowroomController::class, 'update'])->name('showrooms.update');
+        Route::delete('showrooms/{showroom}', [ShowroomController::class, 'destroy'])->name('showrooms.destroy');
+    });
+
+    // Coupons
+    Route::middleware(['check.permission:coupon_view'])->group(function () {
+        Route::get('coupons', [CouponController::class, 'index'])->name('coupons.index');
+    });
+    Route::middleware(['check.permission:coupon_manage'])->group(function () {
+        Route::get('coupons/create', [CouponController::class, 'create'])->name('coupons.create');
+        Route::post('coupons', [CouponController::class, 'store'])->name('coupons.store');
+        Route::get('coupons/{coupon}/edit', [CouponController::class, 'edit'])->name('coupons.edit');
+        Route::put('coupons/{coupon}', [CouponController::class, 'update'])->name('coupons.update');
+        Route::delete('coupons/{coupon}', [CouponController::class, 'destroy'])->name('coupons.destroy');
+    });
+
+    // Flash Sales / Marketing
+    Route::middleware(['check.permission:flash_sale_manage'])->group(function () {
+        Route::get('flash-sales/create', [MarketingController::class, 'create'])->name('flash-sales.create');
+        Route::post('flash-sales', [MarketingController::class, 'store'])->name('flash-sales.store');
+        Route::get('flash-sales/{flashSale}/edit', [MarketingController::class, 'edit'])->name('flash-sales.edit');
+        Route::put('flash-sales/{flashSale}', [MarketingController::class, 'update'])->name('flash-sales.update');
+        Route::delete('flash-sales/{flashSale}', [MarketingController::class, 'destroy'])->name('flash-sales.destroy');
+    });
+    Route::middleware(['check.permission:flash_sale_view'])->group(function () {
+        Route::get('marketing', [MarketingController::class, 'index'])->name('marketing.index');
+        Route::get('flash-sales/{flashSale}', [MarketingController::class, 'show'])->name('flash-sales.show');
+    });
+
+    // Reviews
+    Route::middleware(['check.permission:review_view'])->group(function () {
+        Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
+    });
+    Route::middleware(['check.permission:review_manage'])->group(function () {
+        Route::put('reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+        Route::post('reviews/{review}/approve', [ReviewController::class, 'approve'])->name('reviews.approve');
+        Route::post('reviews/{review}/reject', [ReviewController::class, 'reject'])->name('reviews.reject');
+        Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+    });
+
+    // Quotes
+    Route::middleware(['check.permission:quote_view'])->group(function () {
+        Route::get('quotes', [QuoteAdminController::class, 'index'])->name('quotes.index');
+        Route::get('quotes/{quote}', [QuoteAdminController::class, 'show'])->name('quotes.show');
+    });
+    Route::middleware(['check.permission:quote_manage'])->group(function () {
+        Route::post('quotes/{quote}/respond', [QuoteAdminController::class, 'respond'])->name('quotes.respond');
+        Route::patch('quotes/{quote}/status', [QuoteAdminController::class, 'updateStatus'])->name('quotes.status');
+    });
+
+    // Dealers
+    Route::middleware(['check.permission:dealer_view'])->group(function () {
+        Route::get('dealers', [SettingController::class, 'dealers'])->name('dealers.index');
+    });
+    Route::middleware(['check.permission:dealer_manage'])->group(function () {
+        Route::patch('dealers/{dealer}/status', [SettingController::class, 'dealerStatus'])->name('dealers.status');
+    });
+
+    // Careers
+    Route::middleware(['check.permission:career_manage'])->group(function () {
+        Route::get('careers/create', [CareerController::class, 'create'])->name('careers.create');
+        Route::post('careers', [CareerController::class, 'store'])->name('careers.store');
+        Route::get('careers/{career}/edit', [CareerController::class, 'edit'])->name('careers.edit');
+        Route::put('careers/{career}', [CareerController::class, 'update'])->name('careers.update');
+        Route::delete('careers/{career}', [CareerController::class, 'destroy'])->name('careers.destroy');
+        Route::patch('career-applications/{application}/status', [CareerController::class, 'updateApplicationStatus'])->name('career-applications.status');
+    });
+    Route::middleware(['check.permission:career_view'])->group(function () {
+        Route::get('careers', [CareerController::class, 'index'])->name('careers.index');
+        Route::get('careers/{career}/applications', [CareerController::class, 'applications'])->name('careers.applications');
+        Route::get('career-applications/{application}/resume', [CareerController::class, 'downloadResume'])->name('career-applications.resume');
+    });
+
+    // Contacts
+    Route::middleware(['check.permission:contact_view'])->group(function () {
+        Route::get('contacts', [ContactController::class, 'index'])->name('contacts.index');
+        Route::get('contacts/{message}', [ContactController::class, 'show'])->name('contacts.show');
+    });
+    Route::middleware(['check.permission:contact_manage'])->group(function () {
+        Route::post('contacts/{message}/reply', [ContactController::class, 'reply'])->name('contacts.reply');
+        Route::delete('contacts/{message}', [ContactController::class, 'destroy'])->name('contacts.destroy');
+    });
+
+    // Locations (Provinces, Districts, Subdistricts)
+    Route::middleware(['check.permission:location_view'])->group(function () {
+        Route::get('provinces', [ProvinceController::class, 'index'])->name('provinces.index');
+        Route::get('provinces/{province}/districts', [DistrictController::class, 'index'])->name('provinces.districts.index');
+        Route::get('districts/{district}/subdistricts', [SubdistrictController::class, 'index'])->name('districts.subdistricts.index');
+    });
+    Route::middleware(['check.permission:location_manage'])->group(function () {
+        Route::get('provinces/create', [ProvinceController::class, 'create'])->name('provinces.create');
+        Route::post('provinces', [ProvinceController::class, 'store'])->name('provinces.store');
+        Route::get('provinces/{province}/edit', [ProvinceController::class, 'edit'])->name('provinces.edit');
+        Route::put('provinces/{province}', [ProvinceController::class, 'update'])->name('provinces.update');
+        Route::delete('provinces/{province}', [ProvinceController::class, 'destroy'])->name('provinces.destroy');
+        Route::get('provinces/{province}/districts/create', [DistrictController::class, 'create'])->name('provinces.districts.create');
+        Route::post('provinces/{province}/districts', [DistrictController::class, 'store'])->name('provinces.districts.store');
+        Route::get('districts/{district}/edit', [DistrictController::class, 'edit'])->name('districts.edit');
+        Route::put('districts/{district}', [DistrictController::class, 'update'])->name('districts.update');
+        Route::get('districts/{district}/subdistricts/create', [SubdistrictController::class, 'create'])->name('districts.subdistricts.create');
+        Route::post('districts/{district}/subdistricts', [SubdistrictController::class, 'store'])->name('districts.subdistricts.store');
+        Route::get('subdistricts/{subdistrict}/edit', [SubdistrictController::class, 'edit'])->name('subdistricts.edit');
+        Route::put('subdistricts/{subdistrict}', [SubdistrictController::class, 'update'])->name('subdistricts.update');
+    });
+
+    // Settings
+    Route::middleware(['check.permission:setting_view'])->group(function () {
+        Route::get('settings', [SettingController::class, 'index'])->name('settings.index');
+        Route::get('settings/shipping', [SettingController::class, 'shipping'])->name('settings.shipping');
+        Route::get('settings/shipping-rates', [SettingController::class, 'shippingRates'])->name('settings.shipping-rates');
+        Route::get('settings/shipping-providers', [SettingController::class, 'shippingProviders'])->name('settings.shipping-providers');
+        Route::get('settings/logs', [SettingController::class, 'logs'])->name('settings.logs');
+        Route::get('settings/consent-logs', [SettingController::class, 'consentLogs'])->name('settings.consent-logs');
+    });
+    Route::middleware(['check.permission:setting_manage'])->group(function () {
+        Route::post('settings', [SettingController::class, 'update'])->name('settings.update');
+        Route::post('settings/shipping', [SettingController::class, 'updateShipping'])->name('settings.shipping.update');
+        Route::post('settings/shipping-rates', [SettingController::class, 'updateShippingRates'])->name('settings.shipping-rates.update');
+        Route::post('settings/shipping-providers', [SettingController::class, 'updateShippingProviders'])->name('settings.shipping-providers.update');
+    });
+
+    // Landing Pages
+    Route::middleware(['check.permission:landing_page_view'])->group(function () {
+        Route::get('landing-pages', [LandingPageController::class, 'index'])->name('landing-pages.index');
+    });
+    Route::middleware(['check.permission:landing_page_manage'])->group(function () {
+        Route::post('landing-pages', [LandingPageController::class, 'store'])->name('landing-pages.store');
+        Route::post('landing-pages/{landingPage}/toggle', [LandingPageController::class, 'toggle'])->name('landing-pages.toggle');
+        Route::delete('landing-pages/{landingPage}', [LandingPageController::class, 'destroy'])->name('landing-pages.destroy');
+    });
 });
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');

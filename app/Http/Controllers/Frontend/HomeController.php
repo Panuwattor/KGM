@@ -13,6 +13,7 @@ use App\Models\Review;
 use App\Models\Post;
 use App\Models\Video;
 use App\Models\FlashSale;
+use App\Models\NewsTicker;
 use Illuminate\Support\Facades\Cache;
 
 class HomeController extends Controller
@@ -20,6 +21,7 @@ class HomeController extends Controller
     public function index()
     {
         $banners          = Cache::remember('home.banners',          300, fn() => Banner::active()->get());
+        $newsTickers      = Cache::remember('home.news_tickers',     300, fn() => NewsTicker::active()->ordered()->get());
         $categories       = Cache::remember('home.categories',       300, fn() => Category::active()->whereNull('parent_id')->whereNotNull('image')->orderBy('sort_order')->get());
         $productTypes     = Cache::remember('home.product_types',    300, fn() => ProductType::active()->where('show_on_home', true)->whereNotNull('image')->orderBy('sort_order')->get());
         $featuredProducts = Cache::remember('home.featured',         300, fn() => Product::active()->featured()->with(['images', 'category'])->latest()->take(10)->get());
@@ -41,7 +43,7 @@ class HomeController extends Controller
             : [];
 
         return view('frontend.home', compact(
-            'banners', 'categories', 'productTypes', 'featuredProducts', 'bestsellerProducts', 'newProducts', 'testimonials', 'latestPosts', 'homeCoupons', 'collectedIds', 'featuredVideos', 'activeFlashSales'
+            'banners', 'newsTickers', 'categories', 'productTypes', 'featuredProducts', 'bestsellerProducts', 'newProducts', 'testimonials', 'latestPosts', 'homeCoupons', 'collectedIds', 'featuredVideos', 'activeFlashSales'
         ));
     }
 }
