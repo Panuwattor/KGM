@@ -1,9 +1,9 @@
 @extends('layouts.admin')
-@section('title', 'ผู้ใช้งานระบบ')
+@section('title', 'จัดการพนักงาน')
 @section('content')
 <div class="page-header">
     <div>
-        <div class="page-title">ผู้ใช้งานระบบ</div>
+        <div class="page-title">จัดการพนักงาน</div>
         <div class="page-subtitle">แอดมินและพนักงานที่มีสิทธิ์เข้าหลังบ้าน</div>
     </div>
     <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
@@ -23,7 +23,7 @@
 <div class="table-wrap">
     <table>
         <thead>
-            <tr><th>ชื่อ</th><th>อีเมล</th><th>บทบาท</th><th>สถานะ</th><th>เพิ่มเมื่อ</th><th></th></tr>
+            <tr><th>ชื่อ</th><th>อีเมล</th><th>ตำแหน่ง</th><th>สถานะ</th><th>เพิ่มเมื่อ</th><th></th></tr>
         </thead>
         <tbody>
         @forelse($users as $user)
@@ -41,9 +41,13 @@
             </td>
             <td style="color:#555;">{{ $user->email }}</td>
             <td>
-                <span class="status-badge {{ $user->role === 'admin' ? 'status-purple' : 'status-indigo' }}">
-                    {{ $user->role === 'admin' ? 'แอดมิน' : 'พนักงาน' }}
-                </span>
+                @forelse($user->roles as $role)
+                    <span class="status-badge {{ $role->name === 'admin' ? 'status-purple' : 'status-indigo' }}">{{ $role->name }}</span>
+                @empty
+                    <span class="status-badge {{ $user->role === 'admin' ? 'status-purple' : 'status-indigo' }}">
+                        {{ $user->role === 'admin' ? 'แอดมิน' : 'พนักงาน' }}
+                    </span>
+                @endforelse
             </td>
             <td>
                 <span class="status-badge {{ $user->is_active ? 'status-green' : 'status-red' }}">

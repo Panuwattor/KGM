@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -17,13 +18,14 @@ class UserController extends Controller
                 ->where('name', 'like', '%' . $request->search . '%')
                 ->orWhere('email', 'like', '%' . $request->search . '%'));
         }
-        $users = $query->latest()->paginate(20)->withQueryString();
+        $users = $query->with('roles')->latest()->paginate(20)->withQueryString();
         return view('admin.users.index', compact('users'));
     }
 
     public function create()
     {
-        return view('admin.users.create');
+        $roles = Role::whereNotIn('name', ['customer'])->orderBy('name')->get();
+        return view('admin.users.create', compact('roles'));
     }
 
     public function store(Request $request)
@@ -32,16 +34,20 @@ class UserController extends Controller
             'name'                  => 'required|string|max:255',
             'email'                 => 'required|email|unique:users,email',
             'password'              => 'required|min:8|confirmed',
-            'role'                  => 'required|in:admin,staff',
+            'role'                  => 'required|exists:roles,name',
         ]);
 
-        User::create([
+        $isAdminRole = $request->role === 'admin';
+
+        $user = User::create([
             'name'      => $request->name,
             'email'     => $request->email,
             'password'  => Hash::make($request->password),
-            'role'      => $request->role,
+            'role'      => $isAdminRole ? 'admin' : 'staff',
             'is_active' => true,
         ]);
+
+        $user->syncRoles([$request->role]);
 
         return redirect()->route('admin.users.index')->with('success', 'เพิ่มผู้ใช้งานระบบแล้ว');
     }
@@ -53,18 +59,27 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
-        return view('admin.users.edit', compact('user'));
+        $roles = Role::whereNotIn('name', ['customer'])->orderBy('name')->get();
+        return view('admin.users.edit', compact('user', 'roles'));
     }
 
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'role'      => 'required|in:admin,staff',
+            'role' => 'required|exists:roles,name',
         ]);
+
+        if ($user->id === auth()->id() && $request->role !== 'admin') {
+            return back()->with('error', 'ไม่สามารถเปลี่ยนตำแหน่งของตัวเองออกจากแอดมินได้');
+        }
+
         $user->update([
-            'role'      => $request->role,
+            'role'      => $request->role === 'admin' ? 'admin' : 'staff',
             'is_active' => $request->boolean('is_active'),
         ]);
+
+        $user->syncRoles([$request->role]);
+
         return redirect()->route('admin.users.index')->with('success', 'อัปเดตข้อมูลผู้ใช้งานแล้ว');
     }
 

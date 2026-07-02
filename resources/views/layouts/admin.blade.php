@@ -345,9 +345,6 @@
             <a href="{{ route('admin.customers.index') }}" class="nav-item {{ request()->routeIs('admin.customers*') ? 'active' : '' }}">
                 <i class="bi bi-people"></i> ลูกค้า
             </a>
-            <a href="{{ route('admin.users.index') }}" class="nav-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
-                <i class="bi bi-person-badge"></i> ผู้ใช้งานระบบ
-            </a>
             <a href="{{ route('admin.reviews.index') }}" class="nav-item {{ request()->routeIs('admin.reviews*') ? 'active' : '' }}">
                 <i class="bi bi-star-half"></i> รีวิวสินค้า
                 @php $pendingReviews = \App\Models\Review::where('is_approved', false)->count(); @endphp
@@ -363,6 +360,18 @@
             </a>
             <a href="{{ route('admin.dealers.index') }}" class="nav-item {{ request()->routeIs('admin.dealers*') ? 'active' : '' }}">
                 <i class="bi bi-shop"></i> ตัวแทนจำหน่าย
+            </a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">จัดการแอดมิน</div>
+            <a href="{{ route('admin.users.index') }}" class="nav-item {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
+                <i class="bi bi-person-badge"></i> จัดการพนักงาน
+            </a>
+            <a href="{{ route('admin.roles.index') }}" class="nav-item {{ request()->routeIs('admin.roles*') ? 'active' : '' }}">
+                <i class="bi bi-diagram-3"></i> จัดการตำแหน่ง
+            </a>
+            <a href="{{ route('admin.permissions.index') }}" class="nav-item {{ request()->routeIs('admin.permissions*') ? 'active' : '' }}">
+                <i class="bi bi-shield-lock"></i> จัดการสิทธิ์
             </a>
         </div>
         <div class="nav-section">

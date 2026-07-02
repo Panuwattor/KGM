@@ -1,8 +1,8 @@
 @extends('layouts.admin')
-@section('title', 'เพิ่มผู้ใช้งานระบบ')
+@section('title', 'เพิ่มพนักงาน')
 @section('content')
 <div class="page-header">
-    <div class="page-title">เพิ่มผู้ใช้งานระบบ</div>
+    <div class="page-title">เพิ่มพนักงาน</div>
     <a href="{{ route('admin.users.index') }}" class="btn btn-light"><i class="bi bi-arrow-left"></i> กลับ</a>
 </div>
 <div style="max-width:520px;">
@@ -33,10 +33,11 @@
                 <input type="password" name="password_confirmation" class="form-control" required>
             </div>
             <div class="form-group">
-                <label class="form-label">บทบาท <span style="color:#e74c3c;">*</span></label>
+                <label class="form-label">ตำแหน่ง <span style="color:#e74c3c;">*</span></label>
                 <select name="role" class="form-control @error('role') is-invalid @enderror">
-                    <option value="staff" {{ old('role') === 'staff' ? 'selected' : '' }}>พนักงาน (Staff)</option>
-                    <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>แอดมิน (Admin)</option>
+                    @foreach($roles as $r)
+                        <option value="{{ $r->name }}" {{ old('role') === $r->name ? 'selected' : '' }}>{{ $r->name }}</option>
+                    @endforeach
                 </select>
                 @error('role')<div class="invalid-feedback">{{ $message }}</div>@enderror
             </div>

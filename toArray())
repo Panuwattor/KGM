@@ -1,7 +1,7 @@
 
   [41;1m Psy\Exception\ParseErrorException [49;22m
 
-[39;1m  PHP Parse error: Syntax error, unexpected ';' on line 1[39;22m
+[39;1m  PHP Parse error: Syntax error, unexpected ',' on line 1[39;22m
 
   at [32mvendor\psy\psysh\src\Exception\ParseErrorException.php[39m:[32m44[39m
      40▕      * @param \PhpParser\Error $e
@@ -17,6 +17,6 @@
   [90m    Psy\Exception\ParseErrorException::fromParseError(Object(PhpParser\Error))[39m
 
   [33m2   [39m[39;1mvendor\psy\psysh\src\CodeCleaner.php[39;22m:[39;1m273[39;22m
-  [90m    Psy\CodeCleaner::parse("<?php var_dump(App\Models\LandingPage::all()-;
+  [90m    Psy\CodeCleaner::parse("<?php print_r(DB::table("model_has_roles")-,"roles.id","=","model_has_roles.role_id")-,"name")-;
 ")[39m
 

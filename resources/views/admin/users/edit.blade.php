@@ -1,8 +1,8 @@
 @extends('layouts.admin')
-@section('title', 'แก้ไขผู้ใช้งาน')
+@section('title', 'แก้ไขพนักงาน')
 @section('content')
 <div class="page-header">
-    <div class="page-title">แก้ไขผู้ใช้งาน: {{ $user->name }}</div>
+    <div class="page-title">แก้ไขพนักงาน: {{ $user->name }}</div>
     <a href="{{ route('admin.users.index') }}" class="btn btn-light"><i class="bi bi-arrow-left"></i> กลับ</a>
 </div>
 <div style="max-width:520px;">
@@ -16,10 +16,12 @@
                 <div style="color:#555;">{{ $user->email }}</div>
             </div>
             <div class="form-group">
-                <label class="form-label">บทบาท</label>
+                <label class="form-label">ตำแหน่ง</label>
+                @php $currentRole = $user->roles->first()?->name ?? $user->role; @endphp
                 <select name="role" class="form-control">
-                    <option value="staff" {{ $user->role === 'staff' ? 'selected' : '' }}>พนักงาน (Staff)</option>
-                    <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>แอดมิน (Admin)</option>
+                    @foreach($roles as $r)
+                        <option value="{{ $r->name }}" {{ $currentRole === $r->name ? 'selected' : '' }}>{{ $r->name }}</option>
+                    @endforeach
                 </select>
             </div>
             <div class="form-check">
