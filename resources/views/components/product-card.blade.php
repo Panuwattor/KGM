@@ -39,7 +39,7 @@
             </div>
             @if($product->stock_quantity > 0)
             <a href="{{ route('shop.show', $product->slug) }}" class="btn btn-primary product-add-btn">
-                <i class="bi bi-cart-plus"></i> เลือกไซส์
+                <i class="bi bi-cart-plus"></i> เลือกไซซ์
             </a>
             @else
             <button disabled class="btn product-add-btn" style="background:#f0f0f0;color:#bbb;cursor:not-allowed;">

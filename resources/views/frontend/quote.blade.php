@@ -17,7 +17,7 @@
                 <div class="form-group"><label class="form-label">ชื่อผู้ติดต่อ *</label><input type="text" name="contact_name" class="form-control" required></div>
                 <div class="form-group"><label class="form-label">อีเมล *</label><input type="email" name="email" class="form-control" required></div>
                 <div class="form-group"><label class="form-label">เบอร์โทร *</label><input type="text" name="phone" class="form-control" required></div>
-                <div class="form-group col-span-2"><label class="form-label">รายละเอียดสินค้าที่ต้องการ *</label><textarea name="product_details" class="form-control" rows="4" placeholder="ระบุประเภท สี ไซส์ หรือรายละเอียดอื่นๆ" required></textarea></div>
+                <div class="form-group col-span-2"><label class="form-label">รายละเอียดสินค้าที่ต้องการ *</label><textarea name="product_details" class="form-control" rows="4" placeholder="ระบุประเภท สี ไซซ์ หรือรายละเอียดอื่นๆ" required></textarea></div>
                 <div class="form-group"><label class="form-label">จำนวน (ชิ้น) *</label><input type="number" name="quantity" class="form-control" min="1" required></div>
                 <div class="form-group"><label class="form-label">แนบไฟล์ประกอบ (โลโก้, แบบเสื้อ)</label><input type="file" name="attachment" class="form-control" style="border-radius:12px;" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"></div>
                 <div class="form-group col-span-2"><label class="form-label">หมายเหตุเพิ่มเติม</label><textarea name="notes" class="form-control" rows="3"></textarea></div>

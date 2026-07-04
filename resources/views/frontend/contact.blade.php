@@ -174,7 +174,7 @@
                     </div>
                     <div class="field-group">
                         <label class="field-label">ข้อความ <span>*</span></label>
-                        <textarea name="message" class="field-input" placeholder="รายละเอียดที่ต้องการ เช่น ประเภทชุด จำนวน ขนาด ไซส์ ..." required>{{ old('message') }}</textarea>
+                        <textarea name="message" class="field-input" placeholder="รายละเอียดที่ต้องการ เช่น ประเภทชุด จำนวน ขนาด ไซซ์ ..." required>{{ old('message') }}</textarea>
                         @error('message')<div style="font-size:12px;color:#e74c3c;margin-top:4px;">{{ $message }}</div>@enderror
                     </div>
                     <button type="submit" class="submit-btn">

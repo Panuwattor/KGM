@@ -1,25 +1,25 @@
 @extends('layouts.app')
-@section('title', 'วิธีวัดไซส์')
-@section('meta_description', 'วิธีวัดไซส์เสื้อและกางเกงอย่างถูกต้อง เพื่อให้ได้ชุดที่พอดีตัวตั้งแต่วันแรกที่ได้รับ')
+@section('title', 'วิธีวัดไซซ์')
+@section('meta_description', 'วิธีวัดไซซ์เสื้อและกางเกงอย่างถูกต้อง เพื่อให้ได้ชุดที่พอดีตัวตั้งแต่วันแรกที่ได้รับ')
 
 
 @section('content')
 
 {{-- Hero --}}
 <div class="sg-hero">
-    <div class="sg-badge"><i class="bi bi-rulers"></i> คู่มือการวัดไซส์</div>
-    <h1>วิธีวัดไซส์</h1>
-    <p>วัดไซส์ให้แม่น เพื่อชุดที่เป๊ะตั้งแต่วันแรกที่ได้รับ<br>ใส่ชุดให้ดูดีเหมือนสั่งตัด ต้องเริ่มที่การวัดไซส์ที่ถูกต้อง</p>
+    <div class="sg-badge"><i class="bi bi-rulers"></i> คู่มือการวัดไซซ์</div>
+    <h1>วิธีวัดไซซ์</h1>
+    <p>วัดไซซ์ให้แม่น เพื่อชุดที่เป๊ะตั้งแต่วันแรกที่ได้รับ<br>ใส่ชุดให้ดูดีเหมือนสั่งตัด ต้องเริ่มที่การวัดไซซ์ที่ถูกต้อง</p>
 </div>
 
     {{-- เสื้อ --}}
     <div class="sg-section">
         <div class="container" style="max-width:1100px;">
-            <h2 class="sg-section-title"><i class="bi bi-person-arms-up"></i> วิธีวัดไซส์เสื้อ</h2>
+            <h2 class="sg-section-title"><i class="bi bi-person-arms-up"></i> วิธีวัดไซซ์เสื้อ</h2>
             <div class="sg-grid">
                 <div class="sg-card">
                     <img src="/images/size/01.jpg"
-                         alt="วิธีวัดไซส์เสื้อ"
+                         alt="วิธีวัดไซซ์เสื้อ"
                          class="sg-guide-img"
                          loading="lazy">
                 </div>
@@ -61,7 +61,7 @@
                         <ul>
                             <li>ใส่เสื้อบาง ๆ ขณะวัด ไม่ควรวัดทับเสื้อหนา</li>
                             <li>ยืนตรง ผ่อนคลาย ไม่กลั้นหายใจขณะวัดรอบอก</li>
-                            <li>หากตัวเลขอยู่ระหว่างไซส์ แนะนำให้เลือกไซส์ที่ใหญ่กว่า</li>
+                            <li>หากตัวเลขอยู่ระหว่างไซซ์ แนะนำให้เลือกไซซ์ที่ใหญ่กว่า</li>
                             <li>วัดซ้ำ 2 ครั้งเพื่อความแม่นยำ</li>
                         </ul>
                     </div>
@@ -75,11 +75,11 @@
     {{-- กางเกง --}}
     <div class="sg-section">
         <div class="container" style="max-width:1100px;">
-            <h2 class="sg-section-title"><i class="bi bi-person-standing"></i> วิธีวัดไซส์กางเกง</h2>
+            <h2 class="sg-section-title"><i class="bi bi-person-standing"></i> วิธีวัดไซซ์กางเกง</h2>
             <div class="sg-grid">
                 <div class="sg-card">
                     <img src="/images/size/02.jpg"
-                         alt="วิธีวัดไซส์กางเกง"
+                         alt="วิธีวัดไซซ์กางเกง"
                          class="sg-guide-img"
                          loading="lazy">
                 </div>
@@ -134,7 +134,7 @@
 <div style="background:linear-gradient(135deg,var(--kgm-green-800),var(--kgm-green-700));padding:48px 20px;text-align:center;">
     <div class="container">
         <h3 style="color:#fff;font-size:22px;font-weight:800;margin:0 0 10px;">พร้อมสั่งซื้อแล้วใช่ไหม?</h3>
-        <p style="color:rgba(255,255,255,0.75);margin:0 0 24px;">เลือกไซส์ได้มั่นใจ แล้วมาเลือกสินค้าของเราได้เลย</p>
+        <p style="color:rgba(255,255,255,0.75);margin:0 0 24px;">เลือกไซซ์ได้มั่นใจ แล้วมาเลือกสินค้าของเราได้เลย</p>
         <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
             <a href="{{ route('shop') }}" class="btn btn-gold" style="border-radius:14px;padding:12px 28px;">
                 <i class="bi bi-bag"></i> ดูสินค้าทั้งหมด

@@ -181,9 +181,9 @@
                         </div>
                     </div>
                     <div class="filter-group">
-                        <label>ไซส์</label>
+                        <label>ไซซ์</label>
                         <select name="size" class="form-control" style="min-width:110px;">
-                            <option value="">ทุกไซส์</option>
+                            <option value="">ทุกไซซ์</option>
                             @foreach(['28','30','32','34','36','38','40','42','44','S','M','L','XL','2XL','3XL'] as $size)
                             <option {{ request('size')==$size?'selected':'' }}>{{ $size }}</option>
                             @endforeach

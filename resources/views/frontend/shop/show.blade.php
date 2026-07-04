@@ -149,7 +149,7 @@
             @php $sizes = $product->variants->pluck('size')->filter()->unique(); @endphp
             @if($sizes->isNotEmpty())
             <div class="variant-section">
-                <div class="variant-label">ไซส์: <span class="variant-label-value" x-text="selectedSize || 'เลือกไซส์'"></span> <span style="color:#ef4444">*</span></div>
+                <div class="variant-label">ไซซ์: <span class="variant-label-value" x-text="selectedSize || 'เลือกไซซ์'"></span> <span style="color:#ef4444">*</span></div>
                 <div class="variant-options" :class="{ 'shake': showSizeError }">
                     @foreach($sizes as $size)
                     @php $sizeVariant = $product->variants->firstWhere('size', $size); @endphp
@@ -159,9 +159,9 @@
                         @click="selectVariant('{{ $size }}'); showSizeError = false">{{ $size }}</button>
                     @endforeach
                 </div>
-                <p x-show="showSizeError" x-cloak style="color:#ef4444;font-size:13px;margin-top:6px;"><i class="bi bi-exclamation-circle"></i> กรุณาเลือกไซส์ก่อน</p>
+                <p x-show="showSizeError" x-cloak style="color:#ef4444;font-size:13px;margin-top:6px;"><i class="bi bi-exclamation-circle"></i> กรุณาเลือกไซซ์ก่อน</p>
                 <p x-show="selectedSize" x-cloak style="font-size:13px;margin-top:8px;color:#555;">
-                    คงเหลือไซส์ <strong x-text="selectedSize"></strong>: <strong x-text="maxStock" style="color:var(--kgm-green-700);"></strong> ชิ้น
+                    คงเหลือไซซ์ <strong x-text="selectedSize"></strong>: <strong x-text="maxStock" style="color:var(--kgm-green-700);"></strong> ชิ้น
                 </p>
             </div>
             @endif

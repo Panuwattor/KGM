@@ -120,7 +120,7 @@
                 <template x-for="(v, i) in variants" :key="i">
                     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 80px 80px auto;gap:8px;margin-bottom:10px;align-items:end;">
                         <div>
-                            <label class="form-label" x-show="i===0">ไซส์ <span style="color:#e74c3c;">*</span></label>
+                            <label class="form-label" x-show="i===0">ไซซ์ <span style="color:#e74c3c;">*</span></label>
                             <input type="text" :name="`variants[${i}][size]`" x-model="v.size" class="form-control" placeholder="S, M, L, XL..." required>
                             @error('variants.*.size')<div class="invalid-feedback" style="display:block;" x-show="i===0">{{ $message }}</div>@enderror
                         </div>

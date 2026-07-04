@@ -154,7 +154,7 @@
     <div class="navbar-secondary">
         <div class="navbar-secondary-inner">
             <div class="navbar-secondary-links">
-                <a href="{{ route('size-guide') }}" class="navbar-secondary-link {{ request()->routeIs('size-guide') ? 'active' : '' }}">วิธีวัดไซส์</a>
+                <a href="{{ route('size-guide') }}" class="navbar-secondary-link {{ request()->routeIs('size-guide') ? 'active' : '' }}">วิธีวัดไซซ์</a>
                 <a href="{{ route('shop') }}?filter=featured" class="navbar-secondary-link {{ request()->routeIs('shop*') && request('filter')==='featured' ? 'active' : '' }}">สินค้าแนะนำ</a>
                 <a href="{{ route('shop') }}?filter=new" class="navbar-secondary-link {{ request()->routeIs('shop*') && request('filter')==='new' ? 'active' : '' }}">สินค้าใหม่</a>
                 <a href="{{ route('shop') }}?filter=bestseller" class="navbar-secondary-link {{ request()->routeIs('shop*') && request('filter')==='bestseller' ? 'active' : '' }}">สินค้าขายดี</a>
@@ -258,7 +258,7 @@
             </div>
         </div>
         @endif
-        <a href="{{ route('size-guide') }}"   class="mobile-nav-link {{ request()->routeIs('size-guide') ? 'active' : '' }}" @click="open=false"><i class="bi bi-rulers"></i> วิธีวัดไซส์</a>
+        <a href="{{ route('size-guide') }}"   class="mobile-nav-link {{ request()->routeIs('size-guide') ? 'active' : '' }}" @click="open=false"><i class="bi bi-rulers"></i> วิธีวัดไซซ์</a>
         <a href="{{ route('coupons.index') }}" class="mobile-nav-link {{ request()->routeIs('coupons*')  ? 'active' : '' }}" @click="open=false"><i class="bi bi-ticket-perforated"></i> คูปอง</a>
         <a href="{{ route('about') }}"         class="mobile-nav-link {{ request()->routeIs('about')      ? 'active' : '' }}" @click="open=false"><i class="bi bi-building"></i> เกี่ยวกับเรา</a>
         <a href="{{ route('services') }}"  class="mobile-nav-link {{ request()->routeIs('services')  ? 'active' : '' }}" @click="open=false"><i class="bi bi-tools"></i> บริการ</a>
@@ -327,7 +327,7 @@
                     <img src="{{ asset('images/kgm_logo.png') }}" alt="KGM" width="718" height="334" style="width:70px;height:70px;object-fit:contain;">
                     <div style="color:white;font-weight:700;font-size:15px;">กิจเจริญการ์เมนท์<span style="display:block;color:rgba(255,255,255,0.45);font-size:11px;font-weight:400;">(1993) จำกัด</span></div>
                 </div>
-                <p style="font-size:13px;line-height:1.8;color:rgba(255,255,255,0.55);margin:0 0 4px;">โรงงานผลิตเครื่องแบบนักเรียนและยูนิฟอร์มคุณภาพสูง ประสบการณ์กว่า 30 ปี</p>
+                <p style="font-size:13px;line-height:1.8;color:rgba(255,255,255,0.55);margin:0 0 4px;">โรงงานผลิตเครื่องแบบนักเรียนและยูนิฟอร์มคุณภาพสูง ประสบการณ์กว่า 40 ปี</p>
                 <div class="social-links">
                     <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
                     <a href="#" class="social-link"><i class="bi bi-instagram"></i></a>

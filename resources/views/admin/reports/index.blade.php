@@ -135,14 +135,14 @@
     </div>
 </div>
 
-{{-- ===== ยอดขายตามหมวด / ประเภท / ไซส์ ===== --}}
+{{-- ===== ยอดขายตามหมวด / ประเภท / ไซซ์ ===== --}}
 <div class="rpt-section-title"><i class="bi bi-pie-chart"></i> ยอดขายตามกลุ่มสินค้า</div>
 <div class="rpt-grid-3">
     @php
         $groupBlocks = [
             ['หมวดหมู่', 'bi-tags', $salesByCategory],
             ['ประเภทสินค้า', 'bi-collection', $salesByType],
-            ['ไซส์ (Variant)', 'bi-rulers', $salesBySize],
+            ['ไซซ์ (Variant)', 'bi-rulers', $salesBySize],
         ];
     @endphp
     @foreach($groupBlocks as [$title, $icon, $data])
@@ -155,7 +155,7 @@
                 @php $mx = $data->max('revenue') ?: 1; @endphp
                 @foreach($data->take(10) as $row)
                 <div class="rpt-bar-row">
-                    <div class="rpt-bar-label" title="{{ $title=='ไซส์ (Variant)' ? $row->size : $row->name }}">{{ $title=='ไซส์ (Variant)' ? $row->size : $row->name }}</div>
+                    <div class="rpt-bar-label" title="{{ $title=='ไซซ์ (Variant)' ? $row->size : $row->name }}">{{ $title=='ไซซ์ (Variant)' ? $row->size : $row->name }}</div>
                     <div class="rpt-bar-track"><div class="rpt-bar-fill" style="width:{{ ($row->revenue/$mx)*100 }}%;"></div></div>
                     <div class="rpt-bar-val">฿{{ number_format($row->revenue,0) }}</div>
                 </div>
@@ -193,9 +193,9 @@
 
 <div class="rpt-grid-2" style="margin-top:18px;">
     <div class="table-wrap">
-        <div class="table-header"><h3><i class="bi bi-exclamation-triangle" style="color:#f59e0b;"></i> สินค้า/ไซส์ ที่สต๊อกต่ำ</h3></div>
+        <div class="table-header"><h3><i class="bi bi-exclamation-triangle" style="color:#f59e0b;"></i> สินค้า/ไซซ์ ที่สต๊อกต่ำ</h3></div>
         <table>
-            <thead><tr><th>สินค้า</th><th>ไซส์</th><th>คงเหลือ</th><th>เกณฑ์</th></tr></thead>
+            <thead><tr><th>สินค้า</th><th>ไซซ์</th><th>คงเหลือ</th><th>เกณฑ์</th></tr></thead>
             <tbody>
             @forelse($lowStockList as $row)
             <tr>

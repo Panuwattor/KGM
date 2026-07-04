@@ -90,7 +90,7 @@
                 <thead><tr>
                     <th>สินค้า</th>
                     <th>ราคาปกติ (ฐาน)</th>
-                    <th>ราคา Flash Sale * <small style="font-weight:400;color:#aaa;">(ก่อนบวกค่าไซส์)</small></th>
+                    <th>ราคา Flash Sale * <small style="font-weight:400;color:#aaa;">(ก่อนบวกค่าไซซ์)</small></th>
                     <th>จำนวนจำกัด</th>
                     <th></th>
                 </tr></thead>

@@ -265,7 +265,7 @@
                     @if($product->stock_quantity > 0)
                     @if($hasSizes)
                     <a href="{{ route('shop.show', $product->slug) }}" class="fs-add-btn">
-                        <i class="bi bi-rulers"></i> เลือกไซส์
+                        <i class="bi bi-rulers"></i> เลือกไซซ์
                     </a>
                     @else
                     <button type="button" class="fs-add-btn"

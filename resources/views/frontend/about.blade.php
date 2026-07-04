@@ -125,14 +125,14 @@ function aboutNav() {
         <div class="rounded-4 text-center mx-auto p-5 mb-4" style="background:linear-gradient(135deg,var(--kgm-green-900),var(--kgm-green-700));max-width:820px;">
             <i class="bi bi-eye d-block mb-3 fs-1" style="color:var(--kgm-gold-300);"></i>
             <p class="fw-bolder text-white mb-2" style="font-size:24px;line-height:1.6;">
-                "สินค้ามีคุณภาพ &nbsp;ลูกค้าชมชอบ<br>ส่งมอบตรงเวลา &nbsp;พัฒนาอย่างต่อเนื่อง"
+                "สินค้ามีดีคุณภาพ &nbsp;ลูกค้าชมชอบ<br>ส่งมอบตรงเวลา &nbsp;พัฒนาอย่างต่อเนื่อง"
             </p>
             <p class="mb-0" style="color:rgba(255,255,255,.6);font-size:14px;">วิสัยทัศน์องค์กร — บริษัท กิจเจริญการ์เมนท์ (1993) จำกัด</p>
         </div>
 
         <div class="row row-cols-2 row-cols-md-4 g-3">
             @foreach([
-                ['bi-gem','สินค้ามีคุณภาพ','ผลิตสินค้าด้วยวัตถุดิบคัดสรร ผ่านระบบควบคุณภาพในทุกขั้นตอน'],
+                ['bi-gem','สินค้ามีดีคุณภาพ','ผลิตสินค้าด้วยวัตถุดิบคัดสรร ผ่านระบบควบคุณภาพในทุกขั้นตอน'],
                 ['bi-heart-fill','ลูกค้าชมชอบ','มุ่งสร้างความพึงพอใจสูงสุดด้วยสินค้าและบริการที่เกินคาด'],
                 ['bi-truck-front-fill','ส่งมอบตรงเวลา','บริหารการผลิตและโลจิสติกส์อย่างมีประสิทธิภาพ ตรงตามกำหนด'],
                 ['bi-arrow-repeat','พัฒนาต่อเนื่อง','ไม่หยุดพัฒนาบุคลากร เทคโนโลยี และกระบวนการผลิตให้ทันสมัย'],

@@ -34,7 +34,7 @@
                     @if($item->variant_label)
                     <div style="margin-top:4px;">
                         <span style="display:inline-block;font-size:12px;font-weight:600;color:var(--g700);background:var(--g100);border-radius:6px;padding:2px 8px;">
-                            <i class="bi bi-rulers"></i> ไซส์: {{ $item->variant_label }}
+                            <i class="bi bi-rulers"></i> ไซซ์: {{ $item->variant_label }}
                         </span>
                     </div>
                     @endif
