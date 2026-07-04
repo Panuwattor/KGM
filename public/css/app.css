@@ -68,7 +68,7 @@ img { max-width: 100%; }
 .navbar-secondary-inner { max-width: 1400px; margin: 0 auto; padding: 0 20px; height: 36px; display: flex; align-items: center; justify-content: center; gap: 16px; }
 .navbar-secondary-links { display: flex; align-items: center; gap: 0; }
 .navbar-secondary-link { color: rgba(243, 245, 227, 0.85); font-size: 12px; padding: 4px 10px; white-space: nowrap; text-decoration: none; transition: all 0.2s; font-weight: 600; }
-.navbar-secondary-link:hover, .navbar-secondary-link.active { color: var(--kgm-green-100); background: rgba(255,255,255,0.25); border-radius: 999px; }
+.navbar-secondary-link:hover, .navbar-secondary-link.active { color: var(--kgm-gold-100); background: rgba(255,255,255,0.25); border-radius: 999px; }
 .navbar-secondary-marketplaces { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .navbar-secondary-marketplace { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; text-decoration: none; transition: opacity 0.2s, transform 0.2s; }
 .navbar-secondary-marketplace:hover { opacity: 0.85; transform: translateY(-1px); }
