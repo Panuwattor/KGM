@@ -67,11 +67,11 @@ class DatabaseSeeder extends Seeder
         $this->call(LocationSeeder::class);
 
         // ── Brands & Categories & Products ────────────────────────────────────
-        $this->call([
-            BrandCategorySeeder::class,
-            ProductTypeSeeder::class,
-            ProductSeeder::class,
-        ]);
+        // $this->call([
+        //     BrandCategorySeeder::class,
+        //     ProductTypeSeeder::class,
+        //     ProductSeeder::class,
+        // ]);
 
         // ── Banners ───────────────────────────────────────────────────────────
         if(Banner::count() == 0) {
