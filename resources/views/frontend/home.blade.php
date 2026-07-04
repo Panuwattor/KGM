@@ -1056,7 +1056,7 @@ document.addEventListener('keydown', function(e) { if(e.key==='Escape') homeClos
                 ['https://shopee.co.th/kgmuniform',          '/images/online/online_shopping_shopee.jpg',  'Shopee'],
                 ['https://www.lazada.co.th/shop/kgmuniform', '/images/online/online_shopping_Lazada.jpg',  'Lazada'],
                 ['https://www.tiktok.com/@kgmuniform',       '/images/online/online_shopping_tiktok.jpg',  'TikTok Shop'],
-                ['#',       '/images/online/online_shopping_thaimart.jpg',  'TikTok Shop'],
+                ['https://thaimart.com/sellers/kgmuniform',       '/images/online/online_shopping_thaimart.jpg',  'TikTok Shop'],
             ] as [$url, $img, $name])
             <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" class="online-channel-card">
                 <img src="{{ $img }}" alt="{{ $name }}" width="515" height="233" loading="lazy">

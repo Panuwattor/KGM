@@ -281,8 +281,8 @@
         <a href="https://www.facebook.com/KGMuniform" target="_blank" rel="noopener" class="mobile-nav-link" @click="open=false" style="gap:10px;">
             <img src="{{ asset('images/online/facebook.png') }}" alt="Facebook" width="18" height="18" style="border-radius:4px;"> Facebook
         </a>
-        <a href="#" target="_blank" rel="noopener" class="mobile-nav-link" @click="open=false" style="gap:10px;">
-            <img src="{{ asset('images/online/thaimart.png') }}" alt="Facebook" width="18" height="18" style="border-radius:4px;"> Thaimart
+        <a href="https://thaimart.com/sellers/kgmuniform" target="_blank" rel="noopener" class="mobile-nav-link" @click="open=false" style="gap:10px;">
+            <img src="{{ asset('images/online/thaimart.png') }}" alt="Thaimart" width="18" height="18" style="border-radius:4px;"> Thaimart
         </a>
         <div class="mobile-drawer-footer">
             <a href="{{ route('quote') }}" class="btn btn-gold w-full" style="border-radius:14px;" @click="open=false">
