@@ -470,7 +470,7 @@ function productShowcase(productsData) {
 @endif
 
 {{-- ══ ABOUT + SERVICE HIGHLIGHTS ══ --}}
-<img src="/images/cartoon.jpg" alt="KGM" class="w-100" loading="lazy">
+<img src="/images/cartoonn.jpg" alt="KGM" class="w-100" loading="lazy">
 <section style="background:#E1CD94;" class="pt-0 pb-3">
     <div class="container">
         <div class="grid" style="gap:24px;align-items:stretch;">
