@@ -13,6 +13,7 @@
     --kgm-gold-300: #f0c040;
     --kgm-gold-200: #c2986c;
     --kgm-gold-100: #fef9ec;
+    --kgm-gold-99: #ffeacf;
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; overflow-x: clip; }
@@ -63,12 +64,12 @@ img { max-width: 100%; }
 .cart-badge { position: absolute; top: 2px; right: 2px; background: var(--kgm-gold-400); color: var(--kgm-green-900); border-radius: 999px; padding: 1px 5px; font-size: 10px; font-weight: 700; min-width: 18px; text-align: center; line-height: 1.4; }
 
 /* ───── Secondary Bar ───── */
-.navbar-secondary { background: linear-gradient(135deg, var(--kgm-green-700) , var(--kgm-green-800), var(--kgm-green-900)); border-top: 1px solid rgba(255,255,255,0.15); overflow: hidden; height: 36px; opacity: 1; transition: height 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.28s cubic-bezier(0.4,0,0.2,1); will-change: height, opacity; }
+.navbar-secondary { background: linear-gradient(135deg, var(--kgm-gold-200), var(--kgm-gold-200)); overflow: hidden; height: 36px; opacity: 1; transition: height 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.28s cubic-bezier(0.4,0,0.2,1); will-change: height, opacity; }
 .navbar-secondary.hidden { height: 0; opacity: 0; border-top-color: transparent; pointer-events: none; }
 .navbar-secondary-inner { max-width: 1400px; margin: 0 auto; padding: 0 20px; height: 36px; display: flex; align-items: center; justify-content: center; gap: 16px; }
 .navbar-secondary-links { display: flex; align-items: center; gap: 0; }
-.navbar-secondary-link { color: rgba(243, 245, 227, 0.85); font-size: 12px; padding: 4px 10px; white-space: nowrap; text-decoration: none; transition: all 0.2s; font-weight: 600; }
-.navbar-secondary-link:hover, .navbar-secondary-link.active { color: var(--kgm-gold-100); background: rgba(255,255,255,0.25); border-radius: 999px; }
+.navbar-secondary-link { color: var(--kgm-green-900); font-size: 12px; padding: 4px 10px; white-space: nowrap; text-decoration: none; transition: all 0.2s; font-weight: 600; }
+.navbar-secondary-link:hover, .navbar-secondary-link.active { color: var(--kgm-green-900); background: rgba(255,255,255,0.6); border-radius: 999px; }
 .navbar-secondary-marketplaces { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .navbar-secondary-marketplace { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; text-decoration: none; transition: opacity 0.2s, transform 0.2s; }
 .navbar-secondary-marketplace:hover { opacity: 0.85; transform: translateY(-1px); }
@@ -209,7 +210,7 @@ select.form-control { background-image: url("data:image/svg+xml,%3csvg xmlns='ht
 .col-span-2 { grid-column: span 2; }
 
 /* ───── Section ───── */
-.section { padding: 56px 0; }
+.section { padding: 56px 0; background: linear-gradient(180deg, var(--kgm-gold-100), #ffffff, var(--kgm-gold-100)); }
 .section-title { font-size: clamp(22px, 4vw, 30px); font-weight: 700; color: var(--kgm-green-800); }
 .section-subtitle { color: var(--kgm-gold-600); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
 .section-divider { width: 52px; height: 3px; background: linear-gradient(to right, var(--kgm-gold-500), var(--kgm-gold-300)); border-radius: 999px; margin: 10px 0 20px; }
@@ -502,9 +503,9 @@ span.flatpickr-weekday { background: var(--kgm-green-100); color: var(--kgm-gree
 /* ============================================================
    Size Guide Page (.sg-*)
    ============================================================ */
-.sg-hero { background: linear-gradient(135deg, var(--kgm-green-900), var(--kgm-green-700)); padding: 56px 20px; text-align: center; }
-.sg-hero h1 { color: #fff; font-size: clamp(24px, 4vw, 38px); font-weight: 800; margin: 0 0 12px; }
-.sg-hero p { color: rgba(255,255,255,0.75); font-size: 16px; max-width: 560px; margin: 0 auto; }
+.sg-hero { background: linear-gradient(135deg, var(--kgm-gold-200), var(--kgm-gold-100), #ffffff); padding: 56px 20px; text-align: center; }
+.sg-hero h1 { color: var(--kgm-green-900); font-size: clamp(24px, 4vw, 38px); font-weight: 800; margin: 0 0 12px; }
+.sg-hero p { color: var(--kgm-green-700); font-size: 16px; max-width: 560px; margin: 0 auto; }
 
 .sg-section { padding: 48px 0; }
 .sg-section-title { font-size: clamp(20px, 3vw, 28px); font-weight: 800; color: var(--kgm-green-800); margin: 0 0 32px; display: flex; align-items: center; gap: 10px; }
@@ -532,10 +533,10 @@ span.flatpickr-weekday { background: var(--kgm-green-100); color: var(--kgm-gree
 /* ============================================================
    FAQ Page (.faq-*)
    ============================================================ */
-.faq-hero { background: linear-gradient(135deg, var(--kgm-green-900), var(--kgm-green-700)); padding: 56px 20px; text-align: center; }
-.faq-hero h1 { color: #fff; font-size: clamp(24px, 4vw, 38px); font-weight: 800; margin: 0 0 12px; }
-.faq-hero p { color: rgba(255,255,255,0.75); font-size: 16px; max-width: 560px; margin: 0 auto; }
-.faq-hero-link { color: #f0c040; font-weight: 700; text-decoration: none; }
+.faq-hero { background: linear-gradient(135deg, var(--kgm-gold-200), var(--kgm-gold-100), #ffffff); padding: 56px 20px; text-align: center; }
+.faq-hero h1 { color: var(--kgm-green-900); font-size: clamp(24px, 4vw, 38px); font-weight: 800; margin: 0 0 12px; }
+.faq-hero p { color: var(--kgm-green-700); font-size: 16px; max-width: 560px; margin: 0 auto; }
+.faq-hero-link { color: var(--kgm-gold-600); font-weight: 700; text-decoration: none; }
 .faq-hero-link:hover { text-decoration: underline; }
 
 .faq-wrap { padding: 48px 20px 32px; }

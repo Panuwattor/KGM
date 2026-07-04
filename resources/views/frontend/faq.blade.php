@@ -5,10 +5,10 @@
 @section('content')
 
 {{-- Hero --}}
-<div class="faq-hero">
+<div class="faq-hero" style="background:linear-gradient(135deg,var(--kgm-green-900),var(--kgm-green-700));padding:60px 0;text-align:center;">
     <div class="sg-badge"><i class="bi bi-patch-question-fill"></i> FAQ</div>
-    <h1>คำถามที่พบบ่อย</h1>
-    <p>รวบรวมคำถามยอดนิยมจากลูกค้า<br>หากไม่พบคำตอบที่ต้องการ <a href="{{ route('contact') }}" class="faq-hero-link">ติดต่อเราได้เลย</a></p>
+    <h1 style="font-size:40px;font-weight:800;color:white;">คำถามที่พบบ่อย</h1>
+    <p style="color:white;">รวบรวมคำถามยอดนิยมจากลูกค้า<br>หากไม่พบคำตอบที่ต้องการ <a href="{{ route('contact') }}" class="faq-hero-link">ติดต่อเราได้เลย</a></p>
 </div>
 
 <div class="container faq-wrap" style="max-width:860px;" x-data="{ open: null }">
