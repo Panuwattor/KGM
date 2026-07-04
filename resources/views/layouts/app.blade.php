@@ -53,7 +53,7 @@
                     </a>
                     @foreach($navProductTypes as $pt)
                     <a href="{{ route('shop') }}?type={{ $pt->slug }}" class="nav-dropdown-item {{ request()->get('type') === $pt->slug ? 'nav-dropdown-item-active' : '' }}">
-                        <image src="{{ $pt->image_url }}" alt="{{ $pt->name }}" style="width:16px;height:16px;object-fit:contain;margin-right:6px;">
+                        <image src="{{ media_url($pt->image) }}" alt="{{ $pt->name }}" style="width:16px;height:16px;object-fit:contain;margin-right:6px;">
                          {{ $pt->name }}
                     </a>
                     @endforeach
