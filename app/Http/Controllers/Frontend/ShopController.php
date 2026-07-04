@@ -31,6 +31,23 @@ class ShopController extends Controller
         return view('frontend.shop.index', compact('products', 'categories', 'productTypes', 'selectedCategory', 'selectedType'));
     }
 
+    public function promotions(Request $request)
+    {
+        $categories   = Category::active()->parents()->with('children')->get();
+        $productTypes = ProductType::active()->orderBy('sort_order')->get();
+        $query = Product::active()->onSale()->with(['images', 'category']);
+
+        $this->applyFilters($query, $request);
+
+        $products         = $query->paginate(16)->withQueryString();
+        $selectedCategory = null;
+        $selectedType     = $request->filled('type')
+            ? ProductType::where('slug', $request->type)->first()
+            : null;
+
+        return view('frontend.shop.promotions', compact('products', 'categories', 'productTypes', 'selectedCategory', 'selectedType'));
+    }
+
     public function category(Request $request, string $slug)
     {
         $selectedCategory = Category::where('slug', $slug)->where('is_active', true)->firstOrFail();
@@ -136,6 +153,11 @@ class ShopController extends Controller
         }
         if ($request->filled('size')) {
             $query->whereHas('variants', fn($q) => $q->where('size', $request->size));
+        }
+
+        // กรองสินค้าลดราคา
+        if ($request->filled('sale') && $request->sale == 1) {
+            $query->onSale();
         }
 
         match($request->get('filter')) {

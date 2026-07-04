@@ -21,6 +21,7 @@
     @stack('styles')
 </head>
 <body>
+    @yield('navbar_secondary') 
 
 {{-- ══ Main Navbar ══ --}}
 <nav class="navbar-kgm" x-data="mobileNav()">
@@ -149,7 +150,6 @@
             </button>
         </div>
     </div>
-
     {{-- Secondary Bar --}}
     <div class="navbar-secondary">
         <div class="navbar-secondary-inner">
@@ -158,6 +158,7 @@
                 <a href="{{ route('shop') }}?filter=featured" class="navbar-secondary-link {{ request()->routeIs('shop*') && request('filter')==='featured' ? 'active' : '' }}">สินค้าแนะนำ</a>
                 <a href="{{ route('shop') }}?filter=new" class="navbar-secondary-link {{ request()->routeIs('shop*') && request('filter')==='new' ? 'active' : '' }}">สินค้าใหม่</a>
                 <a href="{{ route('shop') }}?filter=bestseller" class="navbar-secondary-link {{ request()->routeIs('shop*') && request('filter')==='bestseller' ? 'active' : '' }}">สินค้าขายดี</a>
+                <a href="{{ route('promotions') }}" class="navbar-secondary-link {{ request()->routeIs('promotions') ? 'active' : '' }}">สินค้าโปรโมชั่น</a>
                 <a href="{{ route('faq') }}" class="navbar-secondary-link {{ request()->routeIs('faq') ? 'active' : '' }}">คำถามที่พบบ่อย</a>
             </div>
             <div class="navbar-secondary-marketplaces">
@@ -212,6 +213,7 @@
                 <a href="{{ route('shop') }}?filter=featured" class="mobile-nav-sub" @click="open=false"><i class="bi bi-star-fill"></i> สินค้าแนะนำ</a>
                 <a href="{{ route('shop') }}?filter=new" class="mobile-nav-sub" @click="open=false"><i class="bi bi-lightning-charge-fill"></i> สินค้าใหม่</a>
                 <a href="{{ route('shop') }}?filter=bestseller" class="mobile-nav-sub" @click="open=false"><i class="bi bi-fire"></i> สินค้าขายดี</a>
+                <a href="{{ route('promotions') }}" class="mobile-nav-sub" @click="open=false"><i class="bi bi-tag-fill"></i> สินค้าโปรโมชั่น</a>
             </div>
         </div>
 

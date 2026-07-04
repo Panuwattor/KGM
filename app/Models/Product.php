@@ -119,6 +119,12 @@ class Product extends Model
         return $query->where('is_bestseller', true);
     }
 
+    public function scopeOnSale($query)
+    {
+        return $query->whereNotNull('sale_price')
+                     ->whereColumn('sale_price', '<', 'price');
+    }
+
     public function isLowStock(): bool
     {
         return $this->manage_stock && $this->stock_quantity <= $this->low_stock_threshold;

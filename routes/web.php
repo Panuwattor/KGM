@@ -93,6 +93,7 @@ Route::post('/dealer', [DealerController::class, 'submit'])->name('dealer.submit
 
 // Shop
 Route::get('/shop', [ShopController::class, 'index'])->name('shop');
+Route::get('/promotions', [ShopController::class, 'promotions'])->name('promotions');
 Route::get('/shop/category/{slug}', [ShopController::class, 'category'])->name('shop.category');
 Route::get('/shop/{slug}', [ShopController::class, 'show'])->name('shop.show');
 Route::post('/shop/{product}/review', [ShopController::class, 'submitReview'])->name('shop.review')->middleware('auth:customer');

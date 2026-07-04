@@ -27,6 +27,7 @@ class HomeController extends Controller
         $featuredProducts = Cache::remember('home.featured',         300, fn() => Product::active()->featured()->with(['images', 'category'])->latest()->take(10)->get());
         $bestsellerProducts = Cache::remember('home.bestseller',     300, fn() => Product::active()->bestseller()->with(['images', 'category'])->latest()->take(10)->get());
         $newProducts      = Cache::remember('home.new_products',     300, fn() => Product::active()->where('is_new', true)->with(['images', 'category'])->latest()->take(10)->get());
+        $saleProducts     = Cache::remember('home.sale_products',    300, fn() => Product::active()->onSale()->with(['images', 'category'])->inRandomOrder()->take(4)->get());
         $testimonials     = Cache::remember('home.testimonials',     600, fn() => Review::where('is_approved', true)->with('customer', 'product')->latest()->take(6)->get());
         $latestPosts      = Cache::remember('home.latest_posts',     300, fn() => Post::published()->with('postCategory')->latest('published_at')->take(3)->get());
         $homeCoupons      = Cache::remember('home.coupons',          300, fn() => Coupon::publiclyVisible()->latest()->get());
@@ -43,7 +44,7 @@ class HomeController extends Controller
             : [];
 
         return view('frontend.home', compact(
-            'banners', 'newsTickers', 'categories', 'productTypes', 'featuredProducts', 'bestsellerProducts', 'newProducts', 'testimonials', 'latestPosts', 'homeCoupons', 'collectedIds', 'featuredVideos', 'activeFlashSales'
+            'banners', 'newsTickers', 'categories', 'productTypes', 'featuredProducts', 'bestsellerProducts', 'newProducts', 'saleProducts', 'testimonials', 'latestPosts', 'homeCoupons', 'collectedIds', 'featuredVideos', 'activeFlashSales'
         ));
     }
 }

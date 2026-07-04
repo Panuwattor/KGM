@@ -614,9 +614,9 @@ span.flatpickr-weekday { background: var(--kgm-green-100); color: var(--kgm-gree
     display: inline-flex;
     align-items: center;
     white-space: nowrap;
-    animation: ticker-scroll 35s linear infinite;
+    animation: ticker-scroll 70s linear infinite;
     position: absolute;
-    padding-left: 100%;
+    padding-left: 20%;
     height: 100%;
 }
 

@@ -5,32 +5,7 @@
 <link rel="stylesheet" href="{{ asset('css/pages/home.css') }}">
 @endpush
 
-@section('content')
-
-
-{{-- ══ PRODUCT TYPES ══ --}}
-@if($productTypes->isNotEmpty())
-<section class="type-section">
-    <div class="container">
-        <div class="type-grid">
-            @foreach($productTypes as $pt)
-            <a href="{{ route('shop') }}?type={{ $pt->slug }}" class="type-card">
-                <div class="type-img-wrap">
-                    @if($pt->image)
-                        <img src="{{ media_url($pt->image) }}" alt="{{ $pt->name }}" width="110" height="110" loading="lazy">
-                    @else
-                        <div class="type-img-placeholder"><i class="bi bi-grid-3x3-gap"></i></div>
-                    @endif
-                </div>
-                <div class="type-name">{{ $pt->name }}</div>
-            </a>
-            @endforeach
-        </div>
-    </div>
-</section>
-@endif
-
-
+@section('navbar_secondary')
 {{-- ══ NEWS TICKER ══ --}}
 <div class="news-ticker-wrapper">
     <div class="news-ticker-container">
@@ -53,6 +28,8 @@
         </div>
     </div>
 </div>
+@endsection
+@section('content')
 
 {{-- ══ HERO ══ --}}
 @if($banners->isNotEmpty())
@@ -86,6 +63,29 @@
     </div>
     @endif
 </div>
+@endif
+
+
+{{-- ══ PRODUCT TYPES ══ --}}
+@if($productTypes->isNotEmpty())
+<section class="type-section">
+    <div class="container">
+        <div class="type-grid">
+            @foreach($productTypes as $pt)
+            <a href="{{ route('shop') }}?type={{ $pt->slug }}" class="type-card">
+                <div class="type-img-wrap">
+                    @if($pt->image)
+                        <img src="{{ media_url($pt->image) }}" alt="{{ $pt->name }}" width="110" height="110" loading="lazy">
+                    @else
+                        <div class="type-img-placeholder"><i class="bi bi-grid-3x3-gap"></i></div>
+                    @endif
+                </div>
+                <div class="type-name">{{ $pt->name }}</div>
+            </a>
+            @endforeach
+        </div>
+    </div>
+</section>
 @endif
 
 
@@ -353,6 +353,204 @@
         </div>
     </div>
 </section>
+@endif
+
+{{-- ══ PRODUCT SHOWCASE SLIDER ══ --}}
+@if($saleProducts->isNotEmpty())
+<section class="product-showcase-section">
+    <div class="container">
+        <div style="text-align:center;margin-bottom:24px;">
+            <div class="section-title">โปรโมชั่นประจำเดือนนี้</div>
+            <div class="section-divider" style="margin:10px auto 0;"></div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-12 col-xl-10">
+        <div class="showcase-wrapper" x-data="productShowcase({{ json_encode($saleProducts->map(fn($p) => [
+            'id' => $p->id,
+            'name' => $p->name,
+            'slug' => $p->slug,
+            'price' => $p->sale_price ?? $p->price,
+            'originalPrice' => $p->price,
+            'discount' => $p->discount_percent,
+            'image' => media_url($p->main_image),
+            'sizes' => $p->variants->pluck('size')->filter()->unique()->values(),
+            'stock' => $p->stock_quantity,
+            'description' => $p->short_description ?? '',
+            'isNew' => $p->is_new,
+            'isSale' => $p->sale_price && $p->sale_price < $p->price,
+            'category' => $p->category->name ?? '',
+        ])) }})">
+
+            {{-- Left: Vertical Thumbnail List (Different Products) --}}
+            <div class="showcase-thumbnails">
+                <template x-for="(product, index) in products" :key="product.id">
+                    <div class="showcase-thumb"
+                         :class="{ 'active': currentIndex === index }"
+                         @click="selectProduct(index)">
+                        <img :src="product.image" :alt="product.name">
+                    </div>
+                </template>
+            </div>
+
+            {{-- Center: Main Product Image --}}
+            <div class="showcase-main-image">
+                <div class="showcase-image-container">
+                    <img :src="currentProduct.image"
+                         :alt="currentProduct.name"
+                         class="showcase-img">
+
+                    {{-- Badges --}}
+                    <div class="showcase-badges">
+                        <span x-show="currentProduct.isNew" class="badge badge-new">New</span>
+                        <span x-show="currentProduct.isSale && currentProduct.discount > 0"
+                              class="badge badge-sale" x-text="'-' + currentProduct.discount + '%'"></span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Right: Product Details --}}
+            <div class="showcase-details">
+                <h2 class="showcase-title" x-text="currentProduct.name"></h2>
+
+                <div class="showcase-category" x-show="currentProduct.category">
+                    <span class="category-name" x-text="currentProduct.category"></span>
+                </div>
+
+                <div class="showcase-price">
+                    <span class="price-current" x-text="'฿' + currentProduct.price.toLocaleString()"></span>
+                    <template x-if="currentProduct.originalPrice > currentProduct.price">
+                        <span class="price-old" x-text="'฿' + currentProduct.originalPrice.toLocaleString()"></span>
+                    </template>
+                </div>
+
+                <p class="showcase-description" x-text="currentProduct.description"></p>
+
+                <div class="showcase-divider"></div>
+
+                {{-- Buy Button --}}
+                <a :href="`/shop/${currentProduct.slug}`" class="btn btn-primary w-100" style="padding: 16px; font-size: 16px;">
+                    <i class="bi bi-cart-plus"></i> ซื้อเลย
+                </a>
+            </div>
+        </div>
+            </div>
+        </div>
+        <div style="text-align:center;margin-top:24px;">
+            <a href="{{ route('promotions') }}" class="btn btn-outline"><i class="bi bi-grid-3x3-gap"></i> ดูสินค้าโปรโมชั่นทั้งหมด</a>
+        </div>
+    </div>
+</section>
+
+<style>
+.product-showcase-section { padding: 60px 0; background: #fff; }
+.showcase-wrapper { display: grid; grid-template-columns: 200px 1fr 400px; gap: 24px; align-items: start; }
+
+/* Thumbnails */
+.showcase-thumbnails { display: flex; flex-direction: column; gap: 16px; max-height: 490px; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; }
+.showcase-thumbnails::-webkit-scrollbar { display: none; }
+.showcase-thumb { width: 200px; height: 200px; border-radius: 16px; overflow: hidden; cursor: pointer; border: 3px solid #e5e7eb; transition: border-color 0.2s; }
+.showcase-thumb:hover { border-color: var(--kgm-green-500); }
+.showcase-thumb.active { border-color: var(--kgm-green-600); box-shadow: 0 0 0 4px rgba(45,106,79,0.1); }
+.showcase-thumb img { width: 100%; height: 100%; object-fit: contain; background: #f9fafb; }
+
+/* Main Image */
+.showcase-main-image { position: sticky; top: 20px; }
+.showcase-image-container { position: relative; aspect-ratio: 1; background: linear-gradient(135deg, #f0f9f4, #fff); border-radius: 20px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+.showcase-img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+.showcase-image-dots { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
+.showcase-dot { width: 8px; height: 8px; border-radius: 50%; border: none; background: rgba(255,255,255,0.6); cursor: pointer; transition: all 0.2s; padding: 0; }
+.showcase-dot:hover { background: rgba(255,255,255,0.9); }
+.showcase-dot.active { background: var(--kgm-green-600); width: 24px; border-radius: 4px; }
+.showcase-badges { position: absolute; top: 16px; right: 16px; display: flex; flex-direction: column; gap: 8px; }
+
+/* Details */
+.showcase-details { background: #fff; border-radius: 20px; padding: 32px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+.showcase-title { font-size: 24px; font-weight: 700; color: #1f2937; margin: 0 0 12px; line-height: 1.3; }
+.showcase-category { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+.category-label { font-size: 14px; font-weight: 600; color: #6b7280; }
+.category-name { font-size: 14px; font-weight: 600; color: var(--kgm-green-600); background: var(--kgm-green-50); padding: 4px 12px; border-radius: 6px; }
+.showcase-price { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.price-current { font-size: 32px; font-weight: 800; color: var(--kgm-green-700); }
+.price-old { font-size: 18px; color: #9ca3af; text-decoration: line-through; }
+.showcase-description { font-size: 14px; color: #6b7280; line-height: 1.6; margin-bottom: 20px; }
+.showcase-divider { height: 1px; background: #e5e7eb; margin: 20px 0; }
+.showcase-label { font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 12px; display: block; }
+.text-danger { color: #ef4444; }
+
+/* Sizes */
+.showcase-size-section { margin-bottom: 20px; position: relative; }
+.custom-select { position: relative; width: 100%; cursor: pointer; }
+.select-trigger { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; background: #fff; font-size: 14px; font-weight: 600; color: #374151; transition: all 0.2s; }
+.select-trigger:hover { border-color: var(--kgm-green-500); }
+.text-placeholder { color: #9ca3af; }
+.select-arrow { width: 20px; height: 20px; transition: transform 0.2s; flex-shrink: 0; }
+.rotate-180 { transform: rotate(180deg); }
+.select-dropdown { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff; border: 2px solid #e5e7eb; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-height: 250px; overflow-y: auto; z-index: 50; }
+.select-option { padding: 12px 16px; font-size: 14px; font-weight: 600; color: #374151; cursor: pointer; transition: background 0.15s; }
+.select-option:hover { background: #f0f9f4; }
+.select-option.selected { background: var(--kgm-green-50); color: var(--kgm-green-700); }
+
+/* Quantity */
+.showcase-quantity { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+.qty-controls { display: flex; align-items: center; border: 2px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+.qty-btn { width: 40px; height: 40px; border: none; background: #f9fafb; font-size: 18px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+.qty-btn:hover:not(:disabled) { background: #e5e7eb; }
+.qty-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.qty-input { width: 60px; height: 40px; border: none; text-align: center; font-size: 16px; font-weight: 600; }
+.stock-info { font-size: 13px; color: #6b7280; }
+
+/* Total */
+.showcase-total { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #f0f9f4; border-radius: 12px; margin-bottom: 20px; }
+.showcase-total span { font-size: 14px; color: #374151; }
+.showcase-total strong { font-size: 24px; color: var(--kgm-green-700); }
+
+/* Actions */
+.showcase-actions { display: flex; flex-direction: column; gap: 12px; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .showcase-wrapper { grid-template-columns: 160px 1fr 350px; gap: 16px; }
+    .showcase-thumb { width: 160px; height: 160px; }
+    .showcase-details { padding: 24px; }
+    .showcase-title { font-size: 20px; }
+    .price-current { font-size: 28px; }
+}
+
+@media (max-width: 768px) {
+    .product-showcase-section { padding: 40px 0; }
+    .showcase-wrapper { grid-template-columns: 1fr; gap: 20px; }
+    .showcase-thumbnails { flex-direction: row; max-height: none; overflow-x: scroll; overflow-y: hidden; padding-bottom: 8px; scrollbar-width: none; -ms-overflow-style: none; }
+    .showcase-thumbnails::-webkit-scrollbar { display: none; }
+    .showcase-thumb { width: 120px; height: 120px; flex-shrink: 0; }
+    .showcase-main-image { position: static; }
+    .showcase-details { padding: 20px; }
+}
+</style>
+
+<script>
+function productShowcase(productsData) {
+    return {
+        products: productsData,
+        currentIndex: 0,
+        selectedSize: null,
+        quantity: 1,
+        dropdownOpen: false,
+        get currentProduct() {
+            return this.products[this.currentIndex] || this.products[0];
+        },
+        selectProduct(index) {
+            this.currentIndex = index;
+            this.selectedSize = null;
+            this.quantity = 1;
+            this.dropdownOpen = false;
+        },
+        selectSize(size) {
+            this.selectedSize = size;
+            this.dropdownOpen = false;
+        }
+    };
+}
+</script>
 @endif
 
 {{-- ══ ABOUT + SERVICE HIGHLIGHTS ══ --}}
