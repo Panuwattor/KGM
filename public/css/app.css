@@ -13,7 +13,7 @@
     --kgm-gold-300: #f0c040;
     --kgm-gold-200: #c2986c;
     --kgm-gold-100: #fef9ec;
-    --kgm-gold-99: #ffeacf;
+    --kgm-gold-99: #dac68f;
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { scroll-behavior: smooth; overflow-x: clip; }
@@ -64,7 +64,7 @@ img { max-width: 100%; }
 .cart-badge { position: absolute; top: 2px; right: 2px; background: var(--kgm-gold-400); color: var(--kgm-green-900); border-radius: 999px; padding: 1px 5px; font-size: 10px; font-weight: 700; min-width: 18px; text-align: center; line-height: 1.4; }
 
 /* ───── Secondary Bar ───── */
-.navbar-secondary { background: linear-gradient(135deg, var(--kgm-gold-200), var(--kgm-gold-200)); overflow: hidden; height: 36px; opacity: 1; transition: height 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.28s cubic-bezier(0.4,0,0.2,1); will-change: height, opacity; }
+.navbar-secondary { background: linear-gradient(135deg, var(--kgm-gold-99), var(--kgm-gold-99)); overflow: hidden; height: 36px; opacity: 1; transition: height 0.28s cubic-bezier(0.4,0,0.2,1), opacity 0.28s cubic-bezier(0.4,0,0.2,1); will-change: height, opacity; }
 .navbar-secondary.hidden { height: 0; opacity: 0; border-top-color: transparent; pointer-events: none; }
 .navbar-secondary-inner { max-width: 1400px; margin: 0 auto; padding: 0 20px; height: 36px; display: flex; align-items: center; justify-content: center; gap: 16px; }
 .navbar-secondary-links { display: flex; align-items: center; gap: 0; }
