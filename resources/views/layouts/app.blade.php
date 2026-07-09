@@ -374,6 +374,18 @@
                 </div>
             </div>
         </div>
+
+        {{-- Certifications & Awards --}}
+        <div class="container" style="padding: 40px 0 20px;">
+            <div style="display: flex; justify-content: center; align-items: center; gap: 30px; flex-wrap: wrap;">
+                <img src="{{ asset('images/footer/cm.png') }}" alt="UNIDO Exchange" style="height: 80px; width: auto; object-fit: contain; background: white; padding: 12px; border-radius: 8px;">
+                <img src="{{ asset('images/footer/gi.png') }}" alt="Green Industry" style="height: 80px; width: auto; object-fit: contain; background: white; padding: 12px; border-radius: 8px;">
+                <img src="{{ asset('images/footer/iso9001.png') }}" alt="ISO 9001" style="height: 80px; width: auto; object-fit: contain; background: white; padding: 12px; border-radius: 8px;">
+                <img src="{{ asset('images/footer/kfp.png') }}" alt="KFP Award" style="height: 80px; width: auto; object-fit: contain; background: white; padding: 12px; border-radius: 8px;">
+                <img src="{{ asset('images/footer/mit.png') }}" alt="Made in Thailand" style="height: 80px; width: auto; object-fit: contain; background: white; padding: 12px; border-radius: 8px;">
+                <img src="{{ asset('images/footer/mok.png') }}" alt="MBK" style="height: 80px; width: auto; object-fit: contain; background: white; padding: 12px; border-radius: 8px;">
+            </div>
+        </div>
     </div>
     <div class="footer-bottom">
         <div class="container">© {{ date('Y') }} กิจเจริญการ์เมนท์ (1993) จำกัด — สงวนลิขสิทธิ์ทุกประการ</div>
