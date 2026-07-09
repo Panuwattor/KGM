@@ -32,6 +32,7 @@ use App\Http\Controllers\Admin\ReviewController;
 use App\Http\Controllers\Admin\MarketingController;
 use App\Http\Controllers\Admin\PostController;
 use App\Http\Controllers\Admin\ShowroomController;
+use App\Http\Controllers\Admin\ManufacturingProductController;
 use App\Http\Controllers\Admin\VideoController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\ReportController;
@@ -58,6 +59,7 @@ Route::get('/locations/districts/{district}/subdistricts', [LocationController::
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/services', [PageController::class, 'services'])->name('services');
 Route::get('/order', [PageController::class, 'order'])->name('order');
+Route::get('/order/products/{manufacturingProduct}', [PageController::class, 'manufacturingProductShow'])->name('manufacturing-products.show');
 Route::get('/embroidery-screen', [PageController::class, 'embroideryScreen'])->name('embroidery-screen');
 Route::get('/school-uniforms', [PageController::class, 'schoolUniforms'])->name('school-uniforms');
 Route::get('/showrooms', [PageController::class, 'showrooms'])->name('showrooms');
@@ -330,6 +332,19 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
         Route::get('showrooms/{showroom}/edit', [ShowroomController::class, 'edit'])->name('showrooms.edit');
         Route::put('showrooms/{showroom}', [ShowroomController::class, 'update'])->name('showrooms.update');
         Route::delete('showrooms/{showroom}', [ShowroomController::class, 'destroy'])->name('showrooms.destroy');
+    });
+
+    // Manufacturing Products (สินค้าที่รับผลิต)
+    Route::middleware(['check.permission:manufacturing_product_view'])->group(function () {
+        Route::get('manufacturing-products', [ManufacturingProductController::class, 'index'])->name('manufacturing-products.index');
+    });
+    Route::middleware(['check.permission:manufacturing_product_manage'])->group(function () {
+        Route::get('manufacturing-products/create', [ManufacturingProductController::class, 'create'])->name('manufacturing-products.create');
+        Route::post('manufacturing-products', [ManufacturingProductController::class, 'store'])->name('manufacturing-products.store');
+        Route::get('manufacturing-products/{manufacturingProduct}/edit', [ManufacturingProductController::class, 'edit'])->name('manufacturing-products.edit');
+        Route::put('manufacturing-products/{manufacturingProduct}', [ManufacturingProductController::class, 'update'])->name('manufacturing-products.update');
+        Route::delete('manufacturing-products/{manufacturingProduct}', [ManufacturingProductController::class, 'destroy'])->name('manufacturing-products.destroy');
+        Route::delete('manufacturing-products/{manufacturingProduct}/images/{image}', [ManufacturingProductController::class, 'deleteImage'])->name('manufacturing-products.images.delete');
     });
 
     // Coupons

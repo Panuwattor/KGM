@@ -7,6 +7,7 @@ use App\Models\Career;
 use App\Models\ConsentLog;
 use App\Models\ContactMessage;
 use App\Models\JobApplication;
+use App\Models\ManufacturingProduct;
 use App\Models\Post;
 use App\Models\PostCategory;
 use App\Models\Showroom;
@@ -19,7 +20,18 @@ class PageController extends Controller
 
     public function services() { return view('frontend.services'); }
 
-    public function order() { return view('frontend.order'); }
+    public function order()
+    {
+        $manufacturingProducts = ManufacturingProduct::active()->with('images')->get();
+        return view('frontend.order', compact('manufacturingProducts'));
+    }
+
+    public function manufacturingProductShow(ManufacturingProduct $manufacturingProduct)
+    {
+        abort_unless($manufacturingProduct->is_active, 404);
+        $manufacturingProduct->load('images');
+        return view('frontend.manufacturing-product-show', ['product' => $manufacturingProduct]);
+    }
 
     public function embroideryScreen() { return view('frontend.embroidery-screen'); }
 

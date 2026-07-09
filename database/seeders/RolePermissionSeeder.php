@@ -69,6 +69,10 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'showroom_view', 'description' => 'ดูโชว์รูม'],
             ['name' => 'showroom_manage', 'description' => 'จัดการโชว์รูม'],
 
+            // Manufacturing Products (สินค้าที่รับผลิต)
+            ['name' => 'manufacturing_product_view', 'description' => 'ดูสินค้าที่รับผลิต'],
+            ['name' => 'manufacturing_product_manage', 'description' => 'จัดการสินค้าที่รับผลิต'],
+
             // Coupons (คูปอง)
             ['name' => 'coupon_view', 'description' => 'ดูคูปองส่วนลด'],
             ['name' => 'coupon_manage', 'description' => 'จัดการคูปองส่วนลด'],
@@ -169,6 +173,7 @@ class RolePermissionSeeder extends Seeder
             'marketing_view', 'marketing_manage',
             'review_view', 'review_manage',
             'landing_page_view', 'landing_page_manage',
+            'manufacturing_product_view', 'manufacturing_product_manage',
             'report_view',
         ]);
 

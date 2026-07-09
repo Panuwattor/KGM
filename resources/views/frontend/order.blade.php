@@ -47,26 +47,30 @@
             <div class="section-divider" style="margin:10px auto 0;"></div>
         </div>
         <div class="ord-products-grid">
-            @foreach([
-                ['bi-person-badge-fill',     'เสื้อยูนิฟอร์ม',         'ยูนิฟอร์มองค์กร บริษัท โรงแรม ร้านอาหาร ทุกสไตล์'],
-                ['bi-building-fill',         'เสื้อหน่วยงาน',           'ออกแบบตามอัตลักษณ์องค์กร โลโก้คมชัด ทนทาน'],
-                ['bi-mortarboard-fill',      'เครื่องแบบนักเรียน',      'ครบชุดทุกระดับชั้น ชาย-หญิง ลูกเสือ-เนตรนารี และชุดพละ'],
-                ['bi-award-fill',            'เสื้อโปโล',               'ผ้าคุณภาพสูง ปักโลโก้ สกรีนลาย ตามแบบที่ต้องการ'],
-                ['bi-wind',                  'เสื้อแจ็คเก็ต',           'แจ็คเก็ตองค์กร ชมรม มหาวิทยาลัย ตามสเปกที่กำหนด'],
-                ['bi-circle-fill',           'เสื้อยืดคอกลม',           'ทรงหลากหลาย ผ้าดี ปักหรือสกรีนลายตามต้องการ'],
-                ['bi-shield-check',          'ชุดพนักงานราชการ',        'ออกแบบตามระเบียบราชการ ผ้าตรงมาตรฐาน'],
-                ['bi-plus-circle-fill',      'ชุดคนไข้โรงพยาบาล',      'ผ้าพิเศษนุ่มสบาย ดูแลรักษาง่าย ตัดเย็บแม่นยำ'],
-                ['bi-trophy-fill',           'ชุดกีฬา',                 'ชุดกีฬาสีสดใส ระบายอากาศดี พร้อมชื่อและหมายเลข'],
-                ['bi-bag-fill',              'ถุงผ้า',                  'ถุงผ้าสำหรับของชำร่วย รับน้อง และงานอีเวนต์ต่างๆ'],
-            ] as [$icon, $title, $desc])
-            <div style="background:#f8faf8;border-radius:16px;padding:22px 18px;text-align:center;">
+            @forelse($manufacturingProducts as $mp)
+            <a href="{{ route('manufacturing-products.show', $mp) }}" style="background:#f8faf8;border-radius:16px;padding:22px 18px;text-align:center;text-decoration:none;color:inherit;display:block;transition:box-shadow .2s,transform .2s;"
+               onmouseover="this.style.boxShadow='0 8px 24px rgba(26,66,42,.10)';this.style.transform='translateY(-3px)'"
+               onmouseout="this.style.boxShadow='none';this.style.transform='none'">
+                {{-- รูปหลัก แสดงเท่าไอคอนเดิม --}}
+                @if($mp->image)
+                <img src="{{ media_url($mp->image) }}" alt="{{ $mp->name }}" loading="lazy"
+                     style="width:100px;height:100px;object-fit:cover;border-radius:14px;margin:0 auto 12px;display:block;">
+                @else
                 <div style="width:52px;height:52px;background:var(--kgm-green-100);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--kgm-green-600);margin:0 auto 12px;">
-                    <i class="bi {{ $icon }}"></i>
+                    <i class="bi bi-hammer"></i>
                 </div>
-                <h3 style="font-size:14px;font-weight:800;color:var(--kgm-green-800);margin:0 0 6px;">{{ $title }}</h3>
-                <p style="font-size:12px;color:#777;line-height:1.7;margin:0;">{{ $desc }}</p>
+                @endif
+                <h3 style="font-size:14px;font-weight:800;color:var(--kgm-green-800);margin:0 0 6px;">{{ $mp->name }}</h3>
+                @if($mp->description)
+                <p style="font-size:12px;color:#777;line-height:1.7;margin:0;">{{ Str::limit($mp->description, 70) }}</p>
+                @endif
+            </a>
+            @empty
+            <div style="grid-column:1/-1;text-align:center;padding:48px 0;color:#999;">
+                <i class="bi bi-inbox" style="font-size:36px;display:block;margin-bottom:10px;"></i>
+                ยังไม่มีรายการสินค้าที่รับผลิต
             </div>
-            @endforeach
+            @endforelse
         </div>
     </div>
 </section>
