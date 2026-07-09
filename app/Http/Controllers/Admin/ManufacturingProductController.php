@@ -12,7 +12,10 @@ class ManufacturingProductController extends Controller
 {
     public function index()
     {
-        $products = ManufacturingProduct::withCount('images')->orderBy('sort_order')->get();
+        $products = ManufacturingProduct::withCount('images')
+            ->orderByDesc('is_active')
+            ->orderBy('sort_order')
+            ->get();
         return view('admin.manufacturing-products.index', compact('products'));
     }
 

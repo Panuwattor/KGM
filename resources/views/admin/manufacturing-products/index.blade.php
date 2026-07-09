@@ -38,8 +38,6 @@
             <td style="display:flex;gap:6px;">
                 @can('manufacturing_product_manage')
                 <a href="{{ route('admin.manufacturing-products.edit', $p) }}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i></a>
-                <form method="POST" action="{{ route('admin.manufacturing-products.destroy', $p) }}" onsubmit="return confirm('ลบสินค้านี้?')">@csrf @method('DELETE')
-                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button></form>
                 @endcan
             </td>
         </tr>
