@@ -295,12 +295,17 @@
         </div>
         @endcan
 
-        @if(auth()->user()->can('product_view') || auth()->user()->can('category_view') || auth()->user()->can('product_type_view'))
+        @if(auth()->user()->can('product_view') || auth()->user()->can('category_view') || auth()->user()->can('product_type_view') || auth()->user()->can('manufacturing_product_view'))
         <div class="nav-section">
             <div class="nav-section-title">สินค้า</div>
             @can('product_view')
             <a href="{{ route('admin.products.index') }}" class="nav-item {{ request()->routeIs('admin.products*') ? 'active' : '' }}">
                 <i class="bi bi-box-seam"></i> จัดการสินค้า
+            </a>
+            @endcan
+            @can('manufacturing_product_view')
+            <a href="{{ route('admin.manufacturing-products.index') }}" class="nav-item {{ request()->routeIs('admin.manufacturing-products*') ? 'active' : '' }}">
+                <i class="bi bi-hammer"></i> สินค้าที่รับผลิต
             </a>
             @endcan
             @can('category_view')
