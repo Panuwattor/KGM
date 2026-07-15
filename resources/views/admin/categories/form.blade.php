@@ -16,6 +16,18 @@
             <input type="text" name="name" class="form-control" value="{{ old('name', $category->name ?? '') }}" required>
         </div>
         <div class="form-group">
+            <label class="form-label">Slug (URL)</label>
+            <input type="text" name="slug" class="form-control" value="{{ old('slug', $category->slug ?? '') }}"
+                   placeholder="{{ isset($category) ? '' : 'เว้นว่างไว้ = สร้างจากชื่อหมวดหมู่อัตโนมัติ' }}">
+            <small class="form-text" style="color:#6b7280;">
+                @if(isset($category))
+                    เว้นว่างไว้ = ใช้ URL เดิม · แก้ไขแล้วลิงก์เก่าจะใช้ไม่ได้
+                @else
+                    เว้นว่างไว้ = สร้างจากชื่ออัตโนมัติ · ใช้ภาษาไทยได้
+                @endif
+            </small>
+        </div>
+        <div class="form-group">
             <label class="form-label">หมวดหมู่หลัก (ถ้ามี)</label>
             <select name="parent_id" class="form-control">
                 <option value="">-- ไม่มีหมวดหมู่หลัก --</option>

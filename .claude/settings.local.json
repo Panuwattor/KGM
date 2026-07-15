@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(/c/xamppNN/php/php.exe artisan:*)"
+      "Bash(/c/xamppNN/php/php.exe artisan:*)",
+      "Bash(/c/xampp/php/php.exe artisan *)",
+      "Read(//c/Users/PC/.config/herd/bin/**)",
+      "Read(//c/Users/PC/AppData/Roaming/Herd/**)",
+      "Read(//c/Users/PC/.config/herd/**)",
+      "Bash(/c/Users/PC/.config/herd/bin/php84/php.exe artisan *)",
+      "Bash(/c/Users/PC/.config/herd/bin/php84/php.exe artisan tinker '--execute= *)"
     ]
   }
 }

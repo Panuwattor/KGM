@@ -7,7 +7,6 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
@@ -26,7 +25,6 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $data = $this->validateCategory($request);
-        $data['slug'] = Str::slug($request->name);
 
         if ($request->hasFile('image')) {
             $data['image'] = $request->file('image')->store('categories', config('filesystems.media'));
@@ -46,6 +44,13 @@ class CategoryController extends Controller
     public function update(Request $request, Category $category)
     {
         $data = $this->validateCategory($request);
+
+        // เว้นช่อง slug ว่างไว้ = ไม่แก้ URL เดิม (ป้องกันลิงก์เก่าพังโดยไม่ตั้งใจ)
+        if ($request->filled('slug')) {
+            $data['slug'] = $request->slug;
+        } else {
+            unset($data['slug']);
+        }
 
         if ($request->hasFile('image')) {
             if ($category->image) {
@@ -78,6 +83,7 @@ class CategoryController extends Controller
     {
         return $request->validate([
             'name'             => 'required|string|max:255',
+            'slug'             => 'nullable|string|max:255',
             'parent_id'        => 'nullable|exists:categories,id',
             'description'      => 'nullable|string',
             'sort_order'       => 'integer',

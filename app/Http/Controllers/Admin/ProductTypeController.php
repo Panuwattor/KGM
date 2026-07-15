@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helpers\Slugger;
 use App\Http\Controllers\Controller;
 use App\Models\ProductType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class ProductTypeController extends Controller
 {
@@ -25,7 +25,7 @@ class ProductTypeController extends Controller
     public function store(Request $request)
     {
         $data = $this->validateType($request);
-        $data['slug'] = Str::slug($request->name);
+        $data['slug'] = Slugger::unique($request->name, 'product_types', fallback: 'product-type');
         $data['has_embroidery'] = $request->boolean('has_embroidery');
 
         if ($request->hasFile('image')) {
