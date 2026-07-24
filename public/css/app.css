@@ -151,21 +151,28 @@ img { max-width: 100%; }
 .product-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; }
 .product-card:hover .product-img { transform: scale(1.06); }
 /* ── Corner ribbon (clip-path + border-image fold) ──────────────────────── */
-.product-badges {
-    position: absolute; top: 0; right: 0;
+.product-badge-tl, .product-badge-tr {
+    position: absolute; top: 0;
     pointer-events: none; z-index: 1;
 }
+.product-badge-tl { left: 0; }
+.product-badge-tr { right: 0; }
 
-.product-badges .badge {
+.product-badge-tl .badge, .product-badge-tr .badge {
     --f: 0.45em;
     position: absolute;
-    top: 0; right: 0;
+    top: 0;
     line-height: 1.6;
     padding-inline: 1lh;
     padding-bottom: var(--f);
     border-radius: 0;
     font-size: 10px; font-weight: 800; letter-spacing: 0.4px;
     border-image: conic-gradient(#0008 0 0) 51% / var(--f);
+}
+
+/* Original: ribbon folds down-right, hangs off the top-right corner */
+.product-badge-tr .badge {
+    right: 0;
     clip-path: polygon(
         100% calc(100% - var(--f)), 100% 100%, calc(100% - var(--f)) calc(100% - var(--f)),
         var(--f) calc(100% - var(--f)), 0 100%, 0 calc(100% - var(--f)),
@@ -175,9 +182,24 @@ img { max-width: 100%; }
     transform-origin: 0% 100%;
 }
 
-/* Stack 2nd/3rd ribbon lower along the diagonal */
-.product-badges .badge:nth-child(2) { top: 14px; right: 14px; }
-.product-badges .badge:nth-child(3) { top: 28px; right: 28px; }
+/* Mirrored: ribbon folds down-left, hangs off the top-left corner */
+.product-badge-tl .badge {
+    left: 0;
+    clip-path: polygon(
+        0 calc(100% - var(--f)), 0 100%, var(--f) calc(100% - var(--f)),
+        calc(100% - var(--f)) calc(100% - var(--f)), 100% 100%, 100% calc(100% - var(--f)),
+        -999px calc(100% - var(--f) - 999px), calc(100% + 999px) calc(100% - var(--f) - 999px)
+    );
+    transform: translate(calc((cos(45deg) - 1) * 100%), -100%) rotate(-45deg);
+    transform-origin: 100% 100%;
+}
+
+/* Discount: plain pill, bottom-left */
+.product-badge-bl {
+    position: absolute; bottom: 10px; left: 10px;
+    pointer-events: none; z-index: 1;
+}
+.product-badge-bl .badge { border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,.15); }
 
 /* General badge pill (used outside product cards e.g. show page) */
 .badge { padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; display: inline-block; line-height: 1.5; }

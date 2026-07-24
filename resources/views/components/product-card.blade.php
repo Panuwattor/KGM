@@ -1,11 +1,16 @@
 <div class="product-card">
-    <div class="product-badges">
-        @if($product->is_new)<span class="badge badge-new">ใหม่</span>@endif
-        @if($product->is_bestseller)<span class="badge badge-hot">ขายดี</span>@endif
-        @if($product->sale_price)<span class="badge badge-sale">-{{ $product->discount_percent }}%</span>@endif
-    </div>
+    @if($product->is_new)
+    <div class="product-badge-tl"><span class="badge badge-new">ใหม่</span></div>
+    @endif
+    @if($product->is_bestseller)
+    <div class="product-badge-tr"><span class="badge badge-hot">ขายดี</span></div>
+    @endif
     <div class="card">
         <div class="product-img-wrap">
+
+            @if($product->sale_price && $product->discount_percent > 0)
+            <div class="product-badge-bl"><span class="badge badge-sale">-{{ $product->discount_percent }}%</span></div>
+            @endif
             <a href="{{ route('shop.show', $product->slug) }}" style="display:block;line-height:0;">
                 <img src="{{ $product->main_image ? media_url($product->main_image) : asset('images/logo.png') }}"
                     alt="{{ $product->name }}" class="product-img" width="400" height="400" loading="lazy"
