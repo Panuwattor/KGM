@@ -69,6 +69,21 @@ class CategoryController extends Controller
         return redirect()->route('admin.categories.index')->with('success', 'อัปเดตหมวดหมู่แล้ว');
     }
 
+    public function reorder(Request $request)
+    {
+        $request->validate([
+            'ids'   => 'required|array',
+            'ids.*' => 'exists:categories,id',
+        ]);
+
+        foreach ($request->ids as $index => $id) {
+            Category::where('id', $id)->update(['sort_order' => $index]);
+        }
+
+        Cache::forget('home.categories');
+        return response()->json(['success' => true]);
+    }
+
     public function destroy(Category $category)
     {
         if ($category->image) {
