@@ -8,6 +8,10 @@
     <span class="current">{{ isset($product) ? 'แก้ไข' : 'เพิ่มสินค้า' }}</span>
 @endsection
 
+@push('styles')
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.css" rel="stylesheet">
+@endpush
+
 @section('content')
 <div class="page-header">
     <div>
@@ -233,6 +237,29 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-lite.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/lang/summernote-th-TH.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    $('#description').summernote({
+        lang: 'th-TH',
+        height: 250,
+        toolbar: [
+            ['style', ['bold', 'italic', 'underline', 'clear']],
+            ['font', ['fontname', 'fontsize', 'color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['insert', ['link', 'picture', 'table']],
+            ['view', ['fullscreen', 'codeview']],
+        ],
+        callbacks: {
+            onChange: function (contents) {
+                document.getElementById('description').value = contents;
+            },
+        },
+    });
+});
+</script>
 <script>
 function variantManager(initial, initialStock) {
     return {
