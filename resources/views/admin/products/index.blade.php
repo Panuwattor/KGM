@@ -60,12 +60,14 @@
 <div class="table-wrap">
     <table>
         <thead><tr>
+            <th width="40">#</th>
             <th width="60">รูป</th><th>ชื่อสินค้า</th><th>หมวดหมู่</th><th>ประเภท</th><th>ราคา</th>
             <th>สต๊อก</th><th>สถานะ</th><th width="130">จัดการ</th>
         </tr></thead>
         <tbody>
-        @forelse($products as $product)
+        @forelse($products as $no=>$product)
         <tr>
+            <td>{{ $no + 1 }}</td>
             <td>
                 @if($product->images->first())
                     <img src="{{ media_url($product->images->first()->image_path) }}" style="width:50px;height:50px;object-fit:cover;border-radius:10px;">
@@ -122,7 +124,7 @@
             </td>
         </tr>
         @empty
-        <tr><td colspan="8" style="text-align:center;padding:40px;color:#aaa;"><i class="bi bi-box-seam" style="font-size:32px;display:block;margin-bottom:8px;"></i>ไม่พบสินค้า</td></tr>
+        <tr><td colspan="9" style="text-align:center;padding:40px;color:#aaa;"><i class="bi bi-box-seam" style="font-size:32px;display:block;margin-bottom:8px;"></i>ไม่พบสินค้า</td></tr>
         @endforelse
         </tbody>
     </table>
