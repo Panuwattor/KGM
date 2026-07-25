@@ -117,6 +117,9 @@
             {{-- Variants --}}
             <div class="form-card">
                 <h3><i class="bi bi-diagram-3"></i> ตัวเลือกสินค้า (Variants)</h3>
+                <p style="font-size:13px;color:#888;margin-top:-8px;margin-bottom:14px;">
+                    <i class="bi bi-info-circle"></i> "ราคาเพิ่ม (฿)" จะถูกบวกเพิ่มจากราคาขายหลักของสินค้าเสมอ เช่น ราคาขายหลัก 500 บาท และไซซ์นี้ตั้งราคาเพิ่ม 20 บาท ราคาขายจริงของไซซ์นี้จะเท่ากับ 520 บาท (ใส่ 0 หากไม่ต้องการปรับราคา หรือใส่ค่าติดลบเพื่อลดราคา)
+                </p>
                 <template x-for="(v, i) in variants" :key="i">
                     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 80px 80px auto;gap:8px;margin-bottom:10px;align-items:end;">
                         <div>

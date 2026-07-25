@@ -225,6 +225,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     // Orders
     Route::middleware(['check.permission:order_view'])->group(function () {
         Route::get('orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('orders/export/packing', [OrderController::class, 'exportPacking'])->name('orders.export-packing');
         Route::get('orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     });
     Route::middleware(['check.permission:order_manage'])->group(function () {

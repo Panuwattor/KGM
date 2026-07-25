@@ -7,6 +7,9 @@
         <div class="page-title">คำสั่งซื้อทั้งหมด</div>
         <div class="page-subtitle">{{ $orders->total() }} รายการ</div>
     </div>
+    <a href="{{ route('admin.orders.export-packing', request()->query()) }}" class="btn btn-success">
+        <i class="bi bi-file-earmark-excel"></i> Export Excel (สำหรับแพ็กสินค้า)
+    </a>
 </div>
 
 {{-- Status Tabs --}}

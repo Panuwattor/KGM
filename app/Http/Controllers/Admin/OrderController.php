@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Exports\OrdersPackingExport;
 use App\Http\Controllers\Controller;
 use App\Models\AdminLog;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OrderController extends Controller
 {
@@ -34,6 +36,16 @@ class OrderController extends Controller
         $statusCounts = Order::selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status');
 
         return view('admin.orders.index', compact('orders', 'statusCounts'));
+    }
+
+    public function exportPacking(Request $request)
+    {
+        $filters = $request->only('status', 'search', 'date_from', 'date_to');
+        $filename = 'orders-packing-' . now()->format('Y-m-d-Hi') . '.xlsx';
+
+        AdminLog::record('exported', 'Export รายการออเดอร์สำหรับแพ็กสินค้า');
+
+        return Excel::download(new OrdersPackingExport($filters), $filename);
     }
 
     public function show(Order $order)
