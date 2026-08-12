@@ -37,8 +37,8 @@
             </div>
             @endif
             <p style="font-size:13px;color:#7a6f55;line-height:1.65;margin-bottom:12px;">
-                คุณสั่งซื้อแบบไม่ได้สมัครสมาชิก <b>ลิงก์นี้คือทางเดียว</b>ที่จะกลับมาดูสถานะออเดอร์และอัปโหลดสลิปได้
-                กรุณากด Copy แล้วบันทึกไว้ หรือบันทึกหน้านี้เป็นบุ๊กมาร์ก
+                คุณสั่งซื้อแบบไม่ได้สมัครสมาชิก <b>ลิงก์นี้คือทางเดียว</b>ที่จะกลับมาดูสถานะออเดอร์
+                เลขพัสดุ และอัปโหลดสลิปได้ กรุณากด Copy เก็บไว้ หรือกดเข้าไปแล้วบุ๊กมาร์กหน้านั้น
             </p>
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
                 <input type="text" id="guest-link" value="{{ $order->guest_url }}" readonly
@@ -87,11 +87,9 @@
         @endif
 
         <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-            @if(! $order->is_guest)
-            <a href="{{ route('account.orders.show', $order) }}" class="btn btn-primary">
-                <i class="bi bi-receipt"></i> ดูรายละเอียดออเดอร์
+            <a href="{{ $order->is_guest ? $order->guest_url : route('account.orders.show', $order) }}" class="btn btn-primary">
+                <i class="bi bi-receipt"></i> ดูรายละเอียด/ติดตามออเดอร์
             </a>
-            @endif
             <a href="{{ route('shop') }}" class="btn btn-outline">
                 <i class="bi bi-shop"></i> ช็อปปิ้งต่อ
             </a>

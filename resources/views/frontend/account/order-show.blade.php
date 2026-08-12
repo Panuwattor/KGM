@@ -1,7 +1,33 @@
+@php
+    // หน้านี้ใช้ร่วมกันระหว่างสมาชิก (/account/orders/{id}) และลูกค้าทั่วไปที่เปิดลิงก์ลับ (/order/{เลขออเดอร์})
+    // ลูกค้าทั่วไปไม่มีบัญชี จึงไม่มีปุ่มยกเลิก/ยืนยันรับสินค้า (ต้องติดต่อทางร้านแทน)
+    $isGuestView = $isGuestView ?? false;
+@endphp
 @extends('layouts.app')
 @section('title', 'ออเดอร์ '.$order->order_number)
 @section('content')
 <div class="container" style="padding-top:clamp(16px,4vw,32px);padding-bottom:clamp(32px,8vw,64px);max-width:900px;">
+    @if($isGuestView && $order->guest_url)
+    {{-- ลิงก์ลับ: ทางเดียวที่ลูกค้าทั่วไปจะกลับมาดูออเดอร์นี้ได้ --}}
+    <div style="background:#fffdf5;border:2px solid var(--kgm-gold-300);border-radius:16px;padding:clamp(14px,3vw,18px);margin-bottom:20px;">
+        <div style="font-weight:800;color:var(--kgm-gold-700);font-size:15px;margin-bottom:6px;">
+            <i class="bi bi-bookmark-star"></i> บันทึกลิงก์นี้ไว้ดูออเดอร์ภายหลัง
+        </div>
+        @if(session('order_sms_sent'))
+        <div style="background:var(--kgm-green-100);border-radius:10px;padding:8px 12px;margin-bottom:10px;font-size:13px;color:var(--kgm-green-800);font-weight:600;">
+            <i class="bi bi-chat-dots-fill"></i> ส่งลิงก์ทาง SMS ไปที่ {{ $order->ship_phone }} แล้ว
+        </div>
+        @endif
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <input type="text" id="guest-link" value="{{ $order->guest_url }}" readonly onclick="this.select()"
+                style="flex:1;min-width:200px;font-size:12.5px;padding:9px 12px;border:1.5px solid #e6dfc8;border-radius:12px;background:#fff;color:#5a5344;font-family:monospace;">
+            <button type="button" onclick="copyGuestLink(this)" class="btn btn-gold" style="flex-shrink:0;">
+                <i class="bi bi-clipboard"></i> <span>Copy</span>
+            </button>
+        </div>
+    </div>
+    @endif
+
     <div style="background:white;border-radius:20px;padding:clamp(16px,4vw,28px);box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-bottom:20px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px;">
             <div>
@@ -101,13 +127,14 @@
         @endif
         <form method="POST" action="{{ route('orders.upload-slip', $order) }}" enctype="multipart/form-data">
             @csrf
+            @if($isGuestView)<input type="hidden" name="token" value="{{ $order->guest_token }}">@endif
             <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
                 <input type="file" name="slip" accept="image/*" class="form-control" style="flex:2 1 180px;min-width:0;border-radius:12px;" required>
                 <button type="submit" class="btn btn-gold" style="flex:1 1 140px;justify-content:center;"><i class="bi bi-cloud-upload"></i> อัปโหลดสลิป</button>
             </div>
         </form>
 
-        @if($order->status === 'pending_payment')
+        @if($order->status === 'pending_payment' && ! $isGuestView)
         <div style="border-top:1px solid #f0f2f0;margin-top:20px;padding-top:16px;">
             <form method="POST" action="{{ route('account.orders.cancel', $order) }}" id="cancel-order-form" style="text-align:center;">
                 @csrf
@@ -159,8 +186,8 @@
     </div>
     @endif
 
-    {{-- ยืนยันรับสินค้า (ลูกค้ากดเอง) --}}
-    @if($order->status === 'shipped')
+    {{-- ยืนยันรับสินค้า (ลูกค้ากดเอง — เฉพาะสมาชิก) --}}
+    @if($order->status === 'shipped' && ! $isGuestView)
     <div style="background:white;border-radius:20px;padding:clamp(16px,4vw,24px);box-shadow:0 2px 10px rgba(0,0,0,0.06);margin-top:20px;text-align:center;">
         <div style="font-weight:700;margin-bottom:4px;">{{ $order->is_pickup ? 'มารับสินค้าเรียบร้อยแล้วใช่ไหม?' : 'ได้รับสินค้าแล้วใช่ไหม?' }}</div>
         <div style="font-size:13px;color:#888;margin-bottom:14px;">กดยืนยันเพื่อปิดออเดอร์นี้</div>
@@ -174,6 +201,24 @@
 
 @push('scripts')
 <script>
+function copyGuestLink(btn) {
+    const input = document.getElementById('guest-link');
+    if (!input) return;
+    const label = btn.querySelector('span');
+    const done  = () => {
+        label.textContent = 'คัดลอกแล้ว!';
+        btn.querySelector('i').className = 'bi bi-check-lg';
+        setTimeout(() => {
+            label.textContent = 'Copy';
+            btn.querySelector('i').className = 'bi bi-clipboard';
+        }, 2000);
+    };
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(input.value).then(done).catch(() => { input.select(); document.execCommand('copy'); done(); });
+    } else {
+        input.select(); document.execCommand('copy'); done();
+    }
+}
 document.addEventListener('DOMContentLoaded', function () {
     const cancelForm = document.getElementById('cancel-order-form');
     if (cancelForm) {

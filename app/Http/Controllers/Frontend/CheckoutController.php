@@ -229,7 +229,10 @@ class CheckoutController extends Controller
         return view('frontend.checkout-success', compact('order'));
     }
 
-    /** ติดตามออเดอร์ด้วยลิงก์ลับ — ลูกค้าทั่วไปกลับมาดูสถานะ/อัปโหลดสลิปได้ */
+    /**
+     * ติดตามออเดอร์ด้วยลิงก์ลับ — ลูกค้าทั่วไปดูสถานะ/รายการสินค้า/เลขพัสดุ และอัปโหลดสลิปได้
+     * ใช้หน้าเดียวกับออเดอร์ของสมาชิก เพื่อให้เห็นข้อมูลครบเท่ากัน
+     */
     public function track(Request $request, Order $order)
     {
         $this->authorizeOrder($order, $request->query('token'));
@@ -239,7 +242,12 @@ class CheckoutController extends Controller
             return redirect()->route('account.orders.show', $order);
         }
 
-        return view('frontend.checkout-success', compact('order'));
+        $order->load('items', 'pickupShowroom');
+
+        return view('frontend.account.order-show', [
+            'order'       => $order,
+            'isGuestView' => true,
+        ]);
     }
 
     /**
