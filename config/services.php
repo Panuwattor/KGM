@@ -45,6 +45,11 @@ return [
         'secret_key'  => env('SMSMKT_SECRET_KEY'),
         'project_key' => env('SMSMKT_PROJECT_KEY'),
         'sender'      => env('SMSMKT_SENDER', 'KGM'),
+        // ส่ง SMS ข้อความอิสระ (ลิงก์ติดตามออเดอร์) — ใช้เครดิต Broadcast
+        'enabled'      => env('SMSMKT_ENABLED', true),
+        'project_id'   => env('SMSMKT_PROJECT_ID'),
+        // ข้อความไทยใช้ 2 เครดิต/ครั้ง (67 ตัว/เครดิต) ส่วนอังกฤษใช้ 1 (153 ตัว/เครดิต)
+        'thai_message' => env('SMSMKT_THAI_MESSAGE', false),
     ],
 
 ];

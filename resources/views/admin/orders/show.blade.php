@@ -212,6 +212,12 @@
                 {{ $order->is_pickup ? 'ผู้รับสินค้า (รับเองที่ร้าน)' : 'ที่อยู่จัดส่ง' }}
             </h3>
             <div style="font-weight:700;font-size:15px;">{{ $order->ship_name }}</div>
+            @if($order->is_guest)
+            <div style="margin-top:8px;background:#fdf6e3;border:1px solid #f0e2b6;border-radius:10px;padding:8px 10px;font-size:12.5px;color:#8a6d1f;line-height:1.6;">
+                <i class="bi bi-person-badge"></i> <b>ลูกค้าทั่วไป</b> (ไม่ได้สมัครสมาชิก)<br>
+                <span style="color:#a08c56;">ติดต่อกลับทางเบอร์โทรเท่านั้น</span>
+            </div>
+            @endif
             <div style="margin-top:6px;font-size:14px;line-height:1.8;color:#555;">
                 @unless($order->is_pickup)
                 {{ $order->ship_address }}<br>

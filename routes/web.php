@@ -115,13 +115,14 @@ Route::post('/cart/coupon', [CartController::class, 'applyCoupon'])->name('cart.
 Route::delete('/cart/coupon', [CartController::class, 'removeCoupon'])->name('cart.coupon.remove');
 Route::get('/cart/count', [CartController::class, 'count'])->name('cart.count');
 
-// Checkout
-Route::middleware('auth:customer')->group(function () {
-    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
-    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-    Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
-    Route::post('/orders/{order}/upload-slip', [CheckoutController::class, 'uploadSlip'])->name('orders.upload-slip');
-});
+// Checkout — สั่งซื้อได้โดยไม่ต้องสมัครสมาชิก (guest checkout)
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout');
+Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
+Route::post('/orders/{order}/upload-slip', [CheckoutController::class, 'uploadSlip'])->name('orders.upload-slip');
+
+// ติดตามออเดอร์ด้วยลิงก์ลับ (สำหรับลูกค้าที่ไม่ได้สมัครสมาชิก)
+Route::get('/order/{order:order_number}', [CheckoutController::class, 'track'])->name('order.track');
 
 // Customer Account
 Route::middleware('auth:customer')->prefix('account')->name('account.')->group(function () {

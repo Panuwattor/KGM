@@ -222,15 +222,14 @@
                 </div>
             </div>
 
-            @auth('customer')
             <a href="{{ route('checkout') }}" class="btn btn-primary w-full btn-lg" style="justify-content:center;">
                 <i class="bi bi-bag-check"></i> ดำเนินการสั่งซื้อ
             </a>
-            @else
-            <a href="{{ route('checkout') }}" class="btn btn-primary w-full btn-lg" style="justify-content:center;">
-                <i class="bi bi-box-arrow-in-right"></i> เข้าสู่ระบบเพื่อสั่งซื้อ
-            </a>
-            @endauth
+            @guest('customer')
+            <div style="text-align:center;font-size:12.5px;color:#8a938d;margin-top:10px;line-height:1.6;">
+                <i class="bi bi-check-circle" style="color:var(--kgm-green-500);"></i> สั่งซื้อได้เลย ไม่ต้องสมัครสมาชิก
+            </div>
+            @endguest
         </div>
 
     </div>

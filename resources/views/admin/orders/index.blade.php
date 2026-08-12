@@ -50,7 +50,12 @@
         <tr>
             <td><span style="font-weight:700;color:var(--g700);">{{ $order->order_number }}</span></td>
             <td>
-                <div style="font-weight:600;">{{ $order->ship_name }}</div>
+                <div style="font-weight:600;">
+                    {{ $order->ship_name }}
+                    @if($order->is_guest)
+                    <span title="สั่งซื้อโดยไม่ได้สมัครสมาชิก" style="display:inline-block;font-size:10.5px;font-weight:700;color:#8a6d1f;background:#fdf6e3;border:1px solid #f0e2b6;border-radius:999px;padding:1px 7px;margin-left:4px;vertical-align:middle;">ทั่วไป</span>
+                    @endif
+                </div>
                 <div style="font-size:12px;color:#888;">{{ $order->ship_phone }}</div>
             </td>
             <td style="font-size:13px;">{{ $order->items()->count() }} รายการ</td>

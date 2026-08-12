@@ -45,6 +45,12 @@
     .dm-sub { font-size: 11px; }
 }
 
+/* แถบแจ้งลูกค้าทั่วไป (ยังไม่ล็อกอิน) */
+.guest-banner { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; background: var(--kgm-green-100); border: 1.5px solid var(--kgm-green-300, #b7e4c7); border-radius: 16px; padding: 16px 20px; margin-bottom: 20px; }
+.guest-banner-icon { flex-shrink: 0; width: 42px; height: 42px; border-radius: 999px; background: var(--kgm-green-600); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 19px; }
+.guest-banner-link { flex-shrink: 0; font-size: 13px; font-weight: 700; color: var(--kgm-green-700); text-decoration: underline; white-space: nowrap; }
+.guest-banner-link:hover { color: var(--kgm-green-800); }
+
 .checkout-layout { display: grid; grid-template-columns: 3fr 2fr; gap: 28px; align-items: start; }
 .checkout-summary { position: sticky; top: 90px; }
 
@@ -58,6 +64,19 @@
 @section('content')
 <div class="container" style="padding-top:32px;padding-bottom:64px;max-width:1100px;">
     <h1 style="font-size:clamp(20px,5vw,28px);font-weight:800;color:var(--kgm-green-800);margin-bottom:24px;"><i class="bi bi-bag-check"></i> ชำระเงิน</h1>
+
+    @guest('customer')
+    <div class="guest-banner">
+        <span class="guest-banner-icon"><i class="bi bi-person-check"></i></span>
+        <div style="flex:1;min-width:180px;">
+            <div style="font-weight:800;color:var(--kgm-green-800);font-size:15px;">สั่งซื้อได้เลย ไม่ต้องสมัครสมาชิก</div>
+            <div style="font-size:13px;color:#6b7a72;margin-top:2px;">กรอกข้อมูลผู้รับให้ครบ แล้วยืนยันคำสั่งซื้อได้ทันที</div>
+        </div>
+        <a href="{{ route('login') }}" class="guest-banner-link">
+            <i class="bi bi-box-arrow-in-right"></i> มีบัญชีอยู่แล้ว? เข้าสู่ระบบ
+        </a>
+    </div>
+    @endguest
 
     <form method="POST" action="{{ route('checkout.store') }}" x-data="checkoutForm()">
         @csrf
@@ -269,8 +288,8 @@ function checkoutForm() {
         get grandTotal() { return this.subtotalAfterDiscount + this.shipDisplay; },
         fmt(n, dec = 2) { return Number(n).toLocaleString('th-TH', { minimumFractionDigits: dec, maximumFractionDigits: dec }); },
         form: {
-            ship_name: '{{ old('ship_name', $defaultAddress?->recipient_name ?? auth()->user()->name) }}',
-            ship_phone: '{{ old('ship_phone', $defaultAddress?->phone ?? auth()->user()->phone ?? '') }}',
+            ship_name: '{{ old('ship_name', $defaultAddress?->recipient_name ?? auth('customer')->user()?->name ?? '') }}',
+            ship_phone: '{{ old('ship_phone', $defaultAddress?->phone ?? auth('customer')->user()?->phone ?? '') }}',
             ship_address: '{{ old('ship_address', $defaultAddress?->address_line1 ?? '') }}',
             ship_district: '{{ old('ship_district', $defaultAddress?->district ?? '') }}',
             ship_amphoe: '{{ old('ship_amphoe', $defaultAddress?->amphoe ?? '') }}',

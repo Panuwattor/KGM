@@ -8,6 +8,7 @@ use App\Models\CustomerCoupon;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\CartService;
+use App\Services\SmsService;
 use App\Services\TelegramService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,6 +19,7 @@ class CheckoutController extends Controller
     public function __construct(
         private CartService $cart,
         private TelegramService $telegram,
+        private SmsService $sms,
     ) {}
 
     public function index()
@@ -40,9 +42,10 @@ class CheckoutController extends Controller
         $vatAmount             = round($subtotalAfterDiscount * 0.07, 2);
         $total                 = $subtotalAfterDiscount + $shippingFee;
 
-        /** @var \App\Models\Customer $customer */
+        // ลูกค้าทั่วไป (ไม่ได้ล็อกอิน) ไม่มีสมุดที่อยู่ → กรอกใหม่ทุกครั้ง
+        /** @var \App\Models\Customer|null $customer */
         $customer       = auth('customer')->user();
-        $addresses      = $customer->addresses()->get();
+        $addresses      = $customer ? $customer->addresses()->get() : collect();
         $defaultAddress = $addresses->where('is_default', true)->first();
 
         $pickupShowrooms = \App\Models\Showroom::active()
@@ -98,14 +101,17 @@ class CheckoutController extends Controller
         $vatAmount             = $request->boolean('needs_tax_invoice') ? round($subtotalAfterDiscount * 0.07, 2) : 0;
         $total                 = $subtotalAfterDiscount + $shippingFee;
 
-        /** @var \App\Models\Customer $customer */
-        $customer = auth('customer')->user();
-        $order = null;
+        /** @var \App\Models\Customer|null $customer */
+        $customer  = auth('customer')->user();
+        $isGuest   = $customer === null;
+        $order     = null;
 
-        DB::transaction(function () use ($request, $cartItems, $subtotal, $coupon, $stackedCoupon, $discountAmount, $shippingFee, $vatAmount, $total, $customer, $isPickup, $pickupShowroom, &$order) {
+        DB::transaction(function () use ($request, $cartItems, $subtotal, $coupon, $stackedCoupon, $discountAmount, $shippingFee, $vatAmount, $total, $customer, $isGuest, $isPickup, $pickupShowroom, &$order) {
             $order = Order::create([
                 'order_number'     => Order::generateOrderNumber(),
-                'customer_id'      => $customer->id,
+                'customer_id'      => $customer?->id,
+                'is_guest'         => $isGuest,
+                'guest_token'      => $isGuest ? Order::generateGuestToken() : null,
                 'status'           => 'pending_payment',
                 'delivery_method'  => $isPickup ? 'pickup' : 'ship',
                 'pickup_showroom_id' => $pickupShowroom?->id,
@@ -158,21 +164,26 @@ class CheckoutController extends Controller
             }
 
             // ใช้คูปองแล้ว: เพิ่มยอดใช้ และลบออกจากกระเป๋าลูกค้า (ต้องเก็บใหม่ถึงจะใช้ได้อีก)
+            // ลูกค้าทั่วไปไม่มีกระเป๋าคูปอง — นับยอดใช้อย่างเดียว
             if ($coupon) {
                 $coupon->increment('used_count');
-                CustomerCoupon::where('customer_id', $customer->id)
-                    ->where('coupon_id', $coupon->id)
-                    ->delete();
+                if ($customer) {
+                    CustomerCoupon::where('customer_id', $customer->id)
+                        ->where('coupon_id', $coupon->id)
+                        ->delete();
+                }
             }
             if ($stackedCoupon) {
                 $stackedCoupon->increment('used_count');
-                CustomerCoupon::where('customer_id', $customer->id)
-                    ->where('coupon_id', $stackedCoupon->id)
-                    ->delete();
+                if ($customer) {
+                    CustomerCoupon::where('customer_id', $customer->id)
+                        ->where('coupon_id', $stackedCoupon->id)
+                        ->delete();
+                }
             }
 
-            // บันทึกที่อยู่จัดส่งเข้าสมุดที่อยู่ ถ้ายังไม่มี (เฉพาะแบบจัดส่ง)
-            if (! $isPickup) {
+            // บันทึกที่อยู่จัดส่งเข้าสมุดที่อยู่ ถ้ายังไม่มี (เฉพาะสมาชิกที่เลือกแบบจัดส่ง)
+            if ($customer && ! $isPickup) {
                 $exists = $customer->addresses()
                     ->where('address_line1', $request->ship_address)
                     ->where('district', $request->ship_district)
@@ -202,22 +213,54 @@ class CheckoutController extends Controller
         assert($order instanceof Order);
         $this->telegram->notifyNewOrder($order);
 
+        // จำ token ไว้ใน session ลูกค้าทั่วไปจึงเข้าหน้าออเดอร์ต่อได้ทันทีโดยไม่ต้องใส่ ?token=
+        // และส่งลิงก์ทาง SMS ไว้เป็นทางกลับมาอีกทาง (SMS ล้มเหลวต้องไม่ทำให้ออเดอร์พัง)
+        if ($order->is_guest) {
+            session([$order->guestSessionKey() => $order->guest_token]);
+            session()->flash('order_sms_sent', $this->sms->sendOrderLink($order));
+        }
+
         return redirect()->route('checkout.success', $order);
     }
 
     public function success(Order $order)
     {
-        /** @var \App\Models\Customer $customer */
-        $customer = auth('customer')->user();
-        if ($order->customer_id !== $customer->id) abort(403);
+        $this->authorizeOrder($order);
         return view('frontend.checkout-success', compact('order'));
+    }
+
+    /** ติดตามออเดอร์ด้วยลิงก์ลับ — ลูกค้าทั่วไปกลับมาดูสถานะ/อัปโหลดสลิปได้ */
+    public function track(Request $request, Order $order)
+    {
+        $this->authorizeOrder($order, $request->query('token'));
+
+        // สมาชิกที่เปิดลิงก์นี้ ส่งไปหน้าออเดอร์ในบัญชีตัวเองแทน
+        if (! $order->is_guest && auth('customer')->check()) {
+            return redirect()->route('account.orders.show', $order);
+        }
+
+        return view('frontend.checkout-success', compact('order'));
+    }
+
+    /**
+     * อนุญาตเฉพาะเจ้าของออเดอร์ หรือผู้ถือลิงก์ลับ (token จาก query หรือที่จำไว้ใน session)
+     * เมื่อ token ถูกต้อง จะจำไว้ใน session ให้ใช้ต่อได้ทั้ง session
+     */
+    private function authorizeOrder(Order $order, ?string $queryToken = null): void
+    {
+        $customer = auth('customer')->user();
+        $token    = $queryToken ?: session($order->guestSessionKey());
+
+        if (! $order->isAccessibleBy($customer, $token)) abort(403);
+
+        if ($order->is_guest && $token) {
+            session([$order->guestSessionKey() => $token]);
+        }
     }
 
     public function uploadSlip(Request $request, Order $order)
     {
-        /** @var \App\Models\Customer $customer */
-        $customer = auth('customer')->user();
-        if ($order->customer_id !== $customer->id) abort(403);
+        $this->authorizeOrder($order, $request->input('token'));
 
         $request->validate(['slip' => 'required|image|max:5120']);
 

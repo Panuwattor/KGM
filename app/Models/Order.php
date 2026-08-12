@@ -12,7 +12,8 @@ class Order extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'order_number', 'customer_id', 'status', 'delivery_method', 'pickup_showroom_id',
+        'order_number', 'customer_id', 'is_guest', 'guest_token',
+        'status', 'delivery_method', 'pickup_showroom_id',
         'picked_up_at', 'subtotal', 'shipping_fee',
         'discount_amount', 'vat_amount', 'total', 'needs_tax_invoice',
         'tax_id', 'tax_branch', 'tax_company_name', 'tax_address',
@@ -24,6 +25,7 @@ class Order extends Model
     ];
 
     protected $casts = [
+        'is_guest' => 'boolean',
         'needs_tax_invoice' => 'boolean',
         'subtotal' => 'decimal:2',
         'shipping_fee' => 'decimal:2',
@@ -93,5 +95,35 @@ class Order extends Model
         $last = static::where('order_number', 'like', $prefix . '%')->latest()->first();
         $seq = $last ? (int) substr($last->order_number, -4) + 1 : 1;
         return $prefix . str_pad($seq, 4, '0', STR_PAD_LEFT);
+    }
+
+    /** กุญแจลับสำหรับลูกค้าที่ไม่ได้สมัครสมาชิก ใช้เข้าดูออเดอร์/อัปโหลดสลิป */
+    public static function generateGuestToken(): string
+    {
+        return \Illuminate\Support\Str::random(48);
+    }
+
+    /** ลิงก์เต็มที่ลูกค้าทั่วไปใช้กลับมาดูออเดอร์ได้ภายหลัง */
+    public function getGuestUrlAttribute(): ?string
+    {
+        if (! $this->guest_token) return null;
+        return route('order.track', ['order' => $this->order_number, 'token' => $this->guest_token]);
+    }
+
+    /**
+     * ตรวจสิทธิ์เข้าถึงออเดอร์: เจ้าของบัญชี หรือถือ token ที่ถูกต้อง
+     * (token เก็บใน session ด้วย ลูกค้าจึงกดรีเฟรช/อัปโหลดสลิปต่อได้โดยไม่ต้องพก ?token= ตลอด)
+     */
+    public function isAccessibleBy(?Customer $customer, ?string $token): bool
+    {
+        if ($customer && $this->customer_id === $customer->id) return true;
+        if ($this->guest_token && $token) return hash_equals($this->guest_token, $token);
+        return false;
+    }
+
+    /** คีย์ session ที่ใช้จำ token ของออเดอร์นี้ */
+    public function guestSessionKey(): string
+    {
+        return 'guest_order_token_' . $this->id;
     }
 }
